@@ -11,7 +11,7 @@ load_dotenv()
 # Discord Webhook設定
 WEBHOOK_URL = os.getenv(
     'DISCORD_WEBHOOK_URL',
-    'https://discordapp.com/api/webhooks/1461740489693986947/TBycLmvriQtEKM_jVJ8KjoZEwBUn4EqCaD4NMGxZAT25f26IvVc0gDBM91qdjQvWdbqY'
+    '${{ secrets.DISCORD_WEBHOOK_URL }}'
 )
 
 # ログ設定
