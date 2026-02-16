@@ -1,31 +1,60 @@
 name: 2. Trade Monitor
+
 on:
   schedule:
-    - cron: '0 23 * * 0-4' # JST 月-金 08:00 (UTC 日-木 23:00)
+    # JST 月-金 08:00 (UTC 日-木 23:00) に起動
+    - cron: '0 23 * * 0-4'
   workflow_dispatch:
+
 jobs:
   monitor:
     runs-on: ubuntu-latest
+    # ファイルをリポジトリに書き戻すために書き込み権限を付与
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           cache: 'pip'
+
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          pip install holidays pytz
+
       - name: Check Japan Holiday
+        id: holiday_check
         run: |
           python -c "
           import holidays, pytz, sys
           from datetime import datetime
           jst = pytz.timezone('Asia/Tokyo')
           if datetime.now(jst) in holidays.Japan():
-              print('Today is a holiday. Skipping...')
+              print('Today is a holiday in Japan. Skipping...')
               sys.exit(1)
           "
+        # 祝日の場合はここでジョブを終了させる
+        continue-on-error: false
+
       - name: Run Monitor
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        # monitor.pyは修正後の「5時間45分で自動終了する版」を使用してください
         run: python monitor.py
+
+      - name: Commit and Push trade records
+        # 途中でエラーが起きても、そこまでのトレード記録を保存するためにalways()を使用
+        if: always()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          # 作成・更新された可能性のあるすべての記録ファイルをステージング
+          git add *.csv *.json *.txt
+          # 変更がある場合のみコミットしてプッシュ
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update trade records and logs [skip ci]" && git push)
