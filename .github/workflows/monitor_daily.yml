@@ -20,13 +20,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12' # ここを 3.12 に変更
           cache: 'pip'
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install holidays pytz
+          python -m pip install --upgrade pip
+          pip install yfinance pandas numpy requests pytz python-dotenv xlrd holidays pandas-ta
 
       - name: Check Japan Holiday
         id: holiday_check
