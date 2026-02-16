@@ -1,0 +1,9 @@
+yfinance
+pandas
+pandas_ta
+numpy
+requests
+pytz
+python-dotenv
+xlrd
+holidays
