@@ -49,12 +49,19 @@ jobs:
         run: python monitor.py
 
       - name: Commit and Push trade records
-        # 途中でエラーが起きても、そこまでのトレード記録を保存するためにalways()を使用
         if: always()
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          # 作成・更新された可能性のあるすべての記録ファイルをステージング
-          git add *.csv *.json *.txt
-          # 変更がある場合のみコミットしてプッシュ
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update trade records and logs [skip ci]" && git push)
+          
+          # ファイルが存在する場合のみ追加（エラーを防ぐ）
+          # --ignore-unmatch を付けることで、ファイルがなくてもエラーにしない
+          git add --ignore-unmatch *.csv *.json *.txt
+          
+          # 変更（ステージングされたファイル）がある場合のみコミット
+          if ! git diff --cached --quiet; then
+            git commit -m "Update trade records and logs [skip ci]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
