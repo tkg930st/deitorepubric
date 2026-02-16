@@ -1,0 +1,34 @@
+name: 2. Trade Monitor
+on:
+  schedule:
+    - cron: '0 22 * * 0-4' # JST 月-金 07:00 (UTC 日-木 22:00)
+  workflow_dispatch:
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install holidays pytz
+      - name: Check Japan Holiday
+        id: holiday
+        run: |
+          python -c "
+          import holidays, pytz, sys
+          from datetime import datetime
+          jst = pytz.timezone('Asia/Tokyo')
+          if datetime.now(jst) in holidays.Japan():
+              print('Today is a holiday. Skipping...')
+              sys.exit(1)
+          "
+      - name: Run Monitor
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python monitor.py
