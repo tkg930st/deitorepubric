@@ -1,6 +1,6 @@
 yfinance
 pandas
-pandas_ta  # ← ここをアンダーバーに変更します
+pandas-ta
 numpy
 requests
 pytz
