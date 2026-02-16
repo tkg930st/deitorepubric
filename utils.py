@@ -534,6 +534,7 @@ def fetch_macro_sentiment() -> Dict[str, float]:
     V3: マクロ指標取得（前日比変化率 + VIX現在値）
     
     米国市場の前営業日のデータを取得し、変化率を計算します。
+    エラー時はデフォルト値を返します。
     
     Returns:
         {
@@ -544,66 +545,122 @@ def fetch_macro_sentiment() -> Dict[str, float]:
             'jpy_chg': float       # JPY=Xの前日比変化率（%）
         }
     """
-    from config import MARKET_SENTIMENT
+    import warnings
+    warnings.filterwarnings('ignore')
     
-    macro_tickers = MARKET_SENTIMENT.get('macro_tickers', {
-        'SOX': '^SOX',
-        'TNX': '^TNX',
-        'VIX': '^VIX',
-        'JPY': 'JPY=X'
-    })
-    
+    # デフォルト値（取得失敗時）
     result = {
         'sox_chg': 0.0,
         'tnx_chg': 0.0,
-        'vix_value': 0.0,
+        'vix_value': 18.0,  # VIXの典型的な値
         'vix_chg': 0.0,
         'jpy_chg': 0.0
     }
     
+    # ティッカーマップ（複数の代替シンボル）
+    ticker_alternatives = {
+        'SOX': ['^SOX', 'SOXX', 'SMH'],      # SOX指数、iShares半導体ETF、VanEck半導体ETF
+        'TNX': ['^TNX', '^TYX', 'IEF'],       # 米10年債、30年債、iShares債券ETF
+        'VIX': ['^VIX', 'VIXY'],              # 恐怖指数、VIX先物ETF
+        'JPY': ['JPY=X', 'JPYUSD=X', 'FXY']   # ドル円、円ETF
+    }
+    
     try:
-        logger.info("マクロ指標取得中...")
+        logger.info("=" * 60)
+        logger.info("マクロ指標取得開始")
+        logger.info("=" * 60)
         
-        # 各指標を取得（過去5営業日）
-        for key, ticker in macro_tickers.items():
-            try:
-                data = yf.download(ticker, period='5d', interval='1d', progress=False)
+        for key, tickers in ticker_alternatives.items():
+            success = False
+            
+            for ticker in tickers:
+                try:
+                    logger.info(f"試行: {key} <- {ticker}")
+                    
+                    # yfinanceでデータ取得
+                    try:
+                        ticker_obj = yf.Ticker(ticker)
+                        hist = ticker_obj.history(period='1mo', interval='1d')
+                    except Exception as fetch_err:
+                        logger.warning(f"  Ticker取得失敗: {str(fetch_err)}")
+                        continue
+                    
+                    # データ検証
+                    if hist is None or hist.empty:
+                        logger.warning(f"  データなし")
+                        continue
+                    
+                    if len(hist) < 2:
+                        logger.warning(f"  データ不足: {len(hist)}行")
+                        continue
+                    
+                    # Close価格を取得
+                    try:
+                        close_prices = hist['Close'].dropna()
+                        
+                        if len(close_prices) < 2:
+                            logger.warning(f"  Close価格不足")
+                            continue
+                        
+                        # 最新2日分
+                        latest = float(close_prices.iloc[-1])
+                        previous = float(close_prices.iloc[-2])
+                        
+                        # 変化率計算
+                        if previous > 0:
+                            change = ((latest / previous) - 1) * 100
+                        else:
+                            change = 0.0
+                        
+                    except (KeyError, IndexError, ValueError) as e:
+                        logger.warning(f"  価格計算エラー: {str(e)}")
+                        continue
+                    
+                    # 結果格納
+                    if key == 'SOX':
+                        result['sox_chg'] = round(change, 2)
+                        logger.info(f"✅ SOX: {change:+.2f}% (from {ticker})")
+                        success = True
+                        
+                    elif key == 'TNX':
+                        result['tnx_chg'] = round(change, 2)
+                        logger.info(f"✅ TNX: {change:+.2f}% (from {ticker})")
+                        success = True
+                        
+                    elif key == 'VIX':
+                        result['vix_value'] = round(latest, 2)
+                        result['vix_chg'] = round(change, 2)
+                        logger.info(f"✅ VIX: {latest:.2f} ({change:+.2f}%) (from {ticker})")
+                        success = True
+                        
+                    elif key == 'JPY':
+                        result['jpy_chg'] = round(change, 2)
+                        logger.info(f"✅ JPY: {change:+.2f}% (from {ticker})")
+                        success = True
+                    
+                    # 成功したらループを抜ける
+                    if success:
+                        break
                 
-                if data.empty or len(data) < 2:
-                    logger.warning(f"{key}（{ticker}）: データ不足")
+                except Exception as ticker_err:
+                    logger.warning(f"  {ticker} エラー: {str(ticker_err)}")
                     continue
                 
-                # 最新2日分を取得
-                close_today = data['Close'].iloc[-1]
-                close_yesterday = data['Close'].iloc[-2]
-                
-                # 変化率計算
-                change_pct = ((close_today / close_yesterday) - 1) * 100
-                
-                # 結果に格納
-                if key == 'SOX':
-                    result['sox_chg'] = change_pct
-                    logger.info(f"SOX変化率: {change_pct:+.2f}%")
-                elif key == 'TNX':
-                    result['tnx_chg'] = change_pct
-                    logger.info(f"TNX変化率: {change_pct:+.2f}%")
-                elif key == 'VIX':
-                    result['vix_value'] = close_today
-                    result['vix_chg'] = change_pct
-                    logger.info(f"VIX: {close_today:.2f} ({change_pct:+.2f}%)")
-                elif key == 'JPY':
-                    result['jpy_chg'] = change_pct
-                    logger.info(f"JPY=X変化率: {change_pct:+.2f}%")
-                
-                time.sleep(0.5)  # レート制限対策
-                
-            except Exception as e:
-                logger.error(f"{key}取得エラー: {str(e)}")
-                continue
+                finally:
+                    # レート制限対策
+                    time.sleep(0.5)
+            
+            if not success:
+                logger.warning(f"⚠️ {key}: すべてのティッカーで取得失敗（デフォルト値使用）")
         
+        logger.info("=" * 60)
         logger.info("マクロ指標取得完了")
+        logger.info(f"VIX={result['vix_value']:.2f}, SOX={result['sox_chg']:+.2f}%, TNX={result['tnx_chg']:+.2f}%")
+        logger.info("=" * 60)
+        
         return result
     
     except Exception as e:
         logger.error(f"マクロ指標取得全体エラー: {str(e)}")
+        logger.info("デフォルト値を返します")
         return result

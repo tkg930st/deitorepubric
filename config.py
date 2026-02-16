@@ -11,7 +11,7 @@ load_dotenv()
 # Discord Webhook設定
 WEBHOOK_URL = os.getenv(
     'DISCORD_WEBHOOK_URL',
-    '${{ secrets.DISCORD_WEBHOOK_URL }}'
+    'https://discordapp.com/api/webhooks/1461740489693986947/TBycLmvriQtEKM_jVJ8KjoZEwBUn4EqCaD4NMGxZAT25f26IvVc0gDBM91qdjQvWdbqY'
 )
 
 # ログ設定
@@ -108,10 +108,30 @@ POSITION_MANAGEMENT = {
     'positions_file': 'positions.json',  # ポジション管理ファイル
     'trade_results_file': 'trade_results.csv',  # 取引結果ファイル
     'tp1_multiplier': 1.5,  # TP1のATR倍率
-    'tp2_multiplier': 3.0,  # TP2のATR倍率
+    'tp2_multiplier': 3.0,  # TP2のATR倍率（Ver13.5: トレーリング初期値として使用）
     'tp1_exit_ratio': 0.5,  # TP1での決済比率（50%）
     'breakeven_enabled': True,  # TP1後に建値へ移動（Ver 12.0で有効化）
     'trailing_ma_period': 15,    # トレーリング停止判定用MA（Ver 10.3）
+    'trailing_atr_multiplier': 1.0,  # Ver 13.5: TP1後のトレーリングストップ幅（ATR×1.0）
+}
+
+# Ver 13.5: セクター・アライメント設定
+SECTOR_ALIGNMENT = {
+    'enabled': True,
+    'min_aligned_rivals': 2,     # アライメント判定に必要な最低一致数
+    'alignment_score': 15,       # セクター・アライメント加点
+    'volume_accel_score': 10,    # 出来高加速加点
+    'divergence_bonus_score': 20, # ダイバージェンス・ボーナス加点
+    'volume_accel_rvol_threshold': 1.2,  # 出来高加速判定のRVOL閾値
+}
+
+# Ver 13.5: 再試行ループ設定
+RETRY_OPTIMIZATION = {
+    'enabled': True,
+    'max_retries': 10,           # 最大再試行回数
+    'retry_top_n': 5,            # 再試行対象の上位N銘柄
+    'target_profit': 5.0,        # 突破目標利益（%）
+    'iterations_per_retry': 500, # 1回あたりの最適化試行数
 }
 
 # 出力ファイル
