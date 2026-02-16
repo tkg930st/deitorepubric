@@ -1,0 +1,31 @@
+name: 1. Strategy Analyzer
+on:
+  schedule:
+    - cron: '0 16 * * 0-4' # JST 火-土 01:00 (UTC 月-金 16:00)
+  workflow_dispatch:
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install holidays pytz
+      - name: Run Analyzer
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python analyzer.py
+      - name: Commit and Push config
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add best_config.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update strategy config" && git push)
