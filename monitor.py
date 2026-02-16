@@ -709,6 +709,7 @@ def monitor():
         startup_msg += f"\n\n🚫 **エントリー禁止設定:**\n" + "\n".join(disabled_info)
     
     send_discord_notification(WEBHOOK_URL, startup_msg)
+    start_run_time = time.time() # 実行開始時間の記録
     
     try:
         # 地合い判定
@@ -759,6 +760,12 @@ def monitor():
         
         while True:
             current_time = datetime.now(pytz.timezone('Asia/Tokyo')).time()
+            
+            # --- GitHub Actions 6時間制限対策 ---
+            if time.time() - start_run_time > 20700: # 5時間45分経過
+                send_discord_notification(WEBHOOK_URL, "⚠️ **実行制限（6時間）が近づいたため、サマリーを送信して終了します。**")
+                send_daily_summary()
+                break
             
             if current_time >= dt_time.fromisoformat(MONITORING_LOOP['end_time']):
                 # Ver 12.0: 15:00サマリー通知
