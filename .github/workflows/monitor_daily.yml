@@ -54,9 +54,11 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # ファイルが存在する場合のみ追加（エラーを防ぐ）
-          # --ignore-unmatch を付けることで、ファイルがなくてもエラーにしない
-          git add --ignore-unmatch *.csv *.json *.txt
+          # 作成された可能性のあるファイルを個別にチェックして追加
+          # ファイルが存在する場合のみ追加することで、ワイルドカードのエラーを回避します
+          ls *.csv 2>/dev/null && git add *.csv || echo "No CSV files found"
+          ls *.json 2>/dev/null && git add *.json || echo "No JSON files found"
+          ls *.txt 2>/dev/null && git add *.txt || echo "No log files found"
           
           # 変更（ステージングされたファイル）がある場合のみコミット
           if ! git diff --cached --quiet; then
