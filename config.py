@@ -9,10 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Discord Webhook設定
-WEBHOOK_URL = os.getenv(
-    'DISCORD_WEBHOOK_URL',
-    'https://discordapp.com/api/webhooks/1461740489693986947/TBycLmvriQtEKM_jVJ8KjoZEwBUn4EqCaD4NMGxZAT25f26IvVc0gDBM91qdjQvWdbqY'
-)
+WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 # ログ設定
 LOG_FILE = 'execution_log.txt'
