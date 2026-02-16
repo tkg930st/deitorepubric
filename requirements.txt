@@ -1,6 +1,6 @@
 yfinance
 pandas
-git+https://github.com/twopirllc/pandas-ta.git
+pandas-ta==0.3.14b0
 numpy
 requests
 pytz
