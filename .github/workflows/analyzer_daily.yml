@@ -17,8 +17,10 @@ jobs:
           cache: 'pip'
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install holidays pytz
+          python -m pip install --upgrade pip
+          pip install yfinance pandas numpy requests pytz python-dotenv xlrd holidays
+          # pandas-taのみ別途、確実にインストールを試みる
+          pip install pandas-ta || pip install pandas_ta
       - name: Run Analyzer
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
