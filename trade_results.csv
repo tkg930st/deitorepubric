@@ -1,0 +1,2 @@
+ticker,side,entry_price,entry_time,exit_price,exit_time,exit_reason,tp1_hit,tp1_profit,final_profit,total_profit
+3110.T,LONG,21010.0,2026-02-17T04:50:01.892176,21010.0,2026-02-17T04:55:18.948792,TRAILING_EXIT,True,1.003654762068007,0.0,0.5018273810340035

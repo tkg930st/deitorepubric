@@ -19,3 +19,1965 @@
 2026-02-16 13:28:33,045 - utils - INFO - データ取得開始: 8銘柄, period=1d, interval=5m
 2026-02-16 13:28:33,393 - utils - INFO - データ取得完了: shape=(66, 40)
 2026-02-16 13:28:33,408 - __main__ - INFO - 取引結果ファイルが存在しません
+2026-02-16 23:30:26,196 - position_manager - INFO - ポジションファイルが存在しません。新規作成: positions.json
+2026-02-16 23:30:26,537 - utils - INFO - Discord通知送信成功
+2026-02-17 00:30:06,615 - utils - INFO - ============================================================
+2026-02-17 00:30:06,615 - utils - INFO - マクロ指標取得開始
+2026-02-17 00:30:06,615 - utils - INFO - ============================================================
+2026-02-17 00:30:06,615 - utils - INFO - 試行: SOX <- ^SOX
+2026-02-17 00:30:07,297 - utils - INFO - ✅ SOX: +0.66% (from ^SOX)
+2026-02-17 00:30:07,797 - utils - INFO - 試行: TNX <- ^TNX
+2026-02-17 00:30:07,953 - utils - INFO - ✅ TNX: -1.17% (from ^TNX)
+2026-02-17 00:30:08,453 - utils - INFO - 試行: VIX <- ^VIX
+2026-02-17 00:30:08,662 - utils - INFO - ✅ VIX: 21.20 (+2.91%) (from ^VIX)
+2026-02-17 00:30:09,162 - utils - INFO - 試行: JPY <- JPY=X
+2026-02-17 00:30:09,372 - utils - INFO - ✅ JPY: +0.35% (from JPY=X)
+2026-02-17 00:30:09,872 - utils - INFO - ============================================================
+2026-02-17 00:30:09,872 - utils - INFO - マクロ指標取得完了
+2026-02-17 00:30:09,872 - utils - INFO - VIX=21.20, SOX=+0.66%, TNX=-1.17%
+2026-02-17 00:30:09,872 - utils - INFO - ============================================================
+2026-02-17 00:30:10,108 - utils - INFO - Discord通知送信成功
+2026-02-17 00:30:10,109 - utils - INFO - データ取得開始: 8銘柄, period=1d, interval=5m
+2026-02-17 00:30:10,681 - yfinance - ERROR - $3103.T: possibly delisted; no price data found  (period=1d)
+2026-02-17 00:30:10,787 - yfinance - ERROR - 
+1 Failed download:
+2026-02-17 00:30:10,788 - yfinance - ERROR - ['3103.T']: possibly delisted; no price data found  (period=1d)
+2026-02-17 00:30:10,792 - utils - INFO - データ取得完了: shape=(4, 41)
+2026-02-17 00:30:10,805 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:30:14,732 - utils - INFO - データ取得完了: shape=(271, 200)
+2026-02-17 00:30:14,793 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:30:14,794 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:30:15,311 - utils - INFO - データ取得完了: shape=(271, 40)
+2026-02-17 00:30:15,546 - __main__ - INFO - 3103.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:30:15,603 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:30:15,631 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:30:15,645 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:31:15,646 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:31:22,270 - utils - INFO - データ取得完了: shape=(271, 200)
+2026-02-17 00:31:22,336 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:31:22,337 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:31:22,845 - utils - INFO - データ取得完了: shape=(271, 40)
+2026-02-17 00:31:22,928 - __main__ - INFO - 6330.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:32:22,956 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:32:25,382 - utils - INFO - データ取得完了: shape=(271, 200)
+2026-02-17 00:32:25,443 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:32:25,444 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:32:26,014 - utils - INFO - データ取得完了: shape=(271, 40)
+2026-02-17 00:32:26,042 - __main__ - INFO - 6590.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:33:26,127 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:33:28,657 - utils - INFO - データ取得完了: shape=(271, 200)
+2026-02-17 00:33:28,718 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:33:28,718 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:33:29,361 - utils - INFO - データ取得完了: shape=(271, 40)
+2026-02-17 00:33:29,403 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:34:29,472 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:34:32,028 - utils - INFO - データ取得完了: shape=(271, 200)
+2026-02-17 00:34:32,088 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:34:32,089 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:34:32,694 - utils - INFO - データ取得完了: shape=(271, 40)
+2026-02-17 00:35:32,805 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:35:35,476 - utils - INFO - データ取得完了: shape=(272, 200)
+2026-02-17 00:35:35,537 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:35:35,537 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:35:36,108 - utils - INFO - データ取得完了: shape=(272, 40)
+2026-02-17 00:35:36,137 - __main__ - INFO - 6590.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:35:36,138 - __main__ - INFO - ジャーナル記録: 6590.T SHORT
+2026-02-17 00:35:36,469 - utils - INFO - Discord通知送信成功
+2026-02-17 00:35:36,471 - position_manager - INFO - ポジション保存完了: 1件
+2026-02-17 00:35:36,471 - position_manager - INFO - ポジション追加: 6590.T SHORT Entry=23900.0, SL=24197.8, TP1=23703.1, TP2=23479.1
+2026-02-17 00:35:36,515 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:35:36,529 - __main__ - INFO - 6330.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:35:36,546 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:35:36,560 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:36:36,561 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:36:39,107 - utils - INFO - データ取得完了: shape=(272, 200)
+2026-02-17 00:36:39,168 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:36:39,169 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:36:39,632 - utils - INFO - データ取得完了: shape=(272, 40)
+2026-02-17 00:36:39,674 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:37:39,744 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:37:42,484 - utils - INFO - データ取得完了: shape=(272, 200)
+2026-02-17 00:37:42,545 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:37:42,546 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:37:43,064 - utils - INFO - データ取得完了: shape=(272, 40)
+2026-02-17 00:38:43,179 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:38:45,643 - utils - INFO - データ取得完了: shape=(272, 200)
+2026-02-17 00:38:45,705 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:38:45,705 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:38:46,224 - utils - INFO - データ取得完了: shape=(272, 40)
+2026-02-17 00:39:46,334 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:39:48,808 - utils - INFO - データ取得完了: shape=(272, 200)
+2026-02-17 00:39:48,868 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:39:48,869 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:39:49,458 - utils - INFO - データ取得完了: shape=(272, 40)
+2026-02-17 00:39:49,514 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:40:49,570 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:40:52,366 - utils - INFO - データ取得完了: shape=(273, 200)
+2026-02-17 00:40:52,427 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:40:52,428 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:40:52,924 - utils - INFO - データ取得完了: shape=(273, 40)
+2026-02-17 00:40:52,952 - position_manager - INFO - ポジション保存完了: 1件
+2026-02-17 00:40:52,952 - position_manager - INFO - 6590.T: TP1達成 価格=23703.1, 損益=0.82%
+2026-02-17 00:40:52,952 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'set_trailing_stop'
+2026-02-17 00:40:52,993 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:40:53,007 - __main__ - INFO - 6330.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:40:53,021 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:40:53,035 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:41:53,036 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:41:55,669 - utils - INFO - データ取得完了: shape=(273, 200)
+2026-02-17 00:41:55,736 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:41:55,737 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:41:56,391 - utils - INFO - データ取得完了: shape=(273, 40)
+2026-02-17 00:41:56,419 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:41:56,433 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:41:56,448 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:42:56,504 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:42:58,920 - utils - INFO - データ取得完了: shape=(273, 200)
+2026-02-17 00:42:58,981 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:42:58,982 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:42:59,470 - utils - INFO - データ取得完了: shape=(273, 40)
+2026-02-17 00:42:59,498 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:43:59,580 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:44:02,051 - utils - INFO - データ取得完了: shape=(273, 200)
+2026-02-17 00:44:02,113 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:44:02,113 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:44:02,669 - utils - INFO - データ取得完了: shape=(273, 40)
+2026-02-17 00:44:02,697 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:45:02,779 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:45:05,319 - utils - INFO - データ取得完了: shape=(274, 200)
+2026-02-17 00:45:05,381 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:45:05,381 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:45:05,922 - utils - INFO - データ取得完了: shape=(274, 40)
+2026-02-17 00:45:05,951 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:45:05,965 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:45:05,979 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:45:05,994 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:45:06,008 - __main__ - INFO - 6330.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:45:06,022 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:45:06,037 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:46:06,038 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:46:08,802 - utils - INFO - データ取得完了: shape=(274, 200)
+2026-02-17 00:46:08,864 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:46:08,864 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:46:09,420 - utils - INFO - データ取得完了: shape=(274, 40)
+2026-02-17 00:46:09,448 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:47:09,530 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:47:11,935 - utils - INFO - データ取得完了: shape=(274, 200)
+2026-02-17 00:47:11,996 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:47:11,997 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:47:12,498 - utils - INFO - データ取得完了: shape=(274, 40)
+2026-02-17 00:47:12,526 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:48:12,609 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:48:15,050 - utils - INFO - データ取得完了: shape=(274, 200)
+2026-02-17 00:48:15,112 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:48:15,112 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:48:15,673 - utils - INFO - データ取得完了: shape=(274, 40)
+2026-02-17 00:48:15,701 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:49:15,783 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:49:18,621 - utils - INFO - データ取得完了: shape=(274, 200)
+2026-02-17 00:49:18,683 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:49:18,683 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:49:19,278 - utils - INFO - データ取得完了: shape=(274, 40)
+2026-02-17 00:49:19,306 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:50:19,389 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:50:21,880 - utils - INFO - データ取得完了: shape=(275, 200)
+2026-02-17 00:50:21,947 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:50:21,947 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:50:22,452 - utils - INFO - データ取得完了: shape=(275, 40)
+2026-02-17 00:50:22,481 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:50:22,495 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:50:22,510 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:50:22,525 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:50:22,553 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:50:22,567 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:51:22,568 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:51:25,144 - utils - INFO - データ取得完了: shape=(275, 200)
+2026-02-17 00:51:25,206 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:51:25,207 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:51:25,736 - utils - INFO - データ取得完了: shape=(275, 40)
+2026-02-17 00:51:25,765 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:51:25,820 - __main__ - INFO - 6330.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:52:25,848 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:52:28,353 - utils - INFO - データ取得完了: shape=(275, 200)
+2026-02-17 00:52:28,414 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:52:28,414 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:52:28,962 - utils - INFO - データ取得完了: shape=(275, 40)
+2026-02-17 00:52:28,990 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:53:29,072 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:53:31,708 - utils - INFO - データ取得完了: shape=(275, 200)
+2026-02-17 00:53:31,770 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:53:31,770 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:53:32,486 - utils - INFO - データ取得完了: shape=(275, 40)
+2026-02-17 00:53:32,514 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:54:32,598 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:54:35,541 - utils - INFO - データ取得完了: shape=(275, 200)
+2026-02-17 00:54:35,602 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:54:35,603 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:54:36,128 - utils - INFO - データ取得完了: shape=(275, 40)
+2026-02-17 00:54:36,156 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:55:36,239 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:55:38,712 - utils - INFO - データ取得完了: shape=(276, 200)
+2026-02-17 00:55:38,774 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:55:38,774 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:55:39,295 - utils - INFO - データ取得完了: shape=(276, 40)
+2026-02-17 00:55:39,323 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:55:39,337 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:55:39,352 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:55:39,369 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:55:39,397 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:55:39,411 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:56:39,412 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:56:41,934 - utils - INFO - データ取得完了: shape=(276, 200)
+2026-02-17 00:56:41,996 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:56:41,996 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:56:42,951 - utils - INFO - データ取得完了: shape=(276, 40)
+2026-02-17 00:56:42,980 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:57:43,061 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:57:45,485 - utils - INFO - データ取得完了: shape=(276, 200)
+2026-02-17 00:57:45,551 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:57:45,551 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:57:46,111 - utils - INFO - データ取得完了: shape=(276, 40)
+2026-02-17 00:57:46,140 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:58:46,223 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:58:48,850 - utils - INFO - データ取得完了: shape=(276, 200)
+2026-02-17 00:58:48,912 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:58:48,912 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:58:49,509 - utils - INFO - データ取得完了: shape=(276, 40)
+2026-02-17 00:58:49,537 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 00:58:49,592 - __main__ - INFO - 6330.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 00:59:49,620 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 00:59:52,094 - utils - INFO - データ取得完了: shape=(276, 200)
+2026-02-17 00:59:52,155 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 00:59:52,155 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 00:59:52,691 - utils - INFO - データ取得完了: shape=(276, 40)
+2026-02-17 00:59:52,719 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:00:52,802 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:00:55,402 - utils - INFO - データ取得完了: shape=(277, 200)
+2026-02-17 01:00:55,468 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:00:55,468 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:00:56,057 - utils - INFO - データ取得完了: shape=(277, 40)
+2026-02-17 01:00:56,086 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:00:56,100 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:00:56,115 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:00:56,130 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:00:56,158 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:00:56,172 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:01:56,173 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:01:58,572 - utils - INFO - データ取得完了: shape=(277, 200)
+2026-02-17 01:01:58,637 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:01:58,637 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:01:59,186 - utils - INFO - データ取得完了: shape=(277, 40)
+2026-02-17 01:01:59,214 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:02:59,296 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:03:01,824 - utils - INFO - データ取得完了: shape=(277, 200)
+2026-02-17 01:03:01,885 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:03:01,885 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:03:02,449 - utils - INFO - データ取得完了: shape=(277, 40)
+2026-02-17 01:03:02,477 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:04:02,559 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:04:05,158 - utils - INFO - データ取得完了: shape=(277, 200)
+2026-02-17 01:04:05,225 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:04:05,225 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:04:05,815 - utils - INFO - データ取得完了: shape=(277, 40)
+2026-02-17 01:04:05,843 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:05:05,926 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:05:08,309 - utils - INFO - データ取得完了: shape=(278, 200)
+2026-02-17 01:05:08,371 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:05:08,371 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:05:08,990 - utils - INFO - データ取得完了: shape=(278, 40)
+2026-02-17 01:05:09,019 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:05:09,033 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:05:09,048 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:05:09,063 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:05:09,091 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:06:09,105 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:06:11,699 - utils - INFO - データ取得完了: shape=(278, 200)
+2026-02-17 01:06:11,761 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:06:11,761 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:06:12,327 - utils - INFO - データ取得完了: shape=(278, 40)
+2026-02-17 01:06:12,355 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:06:12,444 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:07:12,445 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:07:15,002 - utils - INFO - データ取得完了: shape=(278, 200)
+2026-02-17 01:07:15,067 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:07:15,067 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:07:15,658 - utils - INFO - データ取得完了: shape=(278, 40)
+2026-02-17 01:07:15,686 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:07:15,741 - __main__ - INFO - 6330.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:08:15,769 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:08:18,223 - utils - INFO - データ取得完了: shape=(278, 200)
+2026-02-17 01:08:18,285 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:08:18,286 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:08:18,854 - utils - INFO - データ取得完了: shape=(278, 40)
+2026-02-17 01:08:18,882 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:09:18,965 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:09:21,469 - utils - INFO - データ取得完了: shape=(278, 200)
+2026-02-17 01:09:21,531 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:09:21,531 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:09:22,182 - utils - INFO - データ取得完了: shape=(278, 40)
+2026-02-17 01:09:22,211 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:10:22,294 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:10:24,931 - utils - INFO - データ取得完了: shape=(279, 200)
+2026-02-17 01:10:24,991 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:10:24,992 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:10:25,523 - utils - INFO - データ取得完了: shape=(279, 40)
+2026-02-17 01:10:25,551 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:10:25,564 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:10:25,580 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:10:25,595 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:10:25,623 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:10:25,637 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:11:25,638 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:11:28,167 - utils - INFO - データ取得完了: shape=(279, 200)
+2026-02-17 01:11:28,229 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:11:28,229 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:11:28,803 - utils - INFO - データ取得完了: shape=(279, 40)
+2026-02-17 01:11:28,832 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:12:28,915 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:12:31,257 - utils - INFO - データ取得完了: shape=(279, 200)
+2026-02-17 01:12:31,318 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:12:31,318 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:12:31,842 - utils - INFO - データ取得完了: shape=(279, 40)
+2026-02-17 01:12:31,870 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:13:31,953 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:13:34,352 - utils - INFO - データ取得完了: shape=(279, 200)
+2026-02-17 01:13:34,417 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:13:34,417 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:13:34,963 - utils - INFO - データ取得完了: shape=(279, 40)
+2026-02-17 01:13:34,991 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:14:35,074 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:14:37,623 - utils - INFO - データ取得完了: shape=(279, 200)
+2026-02-17 01:14:37,684 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:14:37,684 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:14:38,214 - utils - INFO - データ取得完了: shape=(279, 40)
+2026-02-17 01:14:38,242 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:15:38,327 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:15:40,780 - utils - INFO - データ取得完了: shape=(280, 200)
+2026-02-17 01:15:40,840 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:15:40,841 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:15:41,381 - utils - INFO - データ取得完了: shape=(280, 40)
+2026-02-17 01:15:41,424 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:15:41,438 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:15:41,453 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:15:41,481 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:15:41,495 - __main__ - INFO - 8303.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:15:41,496 - __main__ - INFO - ジャーナル記録: 8303.T SHORT
+2026-02-17 01:15:41,785 - utils - INFO - Discord通知送信成功
+2026-02-17 01:15:41,787 - position_manager - INFO - ポジション保存完了: 2件
+2026-02-17 01:15:41,787 - position_manager - INFO - ポジション追加: 8303.T SHORT Entry=1946.0, SL=1956.3, TP1=1935.5, TP2=1934.6
+2026-02-17 01:16:41,788 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:16:44,286 - utils - INFO - データ取得完了: shape=(280, 200)
+2026-02-17 01:16:44,348 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:16:44,349 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:16:44,874 - utils - INFO - データ取得完了: shape=(280, 40)
+2026-02-17 01:16:44,902 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:17:44,983 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:17:47,424 - utils - INFO - データ取得完了: shape=(280, 200)
+2026-02-17 01:17:47,485 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:17:47,485 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:17:48,020 - utils - INFO - データ取得完了: shape=(280, 40)
+2026-02-17 01:17:48,048 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:18:48,134 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:18:50,740 - utils - INFO - データ取得完了: shape=(280, 200)
+2026-02-17 01:18:50,801 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:18:50,801 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:18:51,339 - utils - INFO - データ取得完了: shape=(280, 40)
+2026-02-17 01:18:51,367 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:19:51,449 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:19:53,965 - utils - INFO - データ取得完了: shape=(280, 200)
+2026-02-17 01:19:54,026 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:19:54,027 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:19:54,591 - utils - INFO - データ取得完了: shape=(280, 40)
+2026-02-17 01:19:54,619 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:20:54,700 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:20:57,182 - utils - INFO - データ取得完了: shape=(281, 200)
+2026-02-17 01:20:57,243 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:20:57,243 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:20:57,736 - utils - INFO - データ取得完了: shape=(281, 40)
+2026-02-17 01:20:57,765 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:20:57,779 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:20:57,793 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:20:57,810 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:20:57,838 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:21:57,852 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:22:00,371 - utils - INFO - データ取得完了: shape=(281, 200)
+2026-02-17 01:22:00,433 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:22:00,433 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:22:01,065 - utils - INFO - データ取得完了: shape=(281, 40)
+2026-02-17 01:22:01,094 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:23:01,176 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:23:03,834 - utils - INFO - データ取得完了: shape=(281, 200)
+2026-02-17 01:23:03,896 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:23:03,896 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:23:04,460 - utils - INFO - データ取得完了: shape=(281, 40)
+2026-02-17 01:23:04,489 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:24:04,571 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:24:07,165 - utils - INFO - データ取得完了: shape=(281, 200)
+2026-02-17 01:24:07,230 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:24:07,230 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:24:07,780 - utils - INFO - データ取得完了: shape=(281, 40)
+2026-02-17 01:24:07,809 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:25:07,892 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:25:10,523 - utils - INFO - データ取得完了: shape=(282, 200)
+2026-02-17 01:25:10,584 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:25:10,584 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:25:11,408 - utils - INFO - データ取得完了: shape=(282, 40)
+2026-02-17 01:25:11,450 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:25:11,465 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:25:11,480 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:25:11,510 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:26:11,525 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:26:13,927 - utils - INFO - データ取得完了: shape=(282, 200)
+2026-02-17 01:26:13,989 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:26:13,989 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:26:14,545 - utils - INFO - データ取得完了: shape=(282, 40)
+2026-02-17 01:26:14,573 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:27:14,656 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:27:17,217 - utils - INFO - データ取得完了: shape=(282, 200)
+2026-02-17 01:27:17,283 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:27:17,284 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:27:17,841 - utils - INFO - データ取得完了: shape=(282, 40)
+2026-02-17 01:27:17,869 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:28:17,952 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:28:20,608 - utils - INFO - データ取得完了: shape=(282, 200)
+2026-02-17 01:28:20,669 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:28:20,669 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:28:21,247 - utils - INFO - データ取得完了: shape=(282, 40)
+2026-02-17 01:28:21,275 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:29:21,359 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:29:24,096 - utils - INFO - データ取得完了: shape=(282, 200)
+2026-02-17 01:29:24,158 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:29:24,158 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:29:24,672 - utils - INFO - データ取得完了: shape=(282, 40)
+2026-02-17 01:29:24,700 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:30:24,782 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:30:27,388 - utils - INFO - データ取得完了: shape=(283, 200)
+2026-02-17 01:30:27,450 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:30:27,450 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:30:27,977 - utils - INFO - データ取得完了: shape=(283, 40)
+2026-02-17 01:30:28,020 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:30:28,035 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:30:28,050 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:30:28,078 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:31:28,093 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:31:30,603 - utils - INFO - データ取得完了: shape=(283, 200)
+2026-02-17 01:31:30,665 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:31:30,665 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:31:31,206 - utils - INFO - データ取得完了: shape=(283, 40)
+2026-02-17 01:32:31,317 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:32:33,817 - utils - INFO - データ取得完了: shape=(283, 200)
+2026-02-17 01:32:33,878 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:32:33,878 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:32:34,424 - utils - INFO - データ取得完了: shape=(283, 40)
+2026-02-17 01:33:34,581 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:33:37,455 - utils - INFO - データ取得完了: shape=(283, 200)
+2026-02-17 01:33:37,516 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:33:37,516 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:33:38,184 - utils - INFO - データ取得完了: shape=(283, 40)
+2026-02-17 01:34:38,298 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:34:40,819 - utils - INFO - データ取得完了: shape=(283, 200)
+2026-02-17 01:34:40,881 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:34:40,881 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:34:41,432 - utils - INFO - データ取得完了: shape=(283, 40)
+2026-02-17 01:35:41,543 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:35:44,226 - utils - INFO - データ取得完了: shape=(284, 200)
+2026-02-17 01:35:44,288 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:35:44,288 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:35:44,789 - utils - INFO - データ取得完了: shape=(284, 40)
+2026-02-17 01:35:44,817 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:35:44,845 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:35:44,860 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:35:44,888 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:36:44,903 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:36:47,430 - utils - INFO - データ取得完了: shape=(284, 200)
+2026-02-17 01:36:47,491 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:36:47,492 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:36:48,007 - utils - INFO - データ取得完了: shape=(284, 40)
+2026-02-17 01:36:48,035 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:36:48,049 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:37:48,118 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:37:50,641 - utils - INFO - データ取得完了: shape=(284, 200)
+2026-02-17 01:37:50,702 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:37:50,703 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:37:51,290 - utils - INFO - データ取得完了: shape=(284, 40)
+2026-02-17 01:37:51,318 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:38:51,402 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:38:53,874 - utils - INFO - データ取得完了: shape=(284, 200)
+2026-02-17 01:38:53,935 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:38:53,935 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:38:54,613 - utils - INFO - データ取得完了: shape=(284, 40)
+2026-02-17 01:38:54,642 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:39:54,724 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:39:57,184 - utils - INFO - データ取得完了: shape=(284, 200)
+2026-02-17 01:39:57,245 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:39:57,246 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:39:57,860 - utils - INFO - データ取得完了: shape=(284, 40)
+2026-02-17 01:39:57,888 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:40:57,969 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:41:00,470 - utils - INFO - データ取得完了: shape=(285, 200)
+2026-02-17 01:41:00,531 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:41:00,532 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:41:01,011 - utils - INFO - データ取得完了: shape=(285, 40)
+2026-02-17 01:41:01,040 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:41:01,068 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:41:01,083 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:41:01,110 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:42:01,125 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:42:03,850 - utils - INFO - データ取得完了: shape=(285, 200)
+2026-02-17 01:42:03,911 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:42:03,912 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:42:04,514 - utils - INFO - データ取得完了: shape=(285, 40)
+2026-02-17 01:42:04,542 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:42:04,556 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:43:04,626 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:43:07,276 - utils - INFO - データ取得完了: shape=(285, 200)
+2026-02-17 01:43:07,338 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:43:07,338 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:43:08,002 - utils - INFO - データ取得完了: shape=(285, 40)
+2026-02-17 01:43:08,031 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:44:08,114 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:44:10,775 - utils - INFO - データ取得完了: shape=(285, 200)
+2026-02-17 01:44:10,844 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:44:10,844 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:44:11,425 - utils - INFO - データ取得完了: shape=(285, 40)
+2026-02-17 01:44:11,453 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:45:11,536 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:45:14,153 - utils - INFO - データ取得完了: shape=(286, 200)
+2026-02-17 01:45:14,215 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:45:14,215 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:45:14,796 - utils - INFO - データ取得完了: shape=(286, 40)
+2026-02-17 01:45:14,826 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:45:14,854 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:45:14,869 - __main__ - INFO - 9984.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:45:14,897 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:46:14,911 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:46:17,663 - utils - INFO - データ取得完了: shape=(286, 200)
+2026-02-17 01:46:17,724 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:46:17,725 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:46:18,576 - utils - INFO - データ取得完了: shape=(286, 40)
+2026-02-17 01:46:18,605 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:47:18,692 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:47:21,332 - utils - INFO - データ取得完了: shape=(286, 200)
+2026-02-17 01:47:21,397 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:47:21,397 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:47:21,974 - utils - INFO - データ取得完了: shape=(286, 40)
+2026-02-17 01:47:22,003 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:48:22,086 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:48:24,535 - utils - INFO - データ取得完了: shape=(286, 200)
+2026-02-17 01:48:24,596 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:48:24,596 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:48:25,109 - utils - INFO - データ取得完了: shape=(286, 40)
+2026-02-17 01:48:25,137 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:49:25,219 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:49:27,616 - utils - INFO - データ取得完了: shape=(286, 200)
+2026-02-17 01:49:27,677 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:49:27,677 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:49:28,215 - utils - INFO - データ取得完了: shape=(286, 40)
+2026-02-17 01:49:28,243 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:50:28,326 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:50:30,891 - utils - INFO - データ取得完了: shape=(287, 200)
+2026-02-17 01:50:30,953 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:50:30,953 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:50:31,575 - utils - INFO - データ取得完了: shape=(287, 40)
+2026-02-17 01:50:31,603 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:50:31,630 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:50:31,673 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:51:31,688 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:51:34,407 - utils - INFO - データ取得完了: shape=(287, 200)
+2026-02-17 01:51:34,468 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:51:34,469 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:51:35,076 - utils - INFO - データ取得完了: shape=(287, 40)
+2026-02-17 01:51:35,105 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:52:35,188 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:52:37,636 - utils - INFO - データ取得完了: shape=(287, 200)
+2026-02-17 01:52:37,698 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:52:37,698 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:52:38,262 - utils - INFO - データ取得完了: shape=(287, 40)
+2026-02-17 01:52:38,290 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:53:38,373 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:53:40,942 - utils - INFO - データ取得完了: shape=(287, 200)
+2026-02-17 01:53:41,002 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:53:41,002 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:53:41,593 - utils - INFO - データ取得完了: shape=(287, 40)
+2026-02-17 01:53:41,621 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:54:41,710 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:54:44,424 - utils - INFO - データ取得完了: shape=(287, 200)
+2026-02-17 01:54:44,489 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:54:44,489 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:54:45,196 - utils - INFO - データ取得完了: shape=(287, 40)
+2026-02-17 01:54:45,225 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:55:45,310 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:55:48,056 - utils - INFO - データ取得完了: shape=(288, 200)
+2026-02-17 01:55:48,118 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:55:48,118 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:55:48,688 - utils - INFO - データ取得完了: shape=(288, 40)
+2026-02-17 01:55:48,717 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:55:48,744 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:55:48,789 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 01:56:48,804 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:56:51,448 - utils - INFO - データ取得完了: shape=(288, 200)
+2026-02-17 01:56:51,511 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:56:51,511 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:56:52,067 - utils - INFO - データ取得完了: shape=(288, 40)
+2026-02-17 01:56:52,096 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:57:52,178 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:57:54,900 - utils - INFO - データ取得完了: shape=(288, 200)
+2026-02-17 01:57:54,962 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:57:54,962 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:57:55,467 - utils - INFO - データ取得完了: shape=(288, 40)
+2026-02-17 01:57:55,495 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:58:55,578 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 01:58:58,251 - utils - INFO - データ取得完了: shape=(288, 200)
+2026-02-17 01:58:58,312 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 01:58:58,313 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 01:58:58,865 - utils - INFO - データ取得完了: shape=(288, 40)
+2026-02-17 01:58:58,893 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 01:58:58,976 - position_manager - INFO - ポジション保存完了: 2件
+2026-02-17 01:58:58,976 - position_manager - INFO - 8303.T: TP1達成 価格=1935.5, 損益=0.54%
+2026-02-17 01:58:58,976 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'set_trailing_stop'
+2026-02-17 01:59:58,976 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:00:01,817 - utils - INFO - データ取得完了: shape=(288, 200)
+2026-02-17 02:00:01,878 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:00:01,878 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:00:02,473 - utils - INFO - データ取得完了: shape=(289, 40)
+2026-02-17 02:00:02,502 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:00:02,584 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:01:02,584 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:01:05,163 - utils - INFO - データ取得完了: shape=(289, 200)
+2026-02-17 02:01:05,226 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:01:05,226 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:01:05,839 - utils - INFO - データ取得完了: shape=(289, 40)
+2026-02-17 02:01:05,867 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:01:05,895 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:01:05,941 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:01:05,956 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:02:05,956 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:02:08,486 - utils - INFO - データ取得完了: shape=(289, 200)
+2026-02-17 02:02:08,548 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:02:08,548 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:02:09,073 - utils - INFO - データ取得完了: shape=(289, 40)
+2026-02-17 02:02:09,101 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:02:09,184 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:03:09,184 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:03:11,856 - utils - INFO - データ取得完了: shape=(289, 200)
+2026-02-17 02:03:11,916 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:03:11,917 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:03:12,479 - utils - INFO - データ取得完了: shape=(289, 40)
+2026-02-17 02:03:12,507 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:03:12,591 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:04:12,591 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:04:15,048 - utils - INFO - データ取得完了: shape=(289, 200)
+2026-02-17 02:04:15,109 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:04:15,109 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:04:15,743 - utils - INFO - データ取得完了: shape=(289, 40)
+2026-02-17 02:04:15,771 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:04:15,853 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:05:15,853 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:05:18,608 - utils - INFO - データ取得完了: shape=(290, 200)
+2026-02-17 02:05:18,670 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:05:18,670 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:05:19,221 - utils - INFO - データ取得完了: shape=(290, 40)
+2026-02-17 02:05:19,249 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:05:19,277 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:05:19,322 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:05:19,337 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:06:19,337 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:06:21,959 - utils - INFO - データ取得完了: shape=(290, 200)
+2026-02-17 02:06:22,021 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:06:22,021 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:06:22,644 - utils - INFO - データ取得完了: shape=(290, 40)
+2026-02-17 02:06:22,672 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:06:22,757 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:07:22,758 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:07:25,282 - utils - INFO - データ取得完了: shape=(290, 200)
+2026-02-17 02:07:25,345 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:07:25,345 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:07:25,874 - utils - INFO - データ取得完了: shape=(290, 40)
+2026-02-17 02:07:25,902 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:07:25,984 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:08:25,984 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:08:28,832 - utils - INFO - データ取得完了: shape=(290, 200)
+2026-02-17 02:08:28,893 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:08:28,893 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:08:29,409 - utils - INFO - データ取得完了: shape=(290, 40)
+2026-02-17 02:08:29,437 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:08:29,518 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:09:29,518 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:09:32,389 - utils - INFO - データ取得完了: shape=(290, 200)
+2026-02-17 02:09:32,450 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:09:32,450 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:09:33,035 - utils - INFO - データ取得完了: shape=(290, 40)
+2026-02-17 02:09:33,063 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:09:33,146 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:10:33,147 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:10:35,748 - utils - INFO - データ取得完了: shape=(291, 200)
+2026-02-17 02:10:35,809 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:10:35,809 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:10:36,385 - utils - INFO - データ取得完了: shape=(291, 40)
+2026-02-17 02:10:36,414 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:10:36,442 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:10:36,490 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:10:36,504 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:11:36,505 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:11:39,037 - utils - INFO - データ取得完了: shape=(291, 200)
+2026-02-17 02:11:39,098 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:11:39,099 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:11:39,733 - utils - INFO - データ取得完了: shape=(291, 40)
+2026-02-17 02:11:39,762 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:11:39,844 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:12:39,844 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:12:42,410 - utils - INFO - データ取得完了: shape=(291, 200)
+2026-02-17 02:12:42,472 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:12:42,472 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:12:43,031 - utils - INFO - データ取得完了: shape=(291, 40)
+2026-02-17 02:12:43,059 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:12:43,144 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:13:43,144 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:13:45,770 - utils - INFO - データ取得完了: shape=(291, 200)
+2026-02-17 02:13:45,830 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:13:45,831 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:13:46,323 - utils - INFO - データ取得完了: shape=(291, 40)
+2026-02-17 02:13:46,352 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:13:46,438 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:14:46,438 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:14:49,069 - utils - INFO - データ取得完了: shape=(291, 200)
+2026-02-17 02:14:49,130 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:14:49,131 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:14:49,787 - utils - INFO - データ取得完了: shape=(291, 40)
+2026-02-17 02:14:49,816 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:14:49,898 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:15:49,898 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:15:52,605 - utils - INFO - データ取得完了: shape=(292, 200)
+2026-02-17 02:15:52,666 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:15:52,667 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:15:53,195 - utils - INFO - データ取得完了: shape=(292, 40)
+2026-02-17 02:15:53,223 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:15:53,291 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:15:53,306 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:16:53,306 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:16:55,900 - utils - INFO - データ取得完了: shape=(292, 200)
+2026-02-17 02:16:55,961 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:16:55,962 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:16:56,535 - utils - INFO - データ取得完了: shape=(292, 40)
+2026-02-17 02:16:56,563 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:16:56,591 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:16:56,649 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:17:56,649 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:17:59,229 - utils - INFO - データ取得完了: shape=(292, 200)
+2026-02-17 02:17:59,290 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:17:59,291 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:17:59,790 - utils - INFO - データ取得完了: shape=(292, 40)
+2026-02-17 02:17:59,818 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:17:59,901 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:18:59,902 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:19:02,700 - utils - INFO - データ取得完了: shape=(292, 200)
+2026-02-17 02:19:02,762 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:19:02,762 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:19:03,358 - utils - INFO - データ取得完了: shape=(292, 40)
+2026-02-17 02:19:03,386 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:19:03,469 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:20:03,469 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:20:06,180 - utils - INFO - データ取得完了: shape=(293, 200)
+2026-02-17 02:20:06,241 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:20:06,241 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:20:06,754 - utils - INFO - データ取得完了: shape=(293, 40)
+2026-02-17 02:20:06,782 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:20:06,850 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:20:06,864 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:21:06,865 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:21:09,416 - utils - INFO - データ取得完了: shape=(293, 200)
+2026-02-17 02:21:09,477 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:21:09,477 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:21:10,055 - utils - INFO - データ取得完了: shape=(293, 40)
+2026-02-17 02:21:10,084 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:21:10,171 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:22:10,172 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:22:12,738 - utils - INFO - データ取得完了: shape=(293, 200)
+2026-02-17 02:22:12,799 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:22:12,799 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:22:13,308 - utils - INFO - データ取得完了: shape=(293, 40)
+2026-02-17 02:22:13,337 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:22:13,421 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:23:13,422 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:23:16,006 - utils - INFO - データ取得完了: shape=(293, 200)
+2026-02-17 02:23:16,068 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:23:16,068 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:23:16,521 - utils - INFO - データ取得完了: shape=(293, 40)
+2026-02-17 02:23:16,549 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:23:16,632 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:24:16,632 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:24:19,047 - utils - INFO - データ取得完了: shape=(293, 200)
+2026-02-17 02:24:19,108 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:24:19,108 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:24:19,710 - utils - INFO - データ取得完了: shape=(293, 40)
+2026-02-17 02:24:19,739 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:24:19,767 - __main__ - INFO - 5713.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:24:19,825 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:25:19,825 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:25:22,179 - utils - INFO - データ取得完了: shape=(294, 200)
+2026-02-17 02:25:22,241 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:25:22,241 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:25:22,771 - utils - INFO - データ取得完了: shape=(294, 40)
+2026-02-17 02:25:22,799 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:25:22,867 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:25:22,882 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:26:22,883 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:26:25,429 - utils - INFO - データ取得完了: shape=(294, 200)
+2026-02-17 02:26:25,490 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:26:25,490 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:26:25,998 - utils - INFO - データ取得完了: shape=(294, 40)
+2026-02-17 02:26:26,026 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:26:26,110 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:27:26,110 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:27:28,624 - utils - INFO - データ取得完了: shape=(294, 200)
+2026-02-17 02:27:28,685 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:27:28,685 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:27:29,300 - utils - INFO - データ取得完了: shape=(294, 40)
+2026-02-17 02:27:29,328 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:27:29,472 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:28:29,472 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:28:32,052 - utils - INFO - データ取得完了: shape=(294, 200)
+2026-02-17 02:28:32,113 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:28:32,114 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:28:32,680 - utils - INFO - データ取得完了: shape=(294, 40)
+2026-02-17 02:28:32,709 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:28:32,794 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:29:32,795 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:29:35,442 - utils - INFO - データ取得完了: shape=(294, 200)
+2026-02-17 02:29:35,503 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:29:35,503 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:29:36,035 - utils - INFO - データ取得完了: shape=(294, 40)
+2026-02-17 02:29:36,063 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:29:36,146 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:30:36,146 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:30:38,715 - utils - INFO - データ取得完了: shape=(295, 200)
+2026-02-17 02:30:38,776 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:30:38,776 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:30:39,261 - utils - INFO - データ取得完了: shape=(295, 40)
+2026-02-17 02:30:39,290 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:30:39,358 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:30:39,375 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:31:39,376 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:31:42,094 - utils - INFO - データ取得完了: shape=(295, 200)
+2026-02-17 02:31:42,159 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:31:42,159 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:31:42,703 - utils - INFO - データ取得完了: shape=(295, 40)
+2026-02-17 02:31:42,731 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:31:42,814 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:32:42,814 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:32:45,598 - utils - INFO - データ取得完了: shape=(295, 200)
+2026-02-17 02:32:45,659 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:32:45,660 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:32:46,199 - utils - INFO - データ取得完了: shape=(295, 40)
+2026-02-17 02:32:46,228 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:32:46,310 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:33:46,310 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:33:48,951 - utils - INFO - データ取得完了: shape=(295, 200)
+2026-02-17 02:33:49,012 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:33:49,012 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:33:49,542 - utils - INFO - データ取得完了: shape=(295, 40)
+2026-02-17 02:33:49,571 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:33:49,656 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:34:49,656 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:34:52,098 - utils - INFO - データ取得完了: shape=(295, 200)
+2026-02-17 02:34:52,160 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:34:52,160 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:34:52,735 - utils - INFO - データ取得完了: shape=(295, 40)
+2026-02-17 02:34:52,764 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:34:52,847 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:35:52,847 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:35:55,553 - utils - INFO - データ取得完了: shape=(296, 200)
+2026-02-17 02:35:55,615 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:35:55,615 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:35:56,151 - utils - INFO - データ取得完了: shape=(296, 40)
+2026-02-17 02:35:56,179 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:35:56,260 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:36:56,261 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:36:58,834 - utils - INFO - データ取得完了: shape=(296, 200)
+2026-02-17 02:36:58,896 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:36:58,896 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:36:59,445 - utils - INFO - データ取得完了: shape=(296, 40)
+2026-02-17 02:36:59,473 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:36:59,542 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:36:59,557 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:37:59,557 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:38:02,061 - utils - INFO - データ取得完了: shape=(296, 200)
+2026-02-17 02:38:02,122 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:38:02,122 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:38:02,665 - utils - INFO - データ取得完了: shape=(296, 40)
+2026-02-17 02:38:02,693 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:38:02,777 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:39:02,777 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:39:05,243 - utils - INFO - データ取得完了: shape=(296, 200)
+2026-02-17 02:39:05,304 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:39:05,305 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:39:05,878 - utils - INFO - データ取得完了: shape=(296, 40)
+2026-02-17 02:39:05,907 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:39:05,989 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:40:05,989 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:40:08,524 - utils - INFO - データ取得完了: shape=(297, 200)
+2026-02-17 02:40:08,586 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:40:08,586 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:40:09,263 - utils - INFO - データ取得完了: shape=(297, 40)
+2026-02-17 02:40:09,291 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:40:09,374 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:41:09,374 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:41:11,757 - utils - INFO - データ取得完了: shape=(297, 200)
+2026-02-17 02:41:11,818 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:41:11,818 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:41:12,456 - utils - INFO - データ取得完了: shape=(297, 40)
+2026-02-17 02:41:12,484 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:41:12,568 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:42:12,568 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:42:15,182 - utils - INFO - データ取得完了: shape=(297, 200)
+2026-02-17 02:42:15,244 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:42:15,244 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:42:15,760 - utils - INFO - データ取得完了: shape=(297, 40)
+2026-02-17 02:42:15,788 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:42:15,857 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 02:42:15,874 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:43:15,875 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:43:18,414 - utils - INFO - データ取得完了: shape=(297, 200)
+2026-02-17 02:43:18,475 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:43:18,475 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:43:19,015 - utils - INFO - データ取得完了: shape=(297, 40)
+2026-02-17 02:43:19,043 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:43:19,125 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:44:19,125 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:44:21,673 - utils - INFO - データ取得完了: shape=(297, 200)
+2026-02-17 02:44:21,735 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:44:21,735 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:44:22,308 - utils - INFO - データ取得完了: shape=(297, 40)
+2026-02-17 02:44:22,337 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:44:22,418 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:45:22,418 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:45:25,041 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:45:25,103 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:45:25,103 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:45:25,709 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:45:25,737 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:45:25,822 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:46:25,822 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:46:28,272 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:46:28,333 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:46:28,333 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:46:28,810 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:46:28,838 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:46:28,923 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:47:28,923 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:47:31,500 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:47:31,561 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:47:31,561 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:47:32,080 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:47:32,108 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:47:32,192 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:48:32,193 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:48:34,677 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:48:34,744 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:48:34,744 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:48:35,338 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:48:35,366 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:48:35,449 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:49:35,449 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:49:38,040 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:49:38,102 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:49:38,102 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:49:38,723 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:49:38,751 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:49:38,832 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:50:38,833 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:50:41,437 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:50:41,502 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:50:41,502 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:50:42,044 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:50:42,072 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:50:42,154 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:51:42,155 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:51:44,871 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:51:44,932 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:51:44,933 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:51:45,470 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:51:45,499 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:51:45,582 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:52:45,582 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:52:48,285 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:52:48,346 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:52:48,347 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:52:48,856 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:52:48,884 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:52:48,968 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:53:48,968 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:53:51,643 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:53:51,705 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:53:51,705 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:53:52,351 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:53:52,380 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:53:52,465 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:54:52,465 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:54:55,241 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:54:55,302 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:54:55,302 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:54:55,838 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:54:55,867 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:54:55,950 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:55:55,950 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:55:58,563 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:55:58,624 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:55:58,625 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:55:59,173 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:55:59,202 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:55:59,289 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:56:59,290 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:57:01,786 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:57:01,848 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:57:01,848 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:57:02,499 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:57:02,527 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:57:02,614 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:58:02,614 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:58:05,205 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:58:05,273 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:58:05,273 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:58:05,787 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:58:05,816 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:58:05,901 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:59:05,901 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 02:59:08,236 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 02:59:08,298 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 02:59:08,298 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 02:59:08,901 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 02:59:08,930 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 02:59:09,014 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:00:09,014 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:00:11,564 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:00:11,625 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:00:11,626 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:00:12,309 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:00:12,337 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:00:12,420 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:01:12,421 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:01:14,819 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:01:14,886 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:01:14,887 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:01:15,484 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:01:15,512 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:01:15,597 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:02:15,597 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:02:18,305 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:02:18,367 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:02:18,368 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:02:18,858 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:02:18,887 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:02:18,971 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:03:18,971 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:03:21,666 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:03:21,727 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:03:21,727 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:03:22,291 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:03:22,319 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:03:22,403 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:04:22,404 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:04:24,910 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:04:24,972 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:04:24,972 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:04:25,498 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:04:25,527 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:04:25,610 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:05:25,610 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:05:28,009 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:05:28,071 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:05:28,071 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:05:28,669 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:05:28,698 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:05:28,783 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:06:28,783 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:06:31,249 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:06:31,310 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:06:31,310 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:06:31,804 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:06:31,832 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:06:31,921 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:07:31,921 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:07:34,456 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:07:34,520 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:07:34,520 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:07:34,967 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:07:34,996 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:07:35,082 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:08:35,082 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:08:37,504 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:08:37,565 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:08:37,565 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:08:38,099 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:08:38,128 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:08:38,213 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:09:38,213 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:09:40,800 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:09:40,861 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:09:40,862 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:09:41,501 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:09:41,530 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:09:41,615 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:10:41,615 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:10:44,182 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:10:44,245 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:10:44,245 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:10:44,910 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:10:44,939 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:10:45,022 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:11:45,023 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:11:47,761 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:11:47,822 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:11:47,822 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:11:48,370 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:11:48,399 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:11:48,485 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:12:48,485 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:12:51,120 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:12:51,182 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:12:51,182 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:12:51,802 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:12:51,831 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:12:51,914 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:13:51,914 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:13:54,421 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:13:54,482 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:13:54,483 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:13:55,046 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:13:55,075 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:13:55,160 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:14:55,160 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:14:57,833 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:14:57,894 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:14:57,894 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:14:58,499 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:14:58,528 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:14:58,612 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:15:58,612 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:16:01,016 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:16:01,077 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:16:01,077 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:16:01,589 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:16:01,618 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:16:01,702 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:17:01,703 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:17:04,327 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:17:04,388 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:17:04,388 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:17:04,915 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:17:04,944 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:17:05,031 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:18:05,031 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:18:07,486 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:18:07,547 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:18:07,547 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:18:08,189 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:18:08,217 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:18:08,302 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:19:08,302 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:19:10,988 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:19:11,055 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:19:11,055 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:19:11,596 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:19:11,625 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:19:11,711 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:20:11,711 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:20:14,134 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:20:14,195 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:20:14,195 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:20:14,696 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:20:14,725 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:20:14,810 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:21:14,811 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:21:17,436 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:21:17,498 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:21:17,498 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:21:18,068 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:21:18,096 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:21:18,181 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:22:18,181 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:22:20,830 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:22:20,891 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:22:20,891 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:22:21,510 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:22:21,538 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:22:21,623 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:23:21,623 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:23:24,228 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:23:24,289 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:23:24,290 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:23:24,869 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:23:24,898 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:23:24,982 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:24:24,983 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:24:27,608 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:24:27,669 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:24:27,669 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:24:28,195 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:24:28,223 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:24:28,306 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:25:28,306 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:25:30,849 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:25:30,911 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:25:30,911 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:25:31,390 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:25:31,419 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:25:31,502 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:26:31,503 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:26:33,896 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:26:33,957 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:26:33,958 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:26:34,503 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:26:34,532 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:26:34,617 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:27:34,618 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:27:37,445 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:27:37,507 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:27:37,507 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:27:38,004 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:27:38,032 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:27:38,117 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:28:38,117 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:28:40,624 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:28:40,686 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:28:40,686 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:28:41,155 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:28:41,184 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:28:41,270 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:29:41,270 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:29:43,716 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:29:43,776 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:29:43,776 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:29:44,393 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:29:44,421 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:29:44,506 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:30:44,507 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:30:47,116 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:30:47,178 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:30:47,178 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:30:47,761 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:30:47,789 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:30:47,876 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:31:47,877 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:31:50,354 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:31:50,415 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:31:50,416 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:31:50,974 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:31:51,002 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:31:51,085 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:32:51,085 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:32:53,845 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:32:53,906 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:32:53,906 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:32:54,454 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:32:54,482 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:32:54,567 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:33:54,567 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:33:57,186 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:33:57,247 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:33:57,247 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:33:57,786 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:33:57,815 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:33:57,898 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:34:57,898 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:35:00,530 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:35:00,592 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:35:00,592 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:35:01,145 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:35:01,173 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:35:01,257 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:36:01,258 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:36:03,675 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:36:03,737 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:36:03,737 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:36:04,262 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:36:04,291 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:36:04,376 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:37:04,376 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:37:06,973 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:37:07,035 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:37:07,035 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:37:07,700 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:37:07,729 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:37:07,816 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:38:07,816 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:38:10,333 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:38:10,399 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:38:10,400 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:38:10,939 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:38:10,968 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:38:11,049 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:39:11,050 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:39:13,489 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:39:13,550 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:39:13,551 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:39:14,030 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:39:14,059 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:39:14,141 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:40:14,142 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:40:16,665 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:40:16,733 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:40:16,733 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:40:17,369 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:40:17,398 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:40:17,482 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:41:17,483 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:41:19,908 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:41:19,969 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:41:19,970 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:41:20,588 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:41:20,616 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:41:20,701 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:42:20,701 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:42:23,298 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:42:23,360 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:42:23,360 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:42:24,041 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:42:24,069 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:42:24,154 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:43:24,154 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:43:26,806 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:43:26,868 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:43:26,868 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:43:27,458 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:43:27,486 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:43:27,572 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:44:27,573 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:44:29,966 - utils - INFO - データ取得完了: shape=(298, 200)
+2026-02-17 03:44:30,027 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:44:30,027 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:44:30,508 - utils - INFO - データ取得完了: shape=(298, 40)
+2026-02-17 03:44:30,536 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:44:30,620 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:45:30,621 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:45:33,020 - utils - INFO - データ取得完了: shape=(299, 200)
+2026-02-17 03:45:33,081 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:45:33,081 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:45:33,591 - utils - INFO - データ取得完了: shape=(299, 40)
+2026-02-17 03:45:33,620 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:45:33,703 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:46:33,703 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:46:36,199 - utils - INFO - データ取得完了: shape=(299, 200)
+2026-02-17 03:46:36,261 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:46:36,261 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:46:36,777 - utils - INFO - データ取得完了: shape=(299, 40)
+2026-02-17 03:46:36,806 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:46:36,874 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 03:46:36,889 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:47:36,890 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:47:39,285 - utils - INFO - データ取得完了: shape=(299, 200)
+2026-02-17 03:47:39,345 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:47:39,346 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:47:39,988 - utils - INFO - データ取得完了: shape=(299, 40)
+2026-02-17 03:47:40,016 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:47:40,101 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:48:40,102 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:48:42,705 - utils - INFO - データ取得完了: shape=(299, 200)
+2026-02-17 03:48:42,764 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:48:42,765 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:48:43,273 - utils - INFO - データ取得完了: shape=(299, 40)
+2026-02-17 03:48:43,301 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:48:43,384 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:49:43,384 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:49:45,871 - utils - INFO - データ取得完了: shape=(299, 200)
+2026-02-17 03:49:45,932 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:49:45,932 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:49:46,471 - utils - INFO - データ取得完了: shape=(299, 40)
+2026-02-17 03:49:46,499 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:49:46,581 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:50:46,581 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:50:49,223 - utils - INFO - データ取得完了: shape=(300, 200)
+2026-02-17 03:50:49,284 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:50:49,285 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:50:49,803 - utils - INFO - データ取得完了: shape=(300, 40)
+2026-02-17 03:50:49,832 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:50:49,901 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 03:50:49,915 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:51:49,916 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:51:52,418 - utils - INFO - データ取得完了: shape=(300, 200)
+2026-02-17 03:51:52,480 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:51:52,480 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:51:53,045 - utils - INFO - データ取得完了: shape=(300, 40)
+2026-02-17 03:51:53,074 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:51:53,158 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:52:53,158 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:52:55,766 - utils - INFO - データ取得完了: shape=(300, 200)
+2026-02-17 03:52:55,828 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:52:55,828 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:52:56,444 - utils - INFO - データ取得完了: shape=(300, 40)
+2026-02-17 03:52:56,473 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:52:56,555 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:53:56,556 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:53:59,030 - utils - INFO - データ取得完了: shape=(300, 200)
+2026-02-17 03:53:59,091 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:53:59,092 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:53:59,666 - utils - INFO - データ取得完了: shape=(300, 40)
+2026-02-17 03:53:59,694 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:53:59,776 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:54:59,776 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:55:02,192 - utils - INFO - データ取得完了: shape=(301, 200)
+2026-02-17 03:55:02,252 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:55:02,252 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:55:02,841 - utils - INFO - データ取得完了: shape=(301, 40)
+2026-02-17 03:55:02,869 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:55:02,939 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 03:55:02,954 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:56:02,954 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:56:05,467 - utils - INFO - データ取得完了: shape=(301, 200)
+2026-02-17 03:56:05,532 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:56:05,532 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:56:06,054 - utils - INFO - データ取得完了: shape=(301, 40)
+2026-02-17 03:56:06,082 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:56:06,164 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:57:06,165 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:57:08,778 - utils - INFO - データ取得完了: shape=(301, 200)
+2026-02-17 03:57:08,839 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:57:08,840 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:57:09,346 - utils - INFO - データ取得完了: shape=(301, 40)
+2026-02-17 03:57:09,374 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:57:09,457 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:58:09,457 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:58:12,042 - utils - INFO - データ取得完了: shape=(301, 200)
+2026-02-17 03:58:12,104 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:58:12,104 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:58:12,772 - utils - INFO - データ取得完了: shape=(301, 40)
+2026-02-17 03:58:12,800 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:58:12,881 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:59:12,882 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 03:59:15,460 - utils - INFO - データ取得完了: shape=(301, 200)
+2026-02-17 03:59:15,522 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 03:59:15,522 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 03:59:16,074 - utils - INFO - データ取得完了: shape=(301, 40)
+2026-02-17 03:59:16,103 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 03:59:16,185 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:00:16,186 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:00:18,825 - utils - INFO - データ取得完了: shape=(302, 200)
+2026-02-17 04:00:18,886 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:00:18,887 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:00:19,563 - utils - INFO - データ取得完了: shape=(302, 40)
+2026-02-17 04:00:19,591 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:00:19,659 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 04:00:19,673 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:01:19,674 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:01:22,157 - utils - INFO - データ取得完了: shape=(302, 200)
+2026-02-17 04:01:22,218 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:01:22,218 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:01:22,751 - utils - INFO - データ取得完了: shape=(302, 40)
+2026-02-17 04:01:22,780 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:01:22,867 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:02:22,867 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:02:25,519 - utils - INFO - データ取得完了: shape=(302, 200)
+2026-02-17 04:02:25,581 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:02:25,581 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:02:26,313 - utils - INFO - データ取得完了: shape=(302, 40)
+2026-02-17 04:02:26,341 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:02:26,425 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:03:26,425 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:03:29,082 - utils - INFO - データ取得完了: shape=(302, 200)
+2026-02-17 04:03:29,143 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:03:29,143 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:03:29,670 - utils - INFO - データ取得完了: shape=(302, 40)
+2026-02-17 04:03:29,699 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:03:29,781 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:04:29,782 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:04:32,409 - utils - INFO - データ取得完了: shape=(302, 200)
+2026-02-17 04:04:32,471 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:04:32,471 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:04:33,068 - utils - INFO - データ取得完了: shape=(302, 40)
+2026-02-17 04:04:33,096 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:04:33,181 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:05:33,181 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:05:35,784 - utils - INFO - データ取得完了: shape=(303, 200)
+2026-02-17 04:05:35,845 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:05:35,845 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:05:36,412 - utils - INFO - データ取得完了: shape=(303, 40)
+2026-02-17 04:05:36,440 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:05:36,510 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 04:05:36,524 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:06:36,525 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:06:38,959 - utils - INFO - データ取得完了: shape=(303, 200)
+2026-02-17 04:06:39,025 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:06:39,025 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:06:39,561 - utils - INFO - データ取得完了: shape=(303, 40)
+2026-02-17 04:06:39,589 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:06:39,670 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:07:39,671 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:07:42,343 - utils - INFO - データ取得完了: shape=(303, 200)
+2026-02-17 04:07:42,404 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:07:42,404 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:07:43,014 - utils - INFO - データ取得完了: shape=(303, 40)
+2026-02-17 04:07:43,043 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:07:43,125 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:08:43,126 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:08:45,733 - utils - INFO - データ取得完了: shape=(303, 200)
+2026-02-17 04:08:45,795 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:08:45,795 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:08:46,327 - utils - INFO - データ取得完了: shape=(303, 40)
+2026-02-17 04:08:46,355 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:08:46,438 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:09:46,438 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:09:49,053 - utils - INFO - データ取得完了: shape=(303, 200)
+2026-02-17 04:09:49,115 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:09:49,115 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:09:49,715 - utils - INFO - データ取得完了: shape=(303, 40)
+2026-02-17 04:09:49,743 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:09:49,825 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:10:49,826 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:10:52,519 - utils - INFO - データ取得完了: shape=(304, 200)
+2026-02-17 04:10:52,580 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:10:52,580 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:10:53,235 - utils - INFO - データ取得完了: shape=(304, 40)
+2026-02-17 04:10:53,263 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:10:53,346 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:11:53,346 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:11:56,080 - utils - INFO - データ取得完了: shape=(304, 200)
+2026-02-17 04:11:56,146 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:11:56,147 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:11:56,839 - utils - INFO - データ取得完了: shape=(304, 40)
+2026-02-17 04:11:56,867 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:11:56,935 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 04:11:56,950 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:12:56,950 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:12:59,440 - utils - INFO - データ取得完了: shape=(304, 200)
+2026-02-17 04:12:59,502 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:12:59,502 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:13:00,026 - utils - INFO - データ取得完了: shape=(304, 40)
+2026-02-17 04:13:00,055 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:13:00,140 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:14:00,141 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:14:02,841 - utils - INFO - データ取得完了: shape=(304, 200)
+2026-02-17 04:14:02,902 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:14:02,902 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:14:03,504 - utils - INFO - データ取得完了: shape=(304, 40)
+2026-02-17 04:14:03,532 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:14:03,619 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:15:03,620 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:15:06,218 - utils - INFO - データ取得完了: shape=(305, 200)
+2026-02-17 04:15:06,284 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:15:06,284 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:15:06,863 - utils - INFO - データ取得完了: shape=(305, 40)
+2026-02-17 04:15:06,891 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:15:06,973 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:16:06,973 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:16:09,560 - utils - INFO - データ取得完了: shape=(305, 200)
+2026-02-17 04:16:09,621 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:16:09,621 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:16:10,276 - utils - INFO - データ取得完了: shape=(305, 40)
+2026-02-17 04:16:10,304 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:16:10,372 - __main__ - INFO - 7012.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 04:16:10,387 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:17:10,387 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:17:13,057 - utils - INFO - データ取得完了: shape=(305, 200)
+2026-02-17 04:17:13,117 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:17:13,118 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:17:13,703 - utils - INFO - データ取得完了: shape=(305, 40)
+2026-02-17 04:17:13,731 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:17:13,813 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:18:13,814 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:18:16,394 - utils - INFO - データ取得完了: shape=(305, 200)
+2026-02-17 04:18:16,454 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:18:16,454 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:18:16,982 - utils - INFO - データ取得完了: shape=(305, 40)
+2026-02-17 04:18:17,011 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:18:17,095 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:19:17,096 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:19:19,741 - utils - INFO - データ取得完了: shape=(305, 200)
+2026-02-17 04:19:19,805 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:19:19,805 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:19:20,370 - utils - INFO - データ取得完了: shape=(305, 40)
+2026-02-17 04:19:20,398 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:19:20,481 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:20:20,482 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:20:23,042 - utils - INFO - データ取得完了: shape=(306, 200)
+2026-02-17 04:20:23,104 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:20:23,104 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:20:23,620 - utils - INFO - データ取得完了: shape=(306, 40)
+2026-02-17 04:20:23,649 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:20:23,734 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:21:23,734 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:21:26,397 - utils - INFO - データ取得完了: shape=(306, 200)
+2026-02-17 04:21:26,458 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:21:26,458 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:21:26,983 - utils - INFO - データ取得完了: shape=(306, 40)
+2026-02-17 04:21:27,011 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:21:27,097 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:22:27,098 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:22:29,806 - utils - INFO - データ取得完了: shape=(306, 200)
+2026-02-17 04:22:29,867 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:22:29,867 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:22:30,445 - utils - INFO - データ取得完了: shape=(306, 40)
+2026-02-17 04:22:30,473 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:22:30,556 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:23:30,556 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:23:33,444 - utils - INFO - データ取得完了: shape=(306, 200)
+2026-02-17 04:23:33,505 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:23:33,505 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:23:36,162 - utils - INFO - データ取得完了: shape=(306, 40)
+2026-02-17 04:23:36,190 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:23:36,275 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:24:36,276 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:24:38,903 - utils - INFO - データ取得完了: shape=(306, 200)
+2026-02-17 04:24:38,965 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:24:38,966 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:24:39,560 - utils - INFO - データ取得完了: shape=(306, 40)
+2026-02-17 04:24:39,588 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:24:39,675 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:25:39,676 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:25:42,378 - utils - INFO - データ取得完了: shape=(307, 200)
+2026-02-17 04:25:42,439 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:25:42,440 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:25:43,023 - utils - INFO - データ取得完了: shape=(307, 40)
+2026-02-17 04:25:43,052 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:25:43,134 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:26:43,135 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:26:45,741 - utils - INFO - データ取得完了: shape=(307, 200)
+2026-02-17 04:26:45,802 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:26:45,802 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:26:46,403 - utils - INFO - データ取得完了: shape=(307, 40)
+2026-02-17 04:26:46,431 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:26:46,517 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:27:46,517 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:27:49,218 - utils - INFO - データ取得完了: shape=(307, 200)
+2026-02-17 04:27:49,280 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:27:49,280 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:27:49,837 - utils - INFO - データ取得完了: shape=(307, 40)
+2026-02-17 04:27:49,865 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:27:49,951 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:28:49,951 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:28:52,555 - utils - INFO - データ取得完了: shape=(307, 200)
+2026-02-17 04:28:52,620 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:28:52,620 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:28:53,206 - utils - INFO - データ取得完了: shape=(307, 40)
+2026-02-17 04:28:53,234 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:28:53,317 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:29:53,317 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:29:56,113 - utils - INFO - データ取得完了: shape=(307, 200)
+2026-02-17 04:29:56,174 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:29:56,174 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:29:56,983 - utils - INFO - データ取得完了: shape=(307, 40)
+2026-02-17 04:29:57,011 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:29:57,094 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:30:57,094 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:30:59,757 - utils - INFO - データ取得完了: shape=(308, 200)
+2026-02-17 04:30:59,818 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:30:59,819 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:31:00,366 - utils - INFO - データ取得完了: shape=(308, 40)
+2026-02-17 04:31:00,395 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:31:00,483 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:32:00,484 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:32:03,133 - utils - INFO - データ取得完了: shape=(308, 200)
+2026-02-17 04:32:03,194 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:32:03,194 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:32:03,728 - utils - INFO - データ取得完了: shape=(308, 40)
+2026-02-17 04:32:03,757 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:32:03,843 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:33:03,843 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:33:06,488 - utils - INFO - データ取得完了: shape=(308, 200)
+2026-02-17 04:33:06,550 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:33:06,550 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:33:07,109 - utils - INFO - データ取得完了: shape=(308, 40)
+2026-02-17 04:33:07,137 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:33:07,220 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:34:07,220 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:34:10,045 - utils - INFO - データ取得完了: shape=(308, 200)
+2026-02-17 04:34:10,106 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:34:10,107 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:34:10,851 - utils - INFO - データ取得完了: shape=(308, 40)
+2026-02-17 04:34:10,879 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:34:10,962 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:35:10,962 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:35:13,626 - utils - INFO - データ取得完了: shape=(309, 200)
+2026-02-17 04:35:13,687 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:35:13,687 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:35:14,297 - utils - INFO - データ取得完了: shape=(309, 40)
+2026-02-17 04:35:14,325 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:35:14,408 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:36:14,409 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:36:16,977 - utils - INFO - データ取得完了: shape=(309, 200)
+2026-02-17 04:36:17,038 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:36:17,039 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:36:17,595 - utils - INFO - データ取得完了: shape=(309, 40)
+2026-02-17 04:36:17,623 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:36:17,706 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:37:17,707 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:37:20,184 - utils - INFO - データ取得完了: shape=(309, 200)
+2026-02-17 04:37:20,245 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:37:20,245 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:37:20,808 - utils - INFO - データ取得完了: shape=(309, 40)
+2026-02-17 04:37:20,836 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:37:20,920 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:38:20,921 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:38:23,662 - utils - INFO - データ取得完了: shape=(309, 200)
+2026-02-17 04:38:23,723 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:38:23,724 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:38:24,233 - utils - INFO - データ取得完了: shape=(309, 40)
+2026-02-17 04:38:24,261 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:38:24,344 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:39:24,344 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:39:26,896 - utils - INFO - データ取得完了: shape=(309, 200)
+2026-02-17 04:39:26,956 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:39:26,957 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:39:27,497 - utils - INFO - データ取得完了: shape=(309, 40)
+2026-02-17 04:39:27,525 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:39:27,607 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:40:27,608 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:40:30,404 - utils - INFO - データ取得完了: shape=(310, 200)
+2026-02-17 04:40:30,469 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:40:30,469 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:40:31,010 - utils - INFO - データ取得完了: shape=(310, 40)
+2026-02-17 04:40:31,038 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:40:31,121 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:41:31,121 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:41:33,961 - utils - INFO - データ取得完了: shape=(310, 200)
+2026-02-17 04:41:34,021 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:41:34,022 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:41:34,598 - utils - INFO - データ取得完了: shape=(310, 40)
+2026-02-17 04:41:34,627 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:41:34,710 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:42:34,710 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:42:37,369 - utils - INFO - データ取得完了: shape=(310, 200)
+2026-02-17 04:42:37,430 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:42:37,431 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:42:38,104 - utils - INFO - データ取得完了: shape=(310, 40)
+2026-02-17 04:42:38,133 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:42:38,221 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:43:38,221 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:43:40,818 - utils - INFO - データ取得完了: shape=(310, 200)
+2026-02-17 04:43:40,879 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:43:40,879 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:43:41,509 - utils - INFO - データ取得完了: shape=(310, 40)
+2026-02-17 04:43:41,537 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:43:41,619 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:44:41,620 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:44:44,084 - utils - INFO - データ取得完了: shape=(310, 200)
+2026-02-17 04:44:44,145 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:44:44,145 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:44:44,763 - utils - INFO - データ取得完了: shape=(310, 40)
+2026-02-17 04:44:44,791 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:44:44,874 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:45:44,874 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:45:47,456 - utils - INFO - データ取得完了: shape=(311, 200)
+2026-02-17 04:45:47,517 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:45:47,517 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:45:48,110 - utils - INFO - データ取得完了: shape=(311, 40)
+2026-02-17 04:45:48,138 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:45:48,220 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:46:48,221 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:46:50,912 - utils - INFO - データ取得完了: shape=(311, 200)
+2026-02-17 04:46:50,973 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:46:50,973 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:46:51,524 - utils - INFO - データ取得完了: shape=(311, 40)
+2026-02-17 04:46:51,552 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:46:51,636 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:47:51,636 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:47:54,198 - utils - INFO - データ取得完了: shape=(311, 200)
+2026-02-17 04:47:54,258 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:47:54,258 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:47:54,781 - utils - INFO - データ取得完了: shape=(311, 40)
+2026-02-17 04:47:54,809 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:47:54,893 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:48:54,893 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:48:57,527 - utils - INFO - データ取得完了: shape=(311, 200)
+2026-02-17 04:48:57,588 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:48:57,588 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:48:58,206 - utils - INFO - データ取得完了: shape=(311, 40)
+2026-02-17 04:48:58,234 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:48:58,316 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:49:58,316 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:50:00,903 - utils - INFO - データ取得完了: shape=(311, 200)
+2026-02-17 04:50:00,964 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:50:00,964 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:50:01,444 - utils - INFO - データ取得完了: shape=(312, 40)
+2026-02-17 04:50:01,472 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:50:01,486 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 04:50:01,487 - __main__ - INFO - ジャーナル記録: 3110.T LONG
+2026-02-17 04:50:01,890 - utils - INFO - Discord通知送信成功
+2026-02-17 04:50:01,893 - position_manager - INFO - ポジション保存完了: 3件
+2026-02-17 04:50:01,893 - position_manager - INFO - ポジション追加: 3110.T LONG Entry=21010.0, SL=20684.2, TP1=21220.9, TP2=21268.0
+2026-02-17 04:50:01,965 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:51:01,965 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:51:04,607 - utils - INFO - データ取得完了: shape=(312, 200)
+2026-02-17 04:51:04,668 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:51:04,669 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:51:05,165 - utils - INFO - データ取得完了: shape=(312, 40)
+2026-02-17 04:51:05,193 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:51:05,207 - position_manager - INFO - ポジション保存完了: 3件
+2026-02-17 04:51:05,207 - position_manager - INFO - 3110.T: TP1達成 価格=21220.9, 損益=1.00%
+2026-02-17 04:51:05,207 - __main__ - ERROR - エグジット監視エラー (3110.T): 'PositionManager' object has no attribute 'set_trailing_stop'
+2026-02-17 04:51:05,277 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:52:05,277 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:52:07,918 - utils - INFO - データ取得完了: shape=(312, 200)
+2026-02-17 04:52:07,979 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:52:07,979 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:52:08,522 - utils - INFO - データ取得完了: shape=(312, 40)
+2026-02-17 04:52:08,550 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:52:08,564 - __main__ - ERROR - エグジット監視エラー (3110.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:52:08,635 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:53:08,635 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:53:11,309 - utils - INFO - データ取得完了: shape=(312, 200)
+2026-02-17 04:53:11,370 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:53:11,370 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:53:12,000 - utils - INFO - データ取得完了: shape=(312, 40)
+2026-02-17 04:53:12,028 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:53:12,042 - __main__ - ERROR - エグジット監視エラー (3110.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:53:12,111 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:54:12,111 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:54:14,817 - utils - INFO - データ取得完了: shape=(312, 200)
+2026-02-17 04:54:14,878 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:54:14,878 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:54:15,516 - utils - INFO - データ取得完了: shape=(312, 40)
+2026-02-17 04:54:15,544 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:54:15,558 - __main__ - ERROR - エグジット監視エラー (3110.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:54:15,626 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:55:15,626 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:55:18,247 - utils - INFO - データ取得完了: shape=(313, 200)
+2026-02-17 04:55:18,309 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:55:18,309 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:55:18,906 - utils - INFO - データ取得完了: shape=(313, 40)
+2026-02-17 04:55:18,935 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:55:18,949 - position_manager - INFO - 取引結果保存: 3110.T 0.50%
+2026-02-17 04:55:18,949 - position_manager - INFO - ポジション保存完了: 2件
+2026-02-17 04:55:18,949 - position_manager - INFO - 3110.T: ポジションクローズ TRAILING_EXIT 総合損益=0.50% (TP1:True, 最終:0.00%)
+2026-02-17 04:55:19,245 - utils - INFO - Discord通知送信成功
+2026-02-17 04:55:19,325 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:56:19,326 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:56:21,967 - utils - INFO - データ取得完了: shape=(313, 200)
+2026-02-17 04:56:22,028 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:56:22,028 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:56:22,552 - utils - INFO - データ取得完了: shape=(313, 40)
+2026-02-17 04:56:22,580 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:56:22,594 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 04:56:22,664 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:57:22,664 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:57:25,283 - utils - INFO - データ取得完了: shape=(313, 200)
+2026-02-17 04:57:25,345 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:57:25,345 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:57:25,870 - utils - INFO - データ取得完了: shape=(313, 40)
+2026-02-17 04:57:25,898 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:57:25,979 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:58:25,980 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:58:28,399 - utils - INFO - データ取得完了: shape=(313, 200)
+2026-02-17 04:58:28,460 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:58:28,460 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:58:28,955 - utils - INFO - データ取得完了: shape=(313, 40)
+2026-02-17 04:58:28,983 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:58:29,065 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:59:29,066 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 04:59:31,679 - utils - INFO - データ取得完了: shape=(313, 200)
+2026-02-17 04:59:31,740 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 04:59:31,741 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 04:59:32,284 - utils - INFO - データ取得完了: shape=(313, 40)
+2026-02-17 04:59:32,313 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 04:59:32,395 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:00:32,396 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:00:34,999 - utils - INFO - データ取得完了: shape=(314, 200)
+2026-02-17 05:00:35,060 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:00:35,060 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:00:35,760 - utils - INFO - データ取得完了: shape=(314, 40)
+2026-02-17 05:00:35,788 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:00:35,802 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 05:00:35,875 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:01:35,875 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:01:38,474 - utils - INFO - データ取得完了: shape=(314, 200)
+2026-02-17 05:01:38,535 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:01:38,535 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:01:39,079 - utils - INFO - データ取得完了: shape=(314, 40)
+2026-02-17 05:01:39,107 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:01:39,192 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:02:39,192 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:02:41,946 - utils - INFO - データ取得完了: shape=(314, 200)
+2026-02-17 05:02:42,007 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:02:42,007 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:02:42,555 - utils - INFO - データ取得完了: shape=(314, 40)
+2026-02-17 05:02:42,583 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:02:42,665 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:03:42,666 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:03:45,313 - utils - INFO - データ取得完了: shape=(314, 200)
+2026-02-17 05:03:45,374 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:03:45,374 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:03:45,913 - utils - INFO - データ取得完了: shape=(314, 40)
+2026-02-17 05:03:45,941 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:03:46,030 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:04:46,031 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:04:48,601 - utils - INFO - データ取得完了: shape=(314, 200)
+2026-02-17 05:04:48,662 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:04:48,662 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:04:49,183 - utils - INFO - データ取得完了: shape=(314, 40)
+2026-02-17 05:04:49,211 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:04:49,294 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:05:49,294 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:05:52,033 - utils - INFO - データ取得完了: shape=(315, 200)
+2026-02-17 05:05:52,095 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:05:52,095 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:05:52,659 - utils - INFO - データ取得完了: shape=(315, 40)
+2026-02-17 05:05:52,687 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:05:52,700 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 05:05:52,771 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:06:52,772 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:06:55,489 - utils - INFO - データ取得完了: shape=(315, 200)
+2026-02-17 05:06:55,551 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:06:55,551 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:06:56,100 - utils - INFO - データ取得完了: shape=(315, 40)
+2026-02-17 05:06:56,128 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:06:56,211 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:07:56,212 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:07:58,885 - utils - INFO - データ取得完了: shape=(315, 200)
+2026-02-17 05:07:58,946 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:07:58,947 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:07:59,478 - utils - INFO - データ取得完了: shape=(315, 40)
+2026-02-17 05:07:59,506 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:07:59,590 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:08:59,591 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:09:02,210 - utils - INFO - データ取得完了: shape=(315, 200)
+2026-02-17 05:09:02,271 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:09:02,271 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:09:02,836 - utils - INFO - データ取得完了: shape=(315, 40)
+2026-02-17 05:09:02,865 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:09:02,947 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:10:02,948 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:10:05,520 - utils - INFO - データ取得完了: shape=(316, 200)
+2026-02-17 05:10:05,581 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:10:05,582 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:10:06,271 - utils - INFO - データ取得完了: shape=(316, 40)
+2026-02-17 05:10:06,299 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:10:06,313 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 05:10:06,386 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:11:06,386 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:11:09,229 - utils - INFO - データ取得完了: shape=(316, 200)
+2026-02-17 05:11:09,290 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:11:09,290 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:11:09,811 - utils - INFO - データ取得完了: shape=(316, 40)
+2026-02-17 05:11:09,840 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:11:09,924 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:12:09,924 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:12:12,455 - utils - INFO - データ取得完了: shape=(316, 200)
+2026-02-17 05:12:12,515 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:12:12,515 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:12:13,118 - utils - INFO - データ取得完了: shape=(316, 40)
+2026-02-17 05:12:13,146 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:12:13,233 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:13:13,234 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:13:16,168 - utils - INFO - データ取得完了: shape=(316, 200)
+2026-02-17 05:13:16,228 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:13:16,228 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:13:16,777 - utils - INFO - データ取得完了: shape=(316, 40)
+2026-02-17 05:13:16,805 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:13:16,887 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:14:16,887 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:14:19,681 - utils - INFO - データ取得完了: shape=(316, 200)
+2026-02-17 05:14:19,742 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:14:19,743 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:14:20,264 - utils - INFO - データ取得完了: shape=(316, 40)
+2026-02-17 05:14:20,292 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:14:20,374 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:15:20,375 - utils - INFO - データ取得開始: 40銘柄, period=5d, interval=5m
+2026-02-17 05:15:22,858 - utils - INFO - データ取得完了: shape=(317, 200)
+2026-02-17 05:15:22,919 - __main__ - INFO - ライバルデータ取得完了: 40銘柄
+2026-02-17 05:15:22,919 - utils - INFO - データ取得開始: 8銘柄, period=5d, interval=5m
+2026-02-17 05:15:23,517 - utils - INFO - データ取得完了: shape=(317, 40)
+2026-02-17 05:15:23,545 - __main__ - ERROR - エグジット監視エラー (6590.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:15:23,559 - __main__ - INFO - 3110.T: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15
+2026-02-17 05:15:23,628 - __main__ - ERROR - エグジット監視エラー (8303.T): 'PositionManager' object has no attribute 'update_trailing_stop'
+2026-02-17 05:16:23,908 - utils - INFO - Discord通知送信成功
+2026-02-17 05:16:24,219 - utils - INFO - Discord通知送信成功
+2026-02-17 05:16:24,221 - __main__ - INFO - サマリー通知完了: 総損益=0.50%, 取引数=1
