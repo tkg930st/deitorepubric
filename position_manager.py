@@ -110,6 +110,22 @@ class PositionManager:
             self.save_positions()
             logger.info(f"{ticker}: トレーリングモード開始")
 
+    def set_trailing_stop(self, ticker: str, trailing_stop: float) -> None:
+        """トレーリングストップの初期値を設定（Ver 13.5）"""
+        if ticker in self.positions:
+            self.positions[ticker]['trailing_stop'] = trailing_stop
+            self.positions[ticker]['trailing_mode'] = True
+            self.save_positions()
+            logger.info(f"{ticker}: トレーリングストップ設定 {trailing_stop:.1f}")
+
+    def update_trailing_stop(self, ticker: str, trailing_stop: float) -> None:
+        """トレーリングストップを更新（Ver 13.5）"""
+        if ticker in self.positions:
+            old_ts = self.positions[ticker].get('trailing_stop', 0)
+            self.positions[ticker]['trailing_stop'] = trailing_stop
+            self.save_positions()
+            logger.info(f"{ticker}: トレーリングストップ更新 {old_ts:.1f} → {trailing_stop:.1f}")
+
     def execute_tp1(self, ticker: str, tp1_price: float) -> float:
         """
         TP1で50%利確
