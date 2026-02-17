@@ -1,9 +1,9 @@
-name: 2. Trade Monitor
+name: 2. Trade Monitor PM
 
 on:
   schedule:
-    # JST 月-金 08:00 (UTC 日-木 23:00) に起動
-    - cron: '0 23 * * 0-4'
+    # JST 月-金 12:00 (UTC 月-金 03:00) に起動
+    - cron: '0 3 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -45,21 +45,29 @@ jobs:
       - name: Run Monitor
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        # monitor.pyは修正後の「5時間45分で自動終了する版」を使用してください
+        # PM: 12:00〜15:00（約180分）で停止
+        timeout-minutes: 190
         run: python monitor.py
+
+      - name: Clear positions.json
+        if: always()
+        run: |
+          # 15:00終了時にポジションデータを消去
+          echo '{}' > positions.json
+          echo "positions.json cleared."
 
       - name: Commit and Push trade records
         if: always()
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
+
           # 作成された可能性のあるファイルを個別にチェックして追加
           # ファイルが存在する場合のみ追加することで、ワイルドカードのエラーを回避します
           ls *.csv 2>/dev/null && git add *.csv || echo "No CSV files found"
           ls *.json 2>/dev/null && git add *.json || echo "No JSON files found"
           ls *.txt 2>/dev/null && git add *.txt || echo "No log files found"
-          
+
           # 変更（ステージングされたファイル）がある場合のみコミット
           if ! git diff --cached --quiet; then
             git commit -m "Update trade records and logs [skip ci]"
