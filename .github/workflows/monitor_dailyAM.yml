@@ -17,6 +17,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Clean old execution logs
+        run: |
+          python3 -c "
+          from datetime import datetime, timedelta, timezone
+          import os
+          log_file = 'execution_log.txt'
+          if not os.path.exists(log_file):
+              print('No log file found.')
+              exit(0)
+          jst = timezone(timedelta(hours=9))
+          cutoff = (datetime.now(jst) - timedelta(days=5)).strftime('%Y-%m-%d')
+          with open(log_file, 'r') as f:
+              lines = f.readlines()
+          kept = [l for l in lines if l[:10] >= cutoff or len(l.strip()) < 10]
+          with open(log_file, 'w') as f:
+              f.writelines(kept)
+          print(f'Log cleanup: {len(lines)} -> {len(kept)} lines (cutoff: {cutoff})')
+          "
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
