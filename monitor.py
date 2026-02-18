@@ -685,7 +685,23 @@ def monitor():
     params_all = {d['t']: d['params'] for d in config['details']}
     sectors_map = {d['t']: d.get('sector', '') for d in config['details']}
     rivals_map = {d['t']: d.get('rivals', []) for d in config['details']}  # Ver 13.5: ライバル取得
-    
+
+    # 環境変数から終了時刻・最大実行時間を最初に取得（AMセッション/PMセッション別制御）
+    # MONITOR_END_TIME: ワークフロー側からセッションに応じた終了時刻を指定（例: AM='11:25', PM='14:55'）
+    # MAX_RUNTIME_MINUTES: ワークフローのtimeout-minutesより短い値を指定してグレースフルに終了
+    monitor_end_time_str = os.environ.get('MONITOR_END_TIME', MONITORING_LOOP['end_time'])
+    max_runtime_minutes = int(os.environ.get('MAX_RUNTIME_MINUTES', '345'))  # デフォルト: 5時間45分
+    monitor_end_time = dt_time.fromisoformat(monitor_end_time_str)
+    logger.info(f"監視設定: 終了時刻={monitor_end_time_str}, 最大実行時間={max_runtime_minutes}分")
+
+    # スケジューラ遅延対策: 既に終了時刻を過ぎている場合は即座に終了
+    current_jst = datetime.now(pytz.timezone('Asia/Tokyo')).time()
+    if current_jst >= monitor_end_time:
+        msg = f"⚠️ **監視終了時刻（{monitor_end_time_str}）を既に過ぎています（現在: {current_jst.strftime('%H:%M')}）。スキップします。**"
+        logger.info(msg)
+        send_discord_notification(WEBHOOK_URL, msg)
+        return
+
     # Ver 11.0: 禁止フラグマップの作成
     disabled_map = {
         d['t']: {
@@ -694,7 +710,7 @@ def monitor():
         }
         for d in config['details']
     }
-    
+
     # 禁止銘柄の通知
     disabled_info = []
     for ticker, flags in disabled_map.items():
@@ -703,32 +719,40 @@ def monitor():
             if flags['long']: disabled_sides.append('LONG')
             if flags['short']: disabled_sides.append('SHORT')
             disabled_info.append(f"{ticker}: {'/'.join(disabled_sides)}禁止")
-    
+
     startup_msg = "📡 **Version 13.5 プロ版 監視起動**\n🌐 マクロ・アライメント + セクター・ブースト + トレーリングTP搭載"
     if disabled_info:
         startup_msg += f"\n\n🚫 **エントリー禁止設定:**\n" + "\n".join(disabled_info)
-    
+
     send_discord_notification(WEBHOOK_URL, startup_msg)
     start_run_time = time.time() # 実行開始時間の記録
-    
+
     try:
-        # 地合い判定
-        while datetime.now(pytz.timezone('Asia/Tokyo')).time() < dt_time.fromisoformat(MARKET_SENTIMENT['judgment_time']): time.sleep(10)
+        # 地合い判定（終了時刻前のみ待機）
+        while datetime.now(pytz.timezone('Asia/Tokyo')).time() < dt_time.fromisoformat(MARKET_SENTIMENT['judgment_time']):
+            if datetime.now(pytz.timezone('Asia/Tokyo')).time() >= monitor_end_time:
+                logger.info("待機中に終了時刻に達したため終了します")
+                return
+            time.sleep(10)
         threshold_adj = 0.0 # 簡易化
-        
-        # 監視開始待機
-        while datetime.now(pytz.timezone('Asia/Tokyo')).time() < dt_time.fromisoformat(MONITORING_LOOP['start_time']): time.sleep(10)
-        
+
+        # 監視開始待機（終了時刻前のみ待機）
+        while datetime.now(pytz.timezone('Asia/Tokyo')).time() < dt_time.fromisoformat(MONITORING_LOOP['start_time']):
+            if datetime.now(pytz.timezone('Asia/Tokyo')).time() >= monitor_end_time:
+                logger.info("待機中に終了時刻に達したため終了します")
+                return
+            time.sleep(10)
+
         # V3: マクロ指標取得（09:30に1回実行）
         global macro_sentiment
         from utils import fetch_macro_sentiment
-        
+
         try:
             macro_sentiment = fetch_macro_sentiment()
-            
+
             # 取得成功の通知
             send_discord_notification(
-                WEBHOOK_URL, 
+                WEBHOOK_URL,
                 f"📊 **V3マクロ指標取得完了**\n"
                 f"VIX: {macro_sentiment.get('vix_value', 18.0):.2f}\n"
                 f"SOX変化率: {macro_sentiment.get('sox_chg', 0):+.2f}%\n"
@@ -748,22 +772,15 @@ def monitor():
                 WEBHOOK_URL,
                 "⚠️ **マクロ指標取得失敗**\nデフォルト値を使用します\n（V3戦略は一部制限されます）"
             )
-        
+
         # オープニング分析
         calculate_opening_analysis(tickers)
-        
+
         # Ver 13.5: ライバル銘柄の全ティッカーリスト収集
         all_rival_tickers = set()
         for rival_list in rivals_map.values():
             all_rival_tickers.update(rival_list)
         all_rival_tickers -= set(tickers)  # 監視銘柄と重複するものを除外
-        
-        # 環境変数から終了時刻・最大実行時間を取得（AMセッション/PMセッション別制御）
-        # MONITOR_END_TIME: ワークフロー側からセッションに応じた終了時刻を指定（例: AM='11:25', PM='14:55'）
-        # MAX_RUNTIME_MINUTES: ワークフローのtimeout-minutesより短い値を指定してグレースフルに終了
-        monitor_end_time_str = os.environ.get('MONITOR_END_TIME', MONITORING_LOOP['end_time'])
-        max_runtime_minutes = int(os.environ.get('MAX_RUNTIME_MINUTES', '345'))  # デフォルト: 5時間45分
-        logger.info(f"監視設定: 終了時刻={monitor_end_time_str}, 最大実行時間={max_runtime_minutes}分")
 
         while True:
             current_time = datetime.now(pytz.timezone('Asia/Tokyo')).time()
@@ -775,7 +792,7 @@ def monitor():
                 send_daily_summary()
                 break
 
-            if current_time >= dt_time.fromisoformat(monitor_end_time_str):
+            if current_time >= monitor_end_time:
                 # 監視終了時刻に達した → サマリー通知して正常終了
                 send_daily_summary()
                 break
