@@ -45,6 +45,10 @@ jobs:
       - name: Run Monitor
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # PMセッション: 後場（12:30〜15:00）を監視
+          # 14:55に自己終了させ、ワークフロータイムアウト(190分)より先に正常終了
+          MONITOR_END_TIME: '14:55'
+          MAX_RUNTIME_MINUTES: '180'
         # PM: 12:00〜15:00（約180分）で停止
         timeout-minutes: 190
         run: python monitor.py
