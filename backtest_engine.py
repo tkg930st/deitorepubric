@@ -1,5 +1,10 @@
 """
-バックテストエンジン (Version 13.5: トレーリングTP & セクター・アライメント & スコア共通化)
+バックテストエンジン (Version 14.0)
+変更点:
+- ② シャンデリア出口: 直近N本の最高値/最安値 - ATR×chandelier_atr_multiplier
+- ① TP1/TRAILING_EXIT後もcooldown_active=True（往復ビンタ防止）
+- ③ エントリーフィルター: RSI過熱(≥70)/売られ過ぎ(≤30)・VWAP乖離超過チェック
+- ⑤ optimize_parameters: tp_mul >= sl_mul×1.5のRR制約を強制
 """
 import numpy as np
 import pandas as pd
@@ -166,50 +171,59 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
 
         if position is not None:
             h, l = row['high'], row['low']
-            
+
             # TP1チェック（利益ロック・建値移動）
             if not position['tp1_hit']:
                 if (side == 'long' and h >= position['tp1']) or \
                    (side == 'short' and l <= position['tp1']):
                     position['tp1_hit'] = True
-                    position['sl'] = position['entry_price'] # 建値に移動
-                    # Ver 13.5: トレーリングストップの初期値を設定
+                    position['sl'] = position['entry_price']  # 建値に移動
+                    # ② シャンデリア出口: 直近N本の高値/安値からATR×chandelier_mulで初期値設定
+                    chandelier_lookback = POSITION_MANAGEMENT.get('chandelier_lookback', 5)
+                    chandelier_mul = POSITION_MANAGEMENT.get('chandelier_atr_multiplier', 2.5)
+                    start_idx = max(0, idx - chandelier_lookback + 1)
                     if side == 'long':
-                        position['trailing_stop'] = h - (position['entry_atr'] * trailing_atr_mul)
+                        highest_high = df['high'].iloc[start_idx:idx + 1].max()
+                        position['trailing_stop'] = highest_high - (position['entry_atr'] * chandelier_mul)
                     else:
-                        position['trailing_stop'] = l + (position['entry_atr'] * trailing_atr_mul)
-            
-            # --- Ver 13.5: TP1後はトレーリングストップで追従 ---
+                        lowest_low = df['low'].iloc[start_idx:idx + 1].min()
+                        position['trailing_stop'] = lowest_low + (position['entry_atr'] * chandelier_mul)
+
+            # --- Ver 14.0: TP1後はシャンデリア出口で追従 ---
             if position['tp1_hit']:
-                atr_trail = position['entry_atr'] * trailing_atr_mul
+                chandelier_lookback = POSITION_MANAGEMENT.get('chandelier_lookback', 5)
+                chandelier_mul = POSITION_MANAGEMENT.get('chandelier_atr_multiplier', 2.5)
+                start_idx = max(0, idx - chandelier_lookback + 1)
                 if side == 'long':
-                    # 高値更新でトレーリングストップを引き上げ
-                    new_trail = h - atr_trail
+                    # 直近N本の最高値 - ATR×chandelier_mul でシャンデリアトレーリング
+                    highest_high = df['high'].iloc[start_idx:idx + 1].max()
+                    new_trail = highest_high - (position['entry_atr'] * chandelier_mul)
                     if new_trail > position['trailing_stop']:
                         position['trailing_stop'] = new_trail
-                    # トレーリングストップに安値がタッチ → 決済
                     if l <= position['trailing_stop']:
                         exit_price = position['trailing_stop']
                         p_exit = ((exit_price / position['entry_price']) - 1 - SLIPPAGE) * 100
                         p_tp1 = ((position['tp1'] / position['entry_price']) - 1 - SLIPPAGE) * 100
                         p_final = (p_tp1 + p_exit) / 2
                         total_profit += p_final; trades.append(p_final); position = None
+                        cooldown_active = True  # ① TRAILING_EXIT後もクールダウン
                         continue
                 else:  # short
-                    # 安値更新でトレーリングストップを引き下げ
-                    new_trail = l + atr_trail
+                    # 直近N本の最安値 + ATR×chandelier_mul でシャンデリアトレーリング
+                    lowest_low = df['low'].iloc[start_idx:idx + 1].min()
+                    new_trail = lowest_low + (position['entry_atr'] * chandelier_mul)
                     if new_trail < position['trailing_stop']:
                         position['trailing_stop'] = new_trail
-                    # トレーリングストップに高値がタッチ → 決済
                     if h >= position['trailing_stop']:
                         exit_price = position['trailing_stop']
                         p_exit = (1 - (exit_price / position['entry_price']) - SLIPPAGE) * 100
                         p_tp1 = (1 - (position['tp1'] / position['entry_price']) - SLIPPAGE) * 100
                         p_final = (p_tp1 + p_exit) / 2
                         total_profit += p_final; trades.append(p_final); position = None
+                        cooldown_active = True  # ① TRAILING_EXIT後もクールダウン
                         continue
-            
-            # TP1未達時の損切チェック（従来ロジック維持）
+
+            # TP1未達時の損切チェック
             if not position['tp1_hit']:
                 if side == 'long':
                     if l <= position['sl']:
@@ -227,7 +241,17 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
 
         # エントリー判定
         if curr_dt.time() < entry_allowed_time: continue
-        
+
+        # ③ RSI過熱感・VWAP乖離チェック（バックテストでも同一フィルターを適用）
+        rsi_val = safe_get(row, 'rsi_14', 50)
+        vwap_dev_val = safe_get(row, 'vwap_dev', 0)
+        if side == 'long':
+            if rsi_val >= SIGNAL_THRESHOLDS.get('rsi_overbought', 70): continue
+            if vwap_dev_val >= SIGNAL_THRESHOLDS.get('vwap_dev_max', 2.5): continue
+        else:
+            if rsi_val <= SIGNAL_THRESHOLDS.get('rsi_oversold', 30): continue
+            if vwap_dev_val <= -SIGNAL_THRESHOLDS.get('vwap_dev_max', 2.5): continue
+
         # 当日制限チェック（ダイバージェンスで解除可能）
         if cooldown_active:
             if DIVERGENCE['enabled'] and idx >= DIVERGENCE['lookback']:
@@ -270,15 +294,20 @@ def optimize_parameters(df: pd.DataFrame, df_15m: pd.DataFrame, side: str,
     tp1_mul = POSITION_MANAGEMENT.get('tp1_multiplier', 1.5)
     
     # 既存のベクトル演算による1次スクリーニング
+    min_rr_ratio = 1.5  # ⑤ RR≥1.5を強制（tp_mul >= sl_mul × 1.5）
     for _ in range(iterations):
+        sl_mul = random.uniform(*PARAM_RANGES['sl_mul'])
+        tp_mul = random.uniform(*PARAM_RANGES['tp_mul'])
+        # ⑤ RR制約: tp_mul >= sl_mul × min_rr_ratio かつ PARAM_RANGES下限以上
+        tp_mul = max(tp_mul, sl_mul * min_rr_ratio, PARAM_RANGES['tp_mul'][0])
         p = {
             'w_rsi': random.randint(*PARAM_RANGES['w_rsi']),
             'w_vwap': random.randint(*PARAM_RANGES['w_vwap']),
             'w_rvol': random.randint(*PARAM_RANGES['w_rvol']),
             'w_adx': random.randint(*PARAM_RANGES['w_adx']),
             'threshold': max(random.randint(*PARAM_RANGES['threshold']), MIN_SCORE_THRESHOLD),
-            'sl_mul': random.uniform(*PARAM_RANGES['sl_mul']),
-            'tp_mul': random.uniform(*PARAM_RANGES['tp_mul'])
+            'sl_mul': sl_mul,
+            'tp_mul': tp_mul
         }
         # ベクトル演算側は簡易シミュレーション
         scores = calculate_score_vectorized(df, p, side)

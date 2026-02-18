@@ -2,8 +2,9 @@ name: 2. Trade Monitor AM
 
 on:
   schedule:
-    # JST 月-金 09:00 (UTC 月-金 00:00) に起動
-    - cron: '0 0 * * 1-5'
+    # JST 月-金 08:00 (UTC 日-木 23:00) に起動
+    # 09:30開始のため1.5時間前に起動 → 最大2時間のスケジューラ遅延が発生しても10:00から監視可能
+    - cron: '0 23 * * 0-4'
   workflow_dispatch:
 
 jobs:
@@ -64,12 +65,15 @@ jobs:
       - name: Run Monitor
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # AMセッション: 前場（09:30〜11:30）を監視
-          # 11:25に自己終了させ、ワークフロータイムアウト(150分)より5分早く正常終了
-          MONITOR_END_TIME: '11:25'
-          MAX_RUNTIME_MINUTES: '140'
-        # AM: 09:00〜11:30（約150分）で停止
-        timeout-minutes: 150
+          # AMセッション: 08:00 JST起動 → 09:30まで待機 → 11:25に自己終了
+          # スケジューラが2時間遅延しても 10:00 JSTから最低1.5時間は監視できる
+          MONITOR_START_TIME: '09:30'   # 09:30まで待機してから監視開始
+          MONITOR_END_TIME: '11:25'     # 11:25に自己終了（11:30の5分前）
+          MAX_RUNTIME_MINUTES: '200'    # 08:05起動→11:25終了 = 最大200分（安全網）
+          # ③ 前場エントリーカットオフ: 10:30以降は新規エントリーしない
+          ENTRY_CUTOFF_TIME: '10:30'
+        # 08:00〜11:30 = 最大210分のタイムアウト（余裕を持たせる）
+        timeout-minutes: 210
         run: python monitor.py
 
       - name: Commit and Push trade records

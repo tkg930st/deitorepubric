@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """
-monitor.py - Version 13.5 プロ版 (トレーリングTP & セクター・アライメント & スコア共通化)
+monitor.py - Version 14.0 プロ版
+変更点:
+- スケジューラ遅延対応: MONITOR_START_TIME環境変数で待機時刻を制御（2時間遅延許容）
+- ① TP1/TRAILING_EXIT後も当日クールダウンを適用（往復ビンタ防止）
+- ② シャンデリア出口: 直近N本高値/安値 - ATR×2.5 でゆったりトレーリング
+- ③ エントリーフィルター強化: RSI過熱/VWAP乖離超過/時間帯カットオフ
+- ④ VIX高時はSL幅変更なく推奨ロット50%を通知
+- ⑤ RR比強制: tp_mul >= sl_mul × 1.5 を送信時に保証
 """
 import json
 import logging
@@ -293,41 +300,48 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
                      cooldown: Dict, market_sentiment_value: float,
                      sector: str = '', disabled: Dict = None,
                      rivals: list = None) -> None:
-    """新規シグナルチェック (Ver 13.5: セクター・アライメント & ブースト統合 + V3マクロ統合)"""
+    """新規シグナルチェック (Ver 14.0: エントリーフィルター強化 + VIXリスク調整)"""
     if disabled is None:
         disabled = {'long': False, 'short': False}
     if df.empty or len(df) < 50: return
-    
+
+    # ③ 時間帯フィルター: エントリーカットオフ後は新規エントリー禁止
+    # ENTRY_CUTOFF_TIME環境変数で上書き可能（AMワークフロー: 10:30, PMワークフロー: 14:00）
+    entry_cutoff_str = os.environ.get('ENTRY_CUTOFF_TIME', MONITORING_LOOP.get('am_entry_cutoff', '10:30'))
+    entry_cutoff = dt_time.fromisoformat(entry_cutoff_str)
+    current_jst_time = datetime.now(pytz.timezone('Asia/Tokyo')).time()
+    if current_jst_time >= entry_cutoff:
+        logger.debug(f"{ticker}: エントリーカットオフ({entry_cutoff_str})超過 → スキップ")
+        return
+
     # ボラティリティフィルター
     atr_ma = df['atr_14'].rolling(window=50).mean().iloc[-1]
     current_atr = df['atr_14'].iloc[-1]
-    if current_atr < atr_ma: return # 活気がない場合はスキップ
+    if current_atr < atr_ma: return
 
     confirmed_row = df.iloc[-2]
     check_key = f"{ticker}_{confirmed_row.name}"
     if check_key in processed_timestamps: return
     processed_timestamps.add(check_key)
-    
+
     if position_manager.has_position(ticker): return
-    
-    # Ver 12.0: 当日制限チェック
+
+    # Ver 12.0: 当日制限チェック（SL・TP1・TRAILING_EXIT全て対象）
     is_cooldown = is_cooldown_active(ticker, cooldown)
     cooldown_overridden = False
-    
+
     if is_cooldown:
         # ダイバージェンス検知で制限解除可能
         if DIVERGENCE['enabled'] and len(df) >= DIVERGENCE['lookback']:
             df_recent = df.iloc[-DIVERGENCE['lookback']:]
             div = check_divergence(df_recent, DIVERGENCE['lookback'])
-            
+
             if div.get('bullish') or div.get('bearish'):
-                # ダイバージェンス検知 → 制限解除
                 del cooldown[ticker]
                 save_daily_cooldown(cooldown)
                 cooldown_overridden = True
                 logger.info(f"{ticker}: ダイバージェンス検知により当日制限解除")
             else:
-                # ダイバージェンスなし → スキップ
                 logger.debug(f"{ticker}: 当日制限中のためスキップ")
                 return
         else:
@@ -337,23 +351,31 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
     drive_pct = opening_drives.get(ticker, {}).get('drive_pct', 0.0)
     ma15_value = confirmed_row.get('ma_15m_20', 0)
     current_price = confirmed_row['close']
-    
+
+    # ③ RSI過熱感・VWAP乖離チェック（共通）
+    rsi_val = safe_get(confirmed_row, 'rsi_14', 50)
+    vwap_dev_val = safe_get(confirmed_row, 'vwap_dev', 0)
+    rsi_overbought = SIGNAL_THRESHOLDS.get('rsi_overbought', 70)
+    rsi_oversold = SIGNAL_THRESHOLDS.get('rsi_oversold', 30)
+    vwap_dev_max = SIGNAL_THRESHOLDS.get('vwap_dev_max', 2.5)
+
     # V3: マクロ指標による動的調整
     global macro_sentiment
     vix_value = macro_sentiment.get('vix_value', 0.0)
     sox_chg = macro_sentiment.get('sox_chg', 0.0)
     tnx_chg = macro_sentiment.get('tnx_chg', 0.0)
-    
-    # V3-A: VIX > 20 → 閾値厳格化、TP/SL拡張
+
+    # V3-A: VIX > 20 → 閾値厳格化、TP拡張、④ SL幅は変えずロット半減を通知
     v3_threshold_adj = 0.0
     v3_tp_multiplier = 1.0
-    v3_sl_multiplier = 1.0
-    
+    v3_sl_multiplier = 1.0   # ④ SL幅は変更しない
+    v3_risk_multiplier = 1.0  # ④ VIX高時: 推奨ロット倍率
+
     if vix_value > 20:
-        v3_threshold_adj += 5.0  # エントリーを厳しく
-        v3_tp_multiplier = 1.25  # 利確幅を拡張
-        v3_sl_multiplier = 1.15  # 損切幅を緩和（ノイズ回避）
-        logger.info(f"{ticker}: VIX > 20 → 閾値+5.0, TP×1.25, SL×1.15")
+        v3_threshold_adj += 5.0   # エントリーを厳しく
+        v3_tp_multiplier = 1.25   # 利確幅を拡張
+        v3_risk_multiplier = 0.5  # ④ ロットを通常の50%に削減
+        logger.info(f"{ticker}: VIX > 20 → 閾値+5.0, TP×1.25, 推奨ロット×0.5")
     
     # V3-B: TNXによるセクター順張り
     if abs(tnx_chg) > 0.5:
@@ -385,157 +407,184 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
                 rival_dfs_for_ticker[r] = rival_data_cache[r]
 
     # LONG
-    if not disabled.get('long', False):  # Ver 11.0: LONG禁止チェック
-        boost_long = 20 if drive_pct > 0.5 else 0
-        
-        # Ver 13.5: リアルタイムブースト計算
-        rt_boost_long = calculate_realtime_boost(df, 'long', rival_dfs_for_ticker)
-        boost_long += rt_boost_long['total']
-        
-        score_long = calculate_single_score(confirmed_row, params_long, 'long', boost_long)
-        threshold_long = params_long['threshold'] + threshold_adjustment + v3_threshold_adj
-        
-        if score_long >= threshold_long:
-            if check_trend_filter(current_price, ma15_value, 'LONG'):
-                # Ver 13.5: ジャーナル記録（ブースト詳細付き）
-                journal_entry = {
-                    'ticker': ticker, 'side': 'LONG', 'entry_price': current_price,
-                    'entry_time': confirmed_row.name.isoformat(),
-                    'market_sentiment': market_sentiment_value,
-                    'rsi': safe_get(confirmed_row, 'rsi_14', 50),
-                    'vwap_dev': safe_get(confirmed_row, 'vwap_dev', 0),
-                    'rvol': safe_get(confirmed_row, 'rvol', 1.0),
-                    'adx': safe_get(confirmed_row, 'adx_14', 0),
-                    'ma15_value': ma15_value,
-                    'ma15_diff_pct': ((current_price / ma15_value - 1) * 100) if ma15_value > 0 else 0,
-                    'vix_value': vix_value,
-                    'sox_chg': sox_chg,
-                    'tnx_chg': tnx_chg,
-                    'divergence_bullish': False,
-                    'divergence_bearish': False,
-                    'cooldown_overridden': cooldown_overridden,
-                    'score': score_long,
-                    'threshold': threshold_long,
-                    'sector_alignment': rt_boost_long['sector_alignment'],
-                    'volume_accel': rt_boost_long['volume_accel'],
-                    'divergence_bonus': rt_boost_long['divergence_bonus']
-                }
-                record_trade_journal(journal_entry)
-                
-                # ドライブによる通常のTP倍率調整
-                tp_mul = params_long['tp_mul'] * 2.0 if drive_pct > 1.0 else params_long['tp_mul']
-                # V3: VIX高時のTP拡張を適用
-                tp_mul = tp_mul * v3_tp_multiplier
-                sl_mul = params_long['sl_mul'] * v3_sl_multiplier
-                send_new_signal_pro(ticker, confirmed_row, score_long, params_long, 'LONG', tp_mul, sl_mul)
+    if not disabled.get('long', False):
+        # ③ RSI過熱感チェック: 既にRSI≥70の場合はオーバーボート → LONGスキップ
+        if rsi_val >= rsi_overbought:
+            logger.debug(f"{ticker}: LONG スキップ - RSI過熱({rsi_val:.1f} >= {rsi_overbought})")
+        # ③ VWAP上方乖離超過: 既に上に乗り過ぎ → LONGスキップ
+        elif vwap_dev_val >= vwap_dev_max:
+            logger.debug(f"{ticker}: LONG スキップ - VWAP上方乖離超過({vwap_dev_val:.2f}% >= {vwap_dev_max}%)")
+        else:
+            boost_long = 20 if drive_pct > 0.5 else 0
+
+            # Ver 13.5: リアルタイムブースト計算
+            rt_boost_long = calculate_realtime_boost(df, 'long', rival_dfs_for_ticker)
+            boost_long += rt_boost_long['total']
+
+            score_long = calculate_single_score(confirmed_row, params_long, 'long', boost_long)
+            threshold_long = params_long['threshold'] + threshold_adjustment + v3_threshold_adj
+
+            if score_long >= threshold_long:
+                if check_trend_filter(current_price, ma15_value, 'LONG'):
+                    journal_entry = {
+                        'ticker': ticker, 'side': 'LONG', 'entry_price': current_price,
+                        'entry_time': confirmed_row.name.isoformat(),
+                        'market_sentiment': market_sentiment_value,
+                        'rsi': rsi_val,
+                        'vwap_dev': vwap_dev_val,
+                        'rvol': safe_get(confirmed_row, 'rvol', 1.0),
+                        'adx': safe_get(confirmed_row, 'adx_14', 0),
+                        'ma15_value': ma15_value,
+                        'ma15_diff_pct': ((current_price / ma15_value - 1) * 100) if ma15_value > 0 else 0,
+                        'vix_value': vix_value,
+                        'sox_chg': sox_chg,
+                        'tnx_chg': tnx_chg,
+                        'divergence_bullish': False,
+                        'divergence_bearish': False,
+                        'cooldown_overridden': cooldown_overridden,
+                        'score': score_long,
+                        'threshold': threshold_long,
+                        'sector_alignment': rt_boost_long['sector_alignment'],
+                        'volume_accel': rt_boost_long['volume_accel'],
+                        'divergence_bonus': rt_boost_long['divergence_bonus']
+                    }
+                    record_trade_journal(journal_entry)
+
+                    tp_mul = params_long['tp_mul'] * 2.0 if drive_pct > 1.0 else params_long['tp_mul']
+                    tp_mul = tp_mul * v3_tp_multiplier
+                    sl_mul = params_long['sl_mul'] * v3_sl_multiplier
+                    send_new_signal_pro(ticker, confirmed_row, score_long, params_long, 'LONG',
+                                        tp_mul, sl_mul, v3_risk_multiplier)
     else:
         logger.debug(f"{ticker}: LONGはエントリー禁止（利益<5%）")
 
     # SHORT
-    if not disabled.get('short', False):  # Ver 11.0: SHORT禁止チェック
-        boost_short = 20 if drive_pct < -0.5 else 0
-        
-        # Ver 13.5: リアルタイムブースト計算
-        rt_boost_short = calculate_realtime_boost(df, 'short', rival_dfs_for_ticker)
-        boost_short += rt_boost_short['total']
-        
-        score_short = calculate_single_score(confirmed_row, params_short, 'short', boost_short)
-        threshold_short = params_short['threshold'] + threshold_adjustment + v3_threshold_adj
-        
-        if score_short >= threshold_short:
-            if check_trend_filter(current_price, ma15_value, 'SHORT'):
-                # Ver 13.5: ジャーナル記録（ブースト詳細付き）
-                journal_entry = {
-                    'ticker': ticker, 'side': 'SHORT', 'entry_price': current_price,
-                    'entry_time': confirmed_row.name.isoformat(),
-                    'market_sentiment': market_sentiment_value,
-                    'rsi': safe_get(confirmed_row, 'rsi_14', 50),
-                    'vwap_dev': safe_get(confirmed_row, 'vwap_dev', 0),
-                    'rvol': safe_get(confirmed_row, 'rvol', 1.0),
-                    'adx': safe_get(confirmed_row, 'adx_14', 0),
-                    'ma15_value': ma15_value,
-                    'ma15_diff_pct': ((current_price / ma15_value - 1) * 100) if ma15_value > 0 else 0,
-                    'vix_value': vix_value,
-                    'sox_chg': sox_chg,
-                    'tnx_chg': tnx_chg,
-                    'divergence_bullish': False,
-                    'divergence_bearish': False,
-                    'cooldown_overridden': cooldown_overridden,
-                    'score': score_short,
-                    'threshold': threshold_short,
-                    'sector_alignment': rt_boost_short['sector_alignment'],
-                    'volume_accel': rt_boost_short['volume_accel'],
-                    'divergence_bonus': rt_boost_short['divergence_bonus']
-                }
-                record_trade_journal(journal_entry)
-                
-                # ドライブによる通常のTP倍率調整
-                tp_mul = params_short['tp_mul'] * 2.0 if drive_pct < -1.0 else params_short['tp_mul']
-                # V3: VIX高時のTP拡張を適用
-                tp_mul = tp_mul * v3_tp_multiplier
-                sl_mul = params_short['sl_mul'] * v3_sl_multiplier
-                send_new_signal_pro(ticker, confirmed_row, score_short, params_short, 'SHORT', tp_mul, sl_mul)
+    if not disabled.get('short', False):
+        # ③ RSI売られ過ぎチェック: 既にRSI≤30の場合はオーバーソールド → SHORTスキップ
+        if rsi_val <= rsi_oversold:
+            logger.debug(f"{ticker}: SHORT スキップ - RSI売られ過ぎ({rsi_val:.1f} <= {rsi_oversold})")
+        # ③ VWAP下方乖離超過: 既に下に落ち過ぎ → SHORTスキップ
+        elif vwap_dev_val <= -vwap_dev_max:
+            logger.debug(f"{ticker}: SHORT スキップ - VWAP下方乖離超過({vwap_dev_val:.2f}% <= -{vwap_dev_max}%)")
+        else:
+            boost_short = 20 if drive_pct < -0.5 else 0
+
+            # Ver 13.5: リアルタイムブースト計算
+            rt_boost_short = calculate_realtime_boost(df, 'short', rival_dfs_for_ticker)
+            boost_short += rt_boost_short['total']
+
+            score_short = calculate_single_score(confirmed_row, params_short, 'short', boost_short)
+            threshold_short = params_short['threshold'] + threshold_adjustment + v3_threshold_adj
+
+            if score_short >= threshold_short:
+                if check_trend_filter(current_price, ma15_value, 'SHORT'):
+                    journal_entry = {
+                        'ticker': ticker, 'side': 'SHORT', 'entry_price': current_price,
+                        'entry_time': confirmed_row.name.isoformat(),
+                        'market_sentiment': market_sentiment_value,
+                        'rsi': rsi_val,
+                        'vwap_dev': vwap_dev_val,
+                        'rvol': safe_get(confirmed_row, 'rvol', 1.0),
+                        'adx': safe_get(confirmed_row, 'adx_14', 0),
+                        'ma15_value': ma15_value,
+                        'ma15_diff_pct': ((current_price / ma15_value - 1) * 100) if ma15_value > 0 else 0,
+                        'vix_value': vix_value,
+                        'sox_chg': sox_chg,
+                        'tnx_chg': tnx_chg,
+                        'divergence_bullish': False,
+                        'divergence_bearish': False,
+                        'cooldown_overridden': cooldown_overridden,
+                        'score': score_short,
+                        'threshold': threshold_short,
+                        'sector_alignment': rt_boost_short['sector_alignment'],
+                        'volume_accel': rt_boost_short['volume_accel'],
+                        'divergence_bonus': rt_boost_short['divergence_bonus']
+                    }
+                    record_trade_journal(journal_entry)
+
+                    tp_mul = params_short['tp_mul'] * 2.0 if drive_pct < -1.0 else params_short['tp_mul']
+                    tp_mul = tp_mul * v3_tp_multiplier
+                    sl_mul = params_short['sl_mul'] * v3_sl_multiplier
+                    send_new_signal_pro(ticker, confirmed_row, score_short, params_short, 'SHORT',
+                                        tp_mul, sl_mul, v3_risk_multiplier)
     else:
         logger.debug(f"{ticker}: SHORTはエントリー禁止（利益<5%）")
 
 
-def send_new_signal_pro(ticker: str, row: pd.Series, score: float, params: Dict, side: str, tp_mul: float, sl_mul: float = None):
-    """ポジション登録 (Ver 13.5: TP1/TP2分割決済 + トレーリングTP対応)"""
+def send_new_signal_pro(ticker: str, row: pd.Series, score: float, params: Dict, side: str,
+                        tp_mul: float, sl_mul: float = None, risk_multiplier: float = 1.0):
+    """ポジション登録 (Ver 14.0: RR強制 + シャンデリア出口 + VIXリスク調整通知)"""
     if sl_mul is None:
         sl_mul = params['sl_mul']
-    
+
+    # ⑤ RR比強制: tp_mul >= sl_mul × min_rr_ratio
+    min_rr_ratio = MONITORING_LOOP.get('min_rr_ratio', 1.5)
+    if tp_mul < sl_mul * min_rr_ratio:
+        adjusted_tp = sl_mul * min_rr_ratio
+        logger.info(f"{ticker}: RR不足(tp={tp_mul:.2f}/sl={sl_mul:.2f}, RR={tp_mul/sl_mul:.2f}) → tp_mul={adjusted_tp:.2f}に調整")
+        tp_mul = adjusted_tp
+
     atr = safe_get(row, 'atr_14', row['close'] * 0.02)
     entry_price = row['close']
-    
-    # Ver 13.5: TP1とTP2（トレーリング開始点）を分けて計算
+
     tp1_mul = POSITION_MANAGEMENT['tp1_multiplier']  # 1.5
-    trailing_atr_mul = POSITION_MANAGEMENT['trailing_atr_multiplier']  # 1.0
-    
+    chandelier_mul = POSITION_MANAGEMENT.get('chandelier_atr_multiplier', 2.5)
+    chandelier_lookback = POSITION_MANAGEMENT.get('chandelier_lookback', 5)
+
     if side == 'LONG':
         tp1 = entry_price + (atr * tp1_mul)
-        tp2 = entry_price + (atr * tp_mul)  # トレーリング上限目安
+        tp2 = entry_price + (atr * tp_mul)  # トレーリング参考値
         sl = entry_price - (atr * sl_mul)
     else:  # SHORT
         tp1 = entry_price - (atr * tp1_mul)
-        tp2 = entry_price - (atr * tp_mul)  # トレーリング上限目安
+        tp2 = entry_price - (atr * tp_mul)
         sl = entry_price + (atr * sl_mul)
-    
-    msg = (f"🛡️ **新規シグナル (Ver 13.5): {side}**\n"
+
+    rr_actual = tp_mul / sl_mul if sl_mul > 0 else 0
+
+    # ④ VIX高時のロット警告
+    risk_note = ""
+    if risk_multiplier < 1.0:
+        risk_note = f"\n⚠️ **VIX高リスク → 推奨ロット: 通常の{risk_multiplier * 100:.0f}% に削減**"
+
+    msg = (f"🛡️ **新規シグナル (Ver 14.0): {side}**\n"
            f"銘柄: {ticker}\n"
            f"価格: ¥{entry_price:,.1f}\n"
            f"TP1: ¥{tp1:,.1f} (ATR×{tp1_mul}) → 50%決済\n"
-           f"TP2: トレーリング (ATR×{trailing_atr_mul}幅)\n"
-           f"SL: ¥{sl:,.1f}\n"
-           f"スコア: {score:.1f}")
-    
+           f"TP2: シャンデリア出口 (直近{chandelier_lookback}本高値 - ATR×{chandelier_mul})\n"
+           f"SL: ¥{sl:,.1f} (ATR×{sl_mul:.2f})\n"
+           f"RR比: {rr_actual:.2f}\n"
+           f"スコア: {score:.1f}"
+           f"{risk_note}")
+
     if send_discord_notification(WEBHOOK_URL, msg):
-        # PositionManagerに登録
         pos_data = {
             'entry_atr': atr, 'tp_mul_actual': tp_mul, 'sl_mul_actual': sl_mul,
-            'trailing_atr_mul': trailing_atr_mul  # Ver 13.5
+            'chandelier_atr_mul': chandelier_mul  # Ver 14.0
         }
         extended_params = {**params, **pos_data}
         position_manager.add_position(ticker, side, entry_price, atr, sl, tp1, tp2, extended_params)
 
 
 def check_exit_signal(ticker: str, df: pd.DataFrame, cooldown: Dict) -> None:
-    """エグジット監視 (Ver 13.5: TP1後トレーリングTP)"""
+    """エグジット監視 (Ver 14.0: シャンデリア出口 + TP後クールダウン)"""
     position = position_manager.get_position(ticker)
     if not position: return
-    
+
     latest_row = df.iloc[-1]
-    current_price = latest_row['close']
     high_price = latest_row['high']
     low_price = latest_row['low']
     side = position['side']
-    
+
     stop_loss = position['stop_loss']
-    tp1 = position.get('tp1', position['tp2'])  # デフォルトはtp2と同じ
-    tp2 = position['tp2']
+    tp1 = position.get('tp1', position['tp2'])
     tp1_hit = position.get('tp1_hit', False)
-    trailing_atr_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
     atr = position.get('atr', position.get('params', {}).get('entry_atr', 0))
-    
+
+    # ② シャンデリア出口パラメータ（Ver 14.0）
+    chandelier_lookback = POSITION_MANAGEMENT.get('chandelier_lookback', 5)
+    chandelier_mul = POSITION_MANAGEMENT.get('chandelier_atr_multiplier', 2.5)
+
     try:
         # --- TP1未達時: 損切チェック ---
         if not tp1_hit:
@@ -543,69 +592,79 @@ def check_exit_signal(ticker: str, df: pd.DataFrame, cooldown: Dict) -> None:
                (side == 'SHORT' and high_price >= stop_loss):
                 result = position_manager.close_position(ticker, stop_loss, 'SL')
                 send_exit_notification(result)
-                # Ver 12.0: 当日制限に追加
                 add_to_cooldown(ticker, 'SL', cooldown)
                 return
-        
-        # TP1チェック（まだTP1に達していない場合）
+
+        # --- TP1チェック ---
         if not tp1_hit:
             if (side == 'LONG' and high_price >= tp1) or \
                (side == 'SHORT' and low_price <= tp1):
-                # TP1で50%利確
                 profit = position_manager.execute_tp1(ticker, tp1)
-                # Ver 13.5: トレーリングストップの初期値を設定
-                atr_trail = atr * trailing_atr_mul
+                # ② シャンデリア出口: TP1後は直近N本の高値/安値からATR×chandelier_mulのゆったりトレーリング
+                recent_slice = df.iloc[-chandelier_lookback:]
                 if side == 'LONG':
-                    initial_trail = high_price - atr_trail
+                    highest_high = recent_slice['high'].max()
+                    initial_trail = highest_high - (atr * chandelier_mul)
                 else:
-                    initial_trail = low_price + atr_trail
+                    lowest_low = recent_slice['low'].min()
+                    initial_trail = lowest_low + (atr * chandelier_mul)
                 position_manager.set_trailing_stop(ticker, initial_trail)
                 send_tp1_notification(ticker, tp1, profit)
+                # ① TP1後も当日制限に追加（同一銘柄の再エントリーを禁止）
+                add_to_cooldown(ticker, 'TP1', cooldown)
                 return
-        
-        # --- Ver 13.5: TP1後はトレーリングストップで追従 ---
+
+        # --- Ver 14.0: TP1後はシャンデリア出口で追従 ---
         if tp1_hit:
             trailing_stop = position.get('trailing_stop', stop_loss)
-            atr_trail = atr * trailing_atr_mul
-            
+
             if side == 'LONG':
-                # 高値更新でトレーリングストップを引き上げ
-                new_trail = high_price - atr_trail
+                # ② シャンデリア: 直近N本の最高値 - ATR × chandelier_mul
+                recent_slice = df.iloc[-chandelier_lookback:]
+                highest_high = recent_slice['high'].max()
+                new_trail = highest_high - (atr * chandelier_mul)
                 if new_trail > trailing_stop:
                     trailing_stop = new_trail
                     position_manager.update_trailing_stop(ticker, trailing_stop)
-                
-                # トレーリングストップにタッチ → 決済
+
                 if low_price <= trailing_stop:
                     result = position_manager.close_position(ticker, trailing_stop, 'TRAILING_EXIT')
                     send_exit_notification(result)
+                    # ① TRAILING_EXIT後も当日制限に追加
+                    add_to_cooldown(ticker, 'TRAILING_EXIT', cooldown)
                     return
             else:  # SHORT
-                # 安値更新でトレーリングストップを引き下げ
-                new_trail = low_price + atr_trail
+                # ② シャンデリア: 直近N本の最安値 + ATR × chandelier_mul
+                recent_slice = df.iloc[-chandelier_lookback:]
+                lowest_low = recent_slice['low'].min()
+                new_trail = lowest_low + (atr * chandelier_mul)
                 if new_trail < trailing_stop:
                     trailing_stop = new_trail
                     position_manager.update_trailing_stop(ticker, trailing_stop)
-                
-                # トレーリングストップにタッチ → 決済
+
                 if high_price >= trailing_stop:
                     result = position_manager.close_position(ticker, trailing_stop, 'TRAILING_EXIT')
                     send_exit_notification(result)
+                    # ① TRAILING_EXIT後も当日制限に追加
+                    add_to_cooldown(ticker, 'TRAILING_EXIT', cooldown)
                     return
-    
+
     except Exception as e:
         logger.error(f"エグジット監視エラー ({ticker}): {str(e)}")
 
 
 def send_tp1_notification(ticker: str, tp1_price: float, profit: float) -> None:
-    """TP1達成通知（Ver 13.5: トレーリング移行通知）"""
-    trailing_atr_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
+    """TP1達成通知（Ver 14.0: シャンデリア出口移行通知）"""
+    chandelier_mul = POSITION_MANAGEMENT.get('chandelier_atr_multiplier', 2.5)
+    chandelier_lookback = POSITION_MANAGEMENT.get('chandelier_lookback', 5)
     message = (f"✅ **TP1達成: {ticker}**\n"
                f"🎯 50%利確完了\n"
                f"・価格: ¥{tp1_price:,.1f}\n"
                f"・損益: {profit:+.2f}%\n"
                f"・損切を建値に移動しました\n"
-               f"・残り50%はトレーリングTP (ATR×{trailing_atr_mul}) で追従中")
+               f"・残り50%はシャンデリア出口で追従中\n"
+               f"  （直近{chandelier_lookback}本高値/安値 - ATR×{chandelier_mul}）\n"
+               f"⚠️ 当日同銘柄の再エントリーは禁止されました")
     send_discord_notification(WEBHOOK_URL, message)
 
 
@@ -728,20 +787,32 @@ def monitor():
     start_run_time = time.time() # 実行開始時間の記録
 
     try:
-        # 地合い判定（終了時刻前のみ待機）
-        while datetime.now(pytz.timezone('Asia/Tokyo')).time() < dt_time.fromisoformat(MARKET_SENTIMENT['judgment_time']):
-            if datetime.now(pytz.timezone('Asia/Tokyo')).time() >= monitor_end_time:
-                logger.info("待機中に終了時刻に達したため終了します")
-                return
-            time.sleep(10)
-        threshold_adj = 0.0 # 簡易化
+        # スケジューラ遅延対応: MONITOR_START_TIME環境変数で開始待機時刻を制御
+        # AMワークフロー: MONITOR_START_TIME='09:30'（08:00 JSTから最大1.5時間待機）
+        # PMワークフロー: MONITOR_START_TIME='12:30'（11:30 JSTから最大1時間待機）
+        # 2時間遅延が発生した場合でも開始時刻が既に過ぎていれば即座に監視を開始する
+        monitor_start_time_str = os.environ.get('MONITOR_START_TIME', MONITORING_LOOP['start_time'])
+        monitor_start_time = dt_time.fromisoformat(monitor_start_time_str)
+        logger.info(f"監視開始待機時刻: {monitor_start_time_str}（既に過ぎていれば即開始）")
 
-        # 監視開始待機（終了時刻前のみ待機）
-        while datetime.now(pytz.timezone('Asia/Tokyo')).time() < dt_time.fromisoformat(MONITORING_LOOP['start_time']):
-            if datetime.now(pytz.timezone('Asia/Tokyo')).time() >= monitor_end_time:
+        last_log_minute = -1
+        while datetime.now(pytz.timezone('Asia/Tokyo')).time() < monitor_start_time:
+            current_jst = datetime.now(pytz.timezone('Asia/Tokyo')).time()
+            if current_jst >= monitor_end_time:
                 logger.info("待機中に終了時刻に達したため終了します")
                 return
+            # 10分ごとに残り時間をログ出力
+            remaining_sec = (
+                datetime.combine(datetime.today(), monitor_start_time) -
+                datetime.combine(datetime.today(), current_jst)
+            ).seconds
+            remaining_min = remaining_sec // 60
+            if remaining_min != last_log_minute and remaining_min % 10 == 0:
+                logger.info(f"監視開始待機中... 残り約{remaining_min}分 → {monitor_start_time_str}に開始予定")
+                last_log_minute = remaining_min
             time.sleep(10)
+
+        threshold_adj = 0.0
 
         # V3: マクロ指標取得（09:30に1回実行）
         global macro_sentiment
