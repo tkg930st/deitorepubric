@@ -37,7 +37,7 @@ PARAM_RANGES = {
     'w_adx': (10, 35),
     'threshold': (30, 75),
     'sl_mul': (0.8, 2.2),
-    'tp_mul': (1.2, 4.0)
+    'tp_mul': (2.0, 5.0)  # ⑤ RR≥1.5確保のため下限を2.0に引き上げ（旧: 1.2〜4.0）
 }
 
 # トレンドフィルター設定（Version 7.0/8.0）
@@ -76,7 +76,11 @@ SIGNAL_THRESHOLDS = {
     'vwap_dev_high': 1.0,
     'rvol_threshold': 1.5,
     'adx_threshold': 25,
-    'adx_trend_strength': 30  # トレーリング開始判断基準（Ver 10.3）
+    'adx_trend_strength': 30,  # トレーリング開始判断基準（Ver 10.3）
+    # ③ エントリーフィルター強化（Ver 14.0）
+    'rsi_overbought': 70,    # LONGエントリー禁止: RSIがこの値以上（過熱）
+    'rsi_oversold': 30,      # SHORTエントリー禁止: RSIがこの値以下（売られ過ぎ）
+    'vwap_dev_max': 2.5,     # エントリー禁止: VWAP乖離率がこの値（%）を超える場合
 }
 
 # 取引時間設定（JST）
@@ -109,7 +113,12 @@ POSITION_MANAGEMENT = {
     'tp1_exit_ratio': 0.5,  # TP1での決済比率（50%）
     'breakeven_enabled': True,  # TP1後に建値へ移動（Ver 12.0で有効化）
     'trailing_ma_period': 15,    # トレーリング停止判定用MA（Ver 10.3）
-    'trailing_atr_multiplier': 1.0,  # Ver 13.5: TP1後のトレーリングストップ幅（ATR×1.0）
+    'trailing_atr_multiplier': 1.0,  # レガシー（後方互換）
+    # ② シャンデリア出口設定（Ver 14.0）
+    # 「直近N本の最高値（最安値）- ATR × chandelier_atr_multiplier」でトレーリングを設定
+    # ゆったりとした幅にすることでTP2（トレーリング）での利益確定率を高める
+    'chandelier_lookback': 5,         # 最高値/最安値を参照する直近バー数
+    'chandelier_atr_multiplier': 2.5, # ATR倍率（1.0より大きくしてゆったりした幅に）
 }
 
 # Ver 13.5: セクター・アライメント設定
@@ -161,9 +170,15 @@ MARKET_SENTIMENT = {
 
 # 監視ループ設定
 MONITORING_LOOP = {
-    'start_time': '09:30',      # 監視開始時刻
+    'start_time': '09:30',      # 監視開始時刻（MONITOR_START_TIME環境変数で上書き可能）
     'judgment_time': '09:15',   # 地合い判定時刻
     'end_time': '15:00',        # 監視終了時刻
     'loop_interval': 60,        # ループ間隔（秒）
     'use_confirmed_candle': True,  # 確定足を使用するか
+    # ③ エントリーカットオフ時刻（Ver 14.0）
+    # ENTRY_CUTOFF_TIME環境変数で上書き可能（AMワークフロー: 10:30, PMワークフロー: 14:00）
+    'am_entry_cutoff': '10:30',  # 前場: 10:30以降は新規エントリー禁止（ダラダラ展開を回避）
+    'pm_entry_cutoff': '14:00',  # 後場: 14:00以降は新規エントリー禁止（大引け前を回避）
+    # ⑤ リスク・リワード比の最低保証
+    'min_rr_ratio': 1.5,         # tp_mul >= sl_mul * min_rr_ratio を強制
 }
