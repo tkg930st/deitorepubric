@@ -3,7 +3,7 @@ name: 2. Trade Monitor AM
 on:
   schedule:
     # JST 月-金 09:00 (UTC 月-金 00:00) に起動
-    - cron: '0 0 * * 1-5'
+    - cron: '0 22 * * 0-4'
   workflow_dispatch:
 
 jobs:
