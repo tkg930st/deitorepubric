@@ -758,17 +758,25 @@ def monitor():
             all_rival_tickers.update(rival_list)
         all_rival_tickers -= set(tickers)  # 監視銘柄と重複するものを除外
         
+        # 環境変数から終了時刻・最大実行時間を取得（AMセッション/PMセッション別制御）
+        # MONITOR_END_TIME: ワークフロー側からセッションに応じた終了時刻を指定（例: AM='11:25', PM='14:55'）
+        # MAX_RUNTIME_MINUTES: ワークフローのtimeout-minutesより短い値を指定してグレースフルに終了
+        monitor_end_time_str = os.environ.get('MONITOR_END_TIME', MONITORING_LOOP['end_time'])
+        max_runtime_minutes = int(os.environ.get('MAX_RUNTIME_MINUTES', '345'))  # デフォルト: 5時間45分
+        logger.info(f"監視設定: 終了時刻={monitor_end_time_str}, 最大実行時間={max_runtime_minutes}分")
+
         while True:
             current_time = datetime.now(pytz.timezone('Asia/Tokyo')).time()
-            
-            # --- GitHub Actions 6時間制限対策 ---
-            if time.time() - start_run_time > 20700: # 5時間45分経過
-                send_discord_notification(WEBHOOK_URL, "⚠️ **実行制限（6時間）が近づいたため、サマリーを送信して終了します。**")
+
+            # 最大実行時間チェック（GitHub Actions タイムアウトより先にグレースフル終了）
+            elapsed_minutes = (time.time() - start_run_time) / 60
+            if elapsed_minutes > max_runtime_minutes:
+                send_discord_notification(WEBHOOK_URL, f"⚠️ **最大実行時間（{max_runtime_minutes}分）に達したため正常終了します。**")
                 send_daily_summary()
                 break
-            
-            if current_time >= dt_time.fromisoformat(MONITORING_LOOP['end_time']):
-                # Ver 12.0: 15:00サマリー通知
+
+            if current_time >= dt_time.fromisoformat(monitor_end_time_str):
+                # 監視終了時刻に達した → サマリー通知して正常終了
                 send_daily_summary()
                 break
             
