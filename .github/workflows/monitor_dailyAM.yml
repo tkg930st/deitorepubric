@@ -73,6 +73,8 @@ jobs:
           MAX_RUNTIME_MINUTES: '200'    # 08:05起動→11:25終了 = 最大200分（安全網）
           # ③ 前場エントリーカットオフ: 10:30以降は新規エントリーしない
           ENTRY_CUTOFF_TIME: '10:30'
+          # セッション終了時に残ポジションを強制決済してtrade_results.csvに記録
+          # （PMで引き継がず、AMで完結させてデータ消失を防止）
         # 08:00〜11:30 = 最大210分のタイムアウト（余裕を持たせる）
         timeout-minutes: 210
         run: python monitor.py

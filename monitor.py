@@ -683,57 +683,108 @@ def send_exit_notification(result: Dict) -> None:
     send_discord_notification(WEBHOOK_URL, message)
 
 
+def force_close_remaining() -> None:
+    """セッション終了時: 全ポジションを強制決済してtrade_results.csvに確実に記録する
+
+    ポジションが残ったままセッションが終了すると、PMワークフローの
+    "Clear positions.json" ステップでポジションが消失し、trade_results.csv に
+    記録されず「取引なし」と判定されてしまう問題を防止する。
+    """
+    positions = position_manager.get_all_positions()
+    if not positions:
+        logger.info("強制決済: 残ポジションなし")
+        return
+
+    tickers_to_close = list(positions.keys())
+    logger.info(f"セッション終了: {len(tickers_to_close)}件のポジションを強制決済します")
+
+    # 最新価格を取得して決済
+    current_prices = {}
+    try:
+        raw_data = fetch_yfinance_data(tickers_to_close, period='1d', interval='5m')
+        for ticker in tickers_to_close:
+            try:
+                df = super_flatten_columns(raw_data[ticker] if len(tickers_to_close) > 1 else raw_data)
+                if not df.empty:
+                    current_prices[ticker] = df['close'].iloc[-1]
+            except Exception:
+                pass
+    except Exception as e:
+        logger.error(f"強制決済: 価格取得失敗 ({str(e)})")
+
+    # 価格取得できなかった銘柄はエントリー価格をフォールバック（損益0%で記録を残す）
+    for ticker in tickers_to_close:
+        if ticker not in current_prices:
+            current_prices[ticker] = positions[ticker].get('entry_price', 0)
+            logger.warning(f"強制決済: {ticker}の最新価格を取得できず、エントリー価格で決済します")
+
+    results = position_manager.force_close_all(current_prices)
+    for result in results:
+        send_exit_notification(result)
+
+    logger.info(f"強制決済完了: {len(results)}件をtrade_results.csvに記録しました")
+
+
 def send_daily_summary() -> None:
-    """15:00サマリー通知（Ver 12.0）"""
+    """取引サマリー通知（Ver 14.0: exit_timeベースに修正）"""
     try:
         results_file = POSITION_MANAGEMENT['trade_results_file']
-        
+
         if not os.path.exists(results_file):
             logger.info("取引結果ファイルが存在しません")
+            send_discord_notification(WEBHOOK_URL, "📊 **本日の取引サマリー**\n取引結果ファイルが存在しません")
             return
-        
-        # CSVから当日分を抽出
+
         df_results = pd.read_csv(results_file)
-        df_results['entry_time'] = pd.to_datetime(df_results['entry_time'])
-        
-        today = datetime.now().date()
-        df_today = df_results[df_results['entry_time'].dt.date == today]
-        
-        if df_today.empty:
+        if df_results.empty:
             send_discord_notification(WEBHOOK_URL, "📊 **本日の取引サマリー**\n本日は取引がありませんでした")
             return
-        
+
+        # exit_time でフィルタ（前場で建てて後場で閉じたケースも正しく集計）
+        df_results['exit_time'] = pd.to_datetime(df_results['exit_time'])
+        today = datetime.now().date()  # UTC（GitHub Actions環境）
+        df_today = df_results[df_results['exit_time'].dt.date == today]
+
+        if df_today.empty:
+            send_discord_notification(WEBHOOK_URL, "📊 **本日の取引サマリー**\n本日は決済された取引がありませんでした")
+            return
+
         # 統計計算
         total_profit = df_today['total_profit'].sum()
         trade_count = len(df_today)
         win_count = len(df_today[df_today['total_profit'] > 0])
         win_rate = (win_count / trade_count * 100) if trade_count > 0 else 0
-        
+
         # 最大利益銘柄
         max_profit_row = df_today.loc[df_today['total_profit'].idxmax()]
         max_ticker = max_profit_row['ticker']
         max_profit = max_profit_row['total_profit']
-        
+
         # 最大損失銘柄
         min_profit_row = df_today.loc[df_today['total_profit'].idxmin()]
         min_ticker = min_profit_row['ticker']
         min_profit = min_profit_row['total_profit']
-        
-        # メッセージ作成
+
+        # 決済理由の内訳
+        reasons = df_today['exit_reason'].value_counts()
+        reason_str = " / ".join([f"{r}: {c}件" for r, c in reasons.items()])
+
         message = f"""📊 **本日の取引サマリー**
 
 💰 総損益: {total_profit:+.2f}%
 🔄 取引回数: {trade_count}回
 ✅ 勝率: {win_rate:.1f}% ({win_count}/{trade_count})
+🔖 決済理由: {reason_str}
 
 📈 最大利益: {max_ticker} ({max_profit:+.2f}%)
 📉 最大損失: {min_ticker} ({min_profit:+.2f}%)"""
-        
+
         send_discord_notification(WEBHOOK_URL, message)
         logger.info(f"サマリー通知完了: 総損益={total_profit:.2f}%, 取引数={trade_count}")
-    
+
     except Exception as e:
         logger.error(f"サマリー通知エラー: {str(e)}")
+        send_discord_notification(WEBHOOK_URL, f"📊 **本日の取引サマリー**\n⚠️ サマリー生成エラー: {str(e)}")
 
 
 def monitor():
@@ -779,7 +830,7 @@ def monitor():
             if flags['short']: disabled_sides.append('SHORT')
             disabled_info.append(f"{ticker}: {'/'.join(disabled_sides)}禁止")
 
-    startup_msg = "📡 **Version 13.5 プロ版 監視起動**\n🌐 マクロ・アライメント + セクター・ブースト + トレーリングTP搭載"
+    startup_msg = "📡 **Version 14.0 プロ版 監視起動**\n🌐 マクロ・アライメント + シャンデリア出口 + RR≥1.5保証"
     if disabled_info:
         startup_msg += f"\n\n🚫 **エントリー禁止設定:**\n" + "\n".join(disabled_info)
 
@@ -860,40 +911,62 @@ def monitor():
             elapsed_minutes = (time.time() - start_run_time) / 60
             if elapsed_minutes > max_runtime_minutes:
                 send_discord_notification(WEBHOOK_URL, f"⚠️ **最大実行時間（{max_runtime_minutes}分）に達したため正常終了します。**")
+                force_close_remaining()
                 send_daily_summary()
                 break
 
             if current_time >= monitor_end_time:
-                # 監視終了時刻に達した → サマリー通知して正常終了
+                # 監視終了時刻に達した → 残ポジションを強制決済してからサマリー通知
+                logger.info(f"監視終了時刻({monitor_end_time_str})に達しました。終了処理を開始します。")
+                force_close_remaining()
                 send_daily_summary()
                 break
-            
-            # Ver 13.5: ライバル銘柄データも同時取得
-            if all_rival_tickers:
-                fetch_rival_data(list(all_rival_tickers))
-            
-            raw_data = fetch_yfinance_data(tickers, period='5d', interval='5m')
-            for ticker in tickers:
-                try:
-                    df = super_flatten_columns(raw_data[ticker] if len(tickers)>1 else raw_data)
-                    df_ind = calculate_technical_indicators(df)
-                    if TREND_FILTER['enabled']:
-                        df_ind['ma_15m_20'] = calculate_ma_from_higher_timeframe(df_ind, TREND_FILTER['ma_period'])
-                    
-                    cooldown = load_daily_cooldown()  # Ver 12.0: 毎回読み込み
-                    
-                    if position_manager.has_position(ticker):
-                        check_exit_signal(ticker, df_ind, cooldown)
-                    else:
-                        p = params_all[ticker]
-                        sector = sectors_map.get(ticker, '')
-                        disabled = disabled_map.get(ticker, {'long': False, 'short': False})
-                        rivals = rivals_map.get(ticker, [])
-                        check_new_signal(ticker, df_ind, p['long'], p['short'], threshold_adj, cooldown, 0.0, sector, disabled, rivals)
-                except: continue
+
+            # --- メインデータ取得・シグナル処理 ---
+            # データ取得失敗時にmonitorがクラッシュしないようtry/exceptで保護
+            try:
+                # Ver 13.5: ライバル銘柄データも同時取得
+                if all_rival_tickers:
+                    fetch_rival_data(list(all_rival_tickers))
+
+                raw_data = fetch_yfinance_data(tickers, period='5d', interval='5m')
+                for ticker in tickers:
+                    try:
+                        df = super_flatten_columns(raw_data[ticker] if len(tickers)>1 else raw_data)
+                        df_ind = calculate_technical_indicators(df)
+                        if TREND_FILTER['enabled']:
+                            df_ind['ma_15m_20'] = calculate_ma_from_higher_timeframe(df_ind, TREND_FILTER['ma_period'])
+
+                        cooldown = load_daily_cooldown()  # Ver 12.0: 毎回読み込み
+
+                        if position_manager.has_position(ticker):
+                            check_exit_signal(ticker, df_ind, cooldown)
+                        else:
+                            p = params_all[ticker]
+                            sector = sectors_map.get(ticker, '')
+                            disabled = disabled_map.get(ticker, {'long': False, 'short': False})
+                            rivals = rivals_map.get(ticker, [])
+                            check_new_signal(ticker, df_ind, p['long'], p['short'], threshold_adj, cooldown, 0.0, sector, disabled, rivals)
+                    except Exception as e:
+                        logger.debug(f"{ticker} 処理エラー: {str(e)}")
+                        continue
+            except Exception as e:
+                logger.error(f"データ取得/処理エラー（次のループで再試行）: {str(e)}")
+
             time.sleep(60)
+
     except KeyboardInterrupt:
-        pass
+        logger.info("KeyboardInterrupt: 終了処理を実行します")
+        force_close_remaining()
+        send_daily_summary()
+    except Exception as e:
+        # 予期せぬ例外でもポジションを確実に決済して記録を残す
+        logger.error(f"monitor() 予期せぬ例外: {str(e)}")
+        try:
+            force_close_remaining()
+            send_daily_summary()
+        except Exception as e2:
+            logger.error(f"終了処理中のエラー: {str(e2)}")
 
 
 if __name__ == "__main__":
