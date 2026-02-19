@@ -1,45 +1,45 @@
 {
-  "timestamp": "2026-02-18T17:20:11.358315",
+  "timestamp": "2026-02-19T17:11:54.535880",
   "version": "13.5",
-  "profit": 48.55648851378777,
+  "profit": 21.053964109751636,
   "params": {
     "long": {
-      "w_rsi": 12,
-      "w_vwap": 20,
-      "w_rvol": 20,
-      "w_adx": 34,
+      "w_rsi": 35,
+      "w_vwap": 24,
+      "w_rvol": 30,
+      "w_adx": 33,
       "threshold": 60.0,
-      "sl_mul": 2.153968505281376,
-      "tp_mul": 1.6551179925242425
+      "sl_mul": 2.145663327338572,
+      "tp_mul": 3.218494991007858
     },
     "short": {
-      "w_rsi": 11,
-      "w_vwap": 21,
-      "w_rvol": 13,
-      "w_adx": 17,
+      "w_rsi": 12,
+      "w_vwap": 16,
+      "w_rvol": 19,
+      "w_adx": 32,
       "threshold": 75,
-      "sl_mul": 1.0334446030581088,
-      "tp_mul": 3.9519846336862194
+      "sl_mul": 0.8380027226817323,
+      "tp_mul": 2.0951309525859405
     }
   },
   "top_5": [
     "3103.T",
-    "3110.T",
     "285A.T",
+    "7012.T",
+    "3436.T",
     "9984.T",
-    "5713.T",
-    "4506.T",
+    "1662.T",
     "6330.T",
-    "7012.T"
+    "5713.T"
   ],
   "details": [
     {
       "t": "3103.T",
-      "profit": 48.55648851378777,
-      "long_profit": 48.55648851378777,
+      "profit": 21.053964109751636,
+      "long_profit": 21.053964109751636,
       "short_profit": 0.0,
-      "raw_long_profit": 48.55648851378777,
-      "raw_short_profit": -0.2811114278334436,
+      "raw_long_profit": 21.053964109751636,
+      "raw_short_profit": 0.0,
       "long_disabled": false,
       "short_disabled": true,
       "sector": "繊維製品",
@@ -53,71 +53,32 @@
       ],
       "params": {
         "long": {
+          "w_rsi": 35,
+          "w_vwap": 24,
+          "w_rvol": 30,
+          "w_adx": 33,
+          "threshold": 60.0,
+          "sl_mul": 2.145663327338572,
+          "tp_mul": 3.218494991007858
+        },
+        "short": {
           "w_rsi": 12,
-          "w_vwap": 20,
-          "w_rvol": 20,
-          "w_adx": 34,
-          "threshold": 60.0,
-          "sl_mul": 2.153968505281376,
-          "tp_mul": 1.6551179925242425
-        },
-        "short": {
-          "w_rsi": 11,
-          "w_vwap": 21,
-          "w_rvol": 13,
-          "w_adx": 17,
+          "w_vwap": 16,
+          "w_rvol": 19,
+          "w_adx": 32,
           "threshold": 75,
-          "sl_mul": 1.0334446030581088,
-          "tp_mul": 3.9519846336862194
-        }
-      }
-    },
-    {
-      "t": "3110.T",
-      "profit": 25.066735209333935,
-      "long_profit": 10.47836700058048,
-      "short_profit": 14.588368208753455,
-      "raw_long_profit": 10.47836700058048,
-      "raw_short_profit": 14.588368208753455,
-      "long_disabled": false,
-      "short_disabled": false,
-      "sector": "ガラス・土石製品",
-      "size_category": "TOPIX Small 1",
-      "rivals": [
-        "5201.T",
-        "5202.T",
-        "5214.T",
-        "5232.T",
-        "5233.T"
-      ],
-      "params": {
-        "long": {
-          "w_rsi": 30,
-          "w_vwap": 10,
-          "w_rvol": 31,
-          "w_adx": 12,
-          "threshold": 60.0,
-          "sl_mul": 1.418026677451825,
-          "tp_mul": 1.2226875057418425
-        },
-        "short": {
-          "w_rsi": 10,
-          "w_vwap": 11,
-          "w_rvol": 16,
-          "w_adx": 19,
-          "threshold": 60,
-          "sl_mul": 2.141877064685851,
-          "tp_mul": 1.2457652431605168
+          "sl_mul": 0.8380027226817323,
+          "tp_mul": 2.0951309525859405
         }
       }
     },
     {
       "t": "285A.T",
-      "profit": 21.381959462260987,
-      "long_profit": 21.381959462260987,
+      "profit": 17.654585192033277,
+      "long_profit": 17.654585192033277,
       "short_profit": 0.0,
-      "raw_long_profit": 21.381959462260987,
-      "raw_short_profit": 3.105180682222691,
+      "raw_long_profit": 17.654585192033277,
+      "raw_short_profit": 0.5882126963828732,
       "long_disabled": false,
       "short_disabled": true,
       "sector": "電気機器",
@@ -131,188 +92,32 @@
       ],
       "params": {
         "long": {
-          "w_rsi": 17,
-          "w_vwap": 16,
-          "w_rvol": 29,
+          "w_rsi": 26,
+          "w_vwap": 29,
+          "w_rvol": 20,
           "w_adx": 35,
           "threshold": 60.0,
-          "sl_mul": 2.1898059320623884,
-          "tp_mul": 2.996296308601299
+          "sl_mul": 2.197973743908349,
+          "tp_mul": 3.4515251773719138
         },
         "short": {
-          "w_rsi": 21,
-          "w_vwap": 22,
-          "w_rvol": 15,
-          "w_adx": 24,
-          "threshold": 68,
-          "sl_mul": 0.9869382936964511,
-          "tp_mul": 1.4616651229850963
-        }
-      }
-    },
-    {
-      "t": "9984.T",
-      "profit": 20.282301765467196,
-      "long_profit": 14.187183171081806,
-      "short_profit": 6.09511859438539,
-      "raw_long_profit": 14.187183171081806,
-      "raw_short_profit": 6.09511859438539,
-      "long_disabled": false,
-      "short_disabled": false,
-      "sector": "情報・通信業",
-      "size_category": "TOPIX Core30",
-      "rivals": [
-        "2121.T",
-        "2307.T",
-        "2317.T",
-        "2326.T",
-        "2327.T"
-      ],
-      "params": {
-        "long": {
-          "w_rsi": 21,
-          "w_vwap": 21,
-          "w_rvol": 34,
-          "w_adx": 24,
+          "w_rsi": 27,
+          "w_vwap": 24,
+          "w_rvol": 19,
+          "w_adx": 13,
           "threshold": 60.0,
-          "sl_mul": 1.6192499907710514,
-          "tp_mul": 2.0702047694211743
-        },
-        "short": {
-          "w_rsi": 10,
-          "w_vwap": 23,
-          "w_rvol": 13,
-          "w_adx": 24,
-          "threshold": 60.0,
-          "sl_mul": 1.3405569626269482,
-          "tp_mul": 1.427084104690623
-        }
-      }
-    },
-    {
-      "t": "5713.T",
-      "profit": 11.283534875731435,
-      "long_profit": 11.283534875731435,
-      "short_profit": 0.0,
-      "raw_long_profit": 11.283534875731435,
-      "raw_short_profit": 4.371161385537865,
-      "long_disabled": false,
-      "short_disabled": true,
-      "sector": "非鉄金属",
-      "size_category": "TOPIX Mid400",
-      "rivals": [
-        "5016.T",
-        "5702.T",
-        "5703.T",
-        "5706.T",
-        "5707.T"
-      ],
-      "params": {
-        "long": {
-          "w_rsi": 16,
-          "w_vwap": 12,
-          "w_rvol": 31,
-          "w_adx": 35,
-          "threshold": 60.0,
-          "sl_mul": 1.6199539571918786,
-          "tp_mul": 1.8886762722841806
-        },
-        "short": {
-          "w_rsi": 14,
-          "w_vwap": 19,
-          "w_rvol": 16,
-          "w_adx": 10,
-          "threshold": 67,
-          "sl_mul": 1.885888941835095,
-          "tp_mul": 2.5913538501650093
-        }
-      }
-    },
-    {
-      "t": "4506.T",
-      "profit": 9.50823551466311,
-      "long_profit": 0.0,
-      "short_profit": 9.50823551466311,
-      "raw_long_profit": 4.223605539994368,
-      "raw_short_profit": 9.50823551466311,
-      "long_disabled": true,
-      "short_disabled": false,
-      "sector": "医薬品",
-      "size_category": "TOPIX Mid400",
-      "rivals": [
-        "4151.T",
-        "4502.T",
-        "4503.T",
-        "4507.T",
-        "4516.T"
-      ],
-      "params": {
-        "long": {
-          "w_rsi": 14,
-          "w_vwap": 14,
-          "w_rvol": 15,
-          "w_adx": 16,
-          "threshold": 70,
-          "sl_mul": 0.801206922596729,
-          "tp_mul": 2.9024648072607304
-        },
-        "short": {
-          "w_rsi": 11,
-          "w_vwap": 13,
-          "w_rvol": 32,
-          "w_adx": 14,
-          "threshold": 66,
-          "sl_mul": 0.9179238041065373,
-          "tp_mul": 1.514334795366731
-        }
-      }
-    },
-    {
-      "t": "6330.T",
-      "profit": 13.326035467607804,
-      "long_profit": 0.0,
-      "short_profit": 13.326035467607804,
-      "raw_long_profit": -1.4898704099740367,
-      "raw_short_profit": 13.326035467607804,
-      "long_disabled": true,
-      "short_disabled": false,
-      "sector": "建設業",
-      "size_category": "TOPIX Small 2",
-      "rivals": [
-        "1414.T",
-        "1417.T",
-        "1419.T",
-        "1429.T",
-        "1433.T"
-      ],
-      "params": {
-        "long": {
-          "w_rsi": 30,
-          "w_vwap": 10,
-          "w_rvol": 14,
-          "w_adx": 35,
-          "threshold": 66,
-          "sl_mul": 1.3059381111462423,
-          "tp_mul": 1.6035451189375336
-        },
-        "short": {
-          "w_rsi": 17,
-          "w_vwap": 13,
-          "w_rvol": 35,
-          "w_adx": 14,
-          "threshold": 60.0,
-          "sl_mul": 1.1780965787514197,
-          "tp_mul": 1.2105889587326342
+          "sl_mul": 1.4338068565310733,
+          "tp_mul": 2.15071028479661
         }
       }
     },
     {
       "t": "7012.T",
-      "profit": 10.200949035813235,
-      "long_profit": 10.200949035813235,
+      "profit": 7.675740326085091,
+      "long_profit": 7.675740326085091,
       "short_profit": 0.0,
-      "raw_long_profit": 10.200949035813235,
-      "raw_short_profit": 0.1911212758866243,
+      "raw_long_profit": 7.675740326085091,
+      "raw_short_profit": 0.0,
       "long_disabled": false,
       "short_disabled": true,
       "sector": "輸送用機器",
@@ -326,22 +131,217 @@
       ],
       "params": {
         "long": {
-          "w_rsi": 16,
-          "w_vwap": 33,
-          "w_rvol": 34,
-          "w_adx": 19,
-          "threshold": 60,
-          "sl_mul": 1.3947676268401998,
-          "tp_mul": 1.2307749326921766
+          "w_rsi": 11,
+          "w_vwap": 10,
+          "w_rvol": 16,
+          "w_adx": 12,
+          "threshold": 60.0,
+          "sl_mul": 1.3124360267749067,
+          "tp_mul": 2.375404899875795
         },
         "short": {
-          "w_rsi": 13,
-          "w_vwap": 10,
-          "w_rvol": 10,
+          "w_rsi": 12,
+          "w_vwap": 15,
+          "w_rvol": 11,
           "w_adx": 10,
+          "threshold": 60,
+          "sl_mul": 1.3537728483065636,
+          "tp_mul": 2.9716907510255828
+        }
+      }
+    },
+    {
+      "t": "3436.T",
+      "profit": 5.403149394475043,
+      "long_profit": 5.403149394475043,
+      "short_profit": 0.0,
+      "raw_long_profit": 5.403149394475043,
+      "raw_short_profit": 0.7707706252191555,
+      "long_disabled": false,
+      "short_disabled": true,
+      "sector": "金属製品",
+      "size_category": "TOPIX Mid400",
+      "rivals": [
+        "3431.T",
+        "3433.T",
+        "3443.T",
+        "3445.T",
+        "5901.T"
+      ],
+      "params": {
+        "long": {
+          "w_rsi": 11,
+          "w_vwap": 10,
+          "w_rvol": 27,
+          "w_adx": 26,
           "threshold": 60.0,
-          "sl_mul": 1.0074780351077277,
-          "tp_mul": 3.569558432155202
+          "sl_mul": 0.9910133721043644,
+          "tp_mul": 2.2983464864838092
+        },
+        "short": {
+          "w_rsi": 17,
+          "w_vwap": 16,
+          "w_rvol": 11,
+          "w_adx": 26,
+          "threshold": 60.0,
+          "sl_mul": 1.5690405661285465,
+          "tp_mul": 2.5671326863759014
+        }
+      }
+    },
+    {
+      "t": "9984.T",
+      "profit": 5.401759913252723,
+      "long_profit": 5.401759913252723,
+      "short_profit": 0.0,
+      "raw_long_profit": 5.401759913252723,
+      "raw_short_profit": 0.21848519650186918,
+      "long_disabled": false,
+      "short_disabled": true,
+      "sector": "情報・通信業",
+      "size_category": "TOPIX Core30",
+      "rivals": [
+        "2121.T",
+        "2307.T",
+        "2317.T",
+        "2326.T",
+        "2327.T"
+      ],
+      "params": {
+        "long": {
+          "w_rsi": 26,
+          "w_vwap": 35,
+          "w_rvol": 30,
+          "w_adx": 20,
+          "threshold": 60.0,
+          "sl_mul": 1.538767301064806,
+          "tp_mul": 2.385471017106759
+        },
+        "short": {
+          "w_rsi": 12,
+          "w_vwap": 13,
+          "w_rvol": 10,
+          "w_adx": 31,
+          "threshold": 72,
+          "sl_mul": 1.4784319553060885,
+          "tp_mul": 2.8186437592190607
+        }
+      }
+    },
+    {
+      "t": "1662.T",
+      "profit": 5.359768495520445,
+      "long_profit": 5.359768495520445,
+      "short_profit": 0.0,
+      "raw_long_profit": 5.359768495520445,
+      "raw_short_profit": 0.05309762752203129,
+      "long_disabled": false,
+      "short_disabled": true,
+      "sector": "鉱業",
+      "size_category": "TOPIX Small 1",
+      "rivals": [
+        "1515.T",
+        "1605.T",
+        "1663.T",
+        "285A.T",
+        "9984.T"
+      ],
+      "params": {
+        "long": {
+          "w_rsi": 29,
+          "w_vwap": 22,
+          "w_rvol": 27,
+          "w_adx": 11,
+          "threshold": 70,
+          "sl_mul": 0.9043882215343043,
+          "tp_mul": 2.3496167219919197
+        },
+        "short": {
+          "w_rsi": 17,
+          "w_vwap": 15,
+          "w_rvol": 11,
+          "w_adx": 11,
+          "threshold": 67,
+          "sl_mul": 1.58093990933709,
+          "tp_mul": 4.93564056917604
+        }
+      }
+    },
+    {
+      "t": "6330.T",
+      "profit": 0.0,
+      "long_profit": 0.0,
+      "short_profit": 0.0,
+      "raw_long_profit": 0.9788231244697194,
+      "raw_short_profit": 2.4500248443573316,
+      "long_disabled": true,
+      "short_disabled": true,
+      "sector": "建設業",
+      "size_category": "TOPIX Small 2",
+      "rivals": [
+        "1414.T",
+        "1417.T",
+        "1419.T",
+        "1429.T",
+        "1433.T"
+      ],
+      "params": {
+        "long": {
+          "w_rsi": 20,
+          "w_vwap": 12,
+          "w_rvol": 11,
+          "w_adx": 30,
+          "threshold": 60.0,
+          "sl_mul": 1.2614336376152395,
+          "tp_mul": 2.0431701028536007
+        },
+        "short": {
+          "w_rsi": 10,
+          "w_vwap": 10,
+          "w_rvol": 23,
+          "w_adx": 29,
+          "threshold": 60.0,
+          "sl_mul": 2.0567104153317253,
+          "tp_mul": 3.085065622997588
+        }
+      }
+    },
+    {
+      "t": "5713.T",
+      "profit": 0.0,
+      "long_profit": 0.0,
+      "short_profit": 0.0,
+      "raw_long_profit": 2.392312848130706,
+      "raw_short_profit": -0.17073257649925067,
+      "long_disabled": true,
+      "short_disabled": true,
+      "sector": "非鉄金属",
+      "size_category": "TOPIX Mid400",
+      "rivals": [
+        "5016.T",
+        "5702.T",
+        "5703.T",
+        "5706.T",
+        "5707.T"
+      ],
+      "params": {
+        "long": {
+          "w_rsi": 17,
+          "w_vwap": 16,
+          "w_rvol": 20,
+          "w_adx": 35,
+          "threshold": 60.0,
+          "sl_mul": 2.1821322490895154,
+          "tp_mul": 3.273198373634273
+        },
+        "short": {
+          "w_rsi": 16,
+          "w_vwap": 17,
+          "w_rvol": 20,
+          "w_adx": 10,
+          "threshold": 60,
+          "sl_mul": 0.8096167807740521,
+          "tp_mul": 2.9707731863445486
         }
       }
     }
