@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """
-monitor.py - Version 14.0 プロ版
+monitor.py - Version 14.1 プロ版
 変更点:
 - スケジューラ遅延対応: MONITOR_START_TIME環境変数で待機時刻を制御（2時間遅延許容）
 - ① TP1/TRAILING_EXIT後も当日クールダウンを適用（往復ビンタ防止）
 - ② シャンデリア出口: 直近N本高値/安値 - ATR×2.5 でゆったりトレーリング
-- ③ エントリーフィルター強化: RSI過熱/VWAP乖離超過/時間帯カットオフ
+- ③ エントリーフィルター強化: RSI過熱/VWAP乖離超過/時間帯カットオフ + 出来高急増フィルター
 - ④ VIX高時はSL幅変更なく推奨ロット50%を通知
 - ⑤ RR比強制: tp_mul >= sl_mul × 1.5 を送信時に保証
+- ⑥ FORCE_CLOSE_TIME: 14:50等のタイム・エグジットで全ポジション強制決済
+- ⑦ ATR動的調整: 銘柄ごとのATR比に基づきSL/TP幅を動的に調整
+- ⑧ PositionManager互換性: set_trailing_stop/update_trailing_stopの防御的呼び出し
 """
 import json
 import logging
@@ -319,6 +322,26 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
     current_atr = df['atr_14'].iloc[-1]
     if current_atr < atr_ma: return
 
+    # ⑦ ATR動的調整係数: 現在ATR / 50本平均ATR（0.85〜1.3にクランプ）
+    # 高ボラ時はSL/TPを広げ（損切が浅すぎてノイズで刈られるのを防ぐ）、低ボラ時は狭める
+    atr_ratio = (current_atr / atr_ma) if atr_ma > 0 else 1.0
+    atr_adjustment = max(0.85, min(1.3, atr_ratio))
+    if abs(atr_adjustment - 1.0) > 0.05:
+        logger.info(f"{ticker}: ⑦ ATR動的調整 ×{atr_adjustment:.2f} "
+                    f"(現在ATR:{current_atr:.3f} / 平均:{atr_ma:.3f} = {atr_ratio:.2f})")
+
+    # ③ 出来高急増フィルター（Ver 14.1）: 直近N本の平均出来高に対して現在の出来高が急増していること
+    vol_surge_lookback = SIGNAL_THRESHOLDS.get('vol_surge_lookback', 10)
+    vol_surge_threshold = SIGNAL_THRESHOLDS.get('vol_surge_threshold', 2.0)
+    if len(df) > vol_surge_lookback + 1:
+        recent_avg_vol = df['volume'].iloc[-(vol_surge_lookback + 1):-1].mean()
+        current_vol = df['volume'].iloc[-1]
+        if recent_avg_vol > 0 and current_vol < recent_avg_vol * vol_surge_threshold:
+            logger.debug(f"{ticker}: 出来高急増フィルター不足 "
+                         f"(現在:{current_vol:.0f} / 平均:{recent_avg_vol:.0f} = "
+                         f"{current_vol / recent_avg_vol:.1f}x < {vol_surge_threshold}x)")
+            return
+
     confirmed_row = df.iloc[-2]
     check_key = f"{ticker}_{confirmed_row.name}"
     if check_key in processed_timestamps: return
@@ -451,8 +474,8 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
                     record_trade_journal(journal_entry)
 
                     tp_mul = params_long['tp_mul'] * 2.0 if drive_pct > 1.0 else params_long['tp_mul']
-                    tp_mul = tp_mul * v3_tp_multiplier
-                    sl_mul = params_long['sl_mul'] * v3_sl_multiplier
+                    tp_mul = tp_mul * v3_tp_multiplier * atr_adjustment  # ⑦ ATR動的調整
+                    sl_mul = params_long['sl_mul'] * v3_sl_multiplier * atr_adjustment  # ⑦ ATR動的調整
                     send_new_signal_pro(ticker, confirmed_row, score_long, params_long, 'LONG',
                                         tp_mul, sl_mul, v3_risk_multiplier)
     else:
@@ -503,8 +526,8 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
                     record_trade_journal(journal_entry)
 
                     tp_mul = params_short['tp_mul'] * 2.0 if drive_pct < -1.0 else params_short['tp_mul']
-                    tp_mul = tp_mul * v3_tp_multiplier
-                    sl_mul = params_short['sl_mul'] * v3_sl_multiplier
+                    tp_mul = tp_mul * v3_tp_multiplier * atr_adjustment  # ⑦ ATR動的調整
+                    sl_mul = params_short['sl_mul'] * v3_sl_multiplier * atr_adjustment  # ⑦ ATR動的調整
                     send_new_signal_pro(ticker, confirmed_row, score_short, params_short, 'SHORT',
                                         tp_mul, sl_mul, v3_risk_multiplier)
     else:
@@ -608,7 +631,17 @@ def check_exit_signal(ticker: str, df: pd.DataFrame, cooldown: Dict) -> None:
                 else:
                     lowest_low = recent_slice['low'].min()
                     initial_trail = lowest_low + (atr * chandelier_mul)
-                position_manager.set_trailing_stop(ticker, initial_trail)
+                # ⑧ 防御的呼び出し: mainブランチにメソッドがない場合のフォールバック
+                if hasattr(position_manager, 'set_trailing_stop'):
+                    position_manager.set_trailing_stop(ticker, initial_trail)
+                else:
+                    # フォールバック: trailing_stopフィールドを直接設定
+                    pos = position_manager.get_position(ticker)
+                    if pos:
+                        pos['trailing_stop'] = initial_trail
+                        pos['trailing_mode'] = True
+                        position_manager.save_positions()
+                    logger.warning(f"{ticker}: set_trailing_stop未実装 → 直接設定にフォールバック")
                 send_tp1_notification(ticker, tp1, profit)
                 # ① TP1後も当日制限に追加（同一銘柄の再エントリーを禁止）
                 add_to_cooldown(ticker, 'TP1', cooldown)
@@ -625,7 +658,14 @@ def check_exit_signal(ticker: str, df: pd.DataFrame, cooldown: Dict) -> None:
                 new_trail = highest_high - (atr * chandelier_mul)
                 if new_trail > trailing_stop:
                     trailing_stop = new_trail
-                    position_manager.update_trailing_stop(ticker, trailing_stop)
+                    # ⑧ 防御的呼び出し
+                    if hasattr(position_manager, 'update_trailing_stop'):
+                        position_manager.update_trailing_stop(ticker, trailing_stop)
+                    else:
+                        pos = position_manager.get_position(ticker)
+                        if pos:
+                            pos['trailing_stop'] = trailing_stop
+                            position_manager.save_positions()
 
                 if low_price <= trailing_stop:
                     result = position_manager.close_position(ticker, trailing_stop, 'TRAILING_EXIT')
@@ -640,7 +680,14 @@ def check_exit_signal(ticker: str, df: pd.DataFrame, cooldown: Dict) -> None:
                 new_trail = lowest_low + (atr * chandelier_mul)
                 if new_trail < trailing_stop:
                     trailing_stop = new_trail
-                    position_manager.update_trailing_stop(ticker, trailing_stop)
+                    # ⑧ 防御的呼び出し
+                    if hasattr(position_manager, 'update_trailing_stop'):
+                        position_manager.update_trailing_stop(ticker, trailing_stop)
+                    else:
+                        pos = position_manager.get_position(ticker)
+                        if pos:
+                            pos['trailing_stop'] = trailing_stop
+                            position_manager.save_positions()
 
                 if high_price >= trailing_stop:
                     result = position_manager.close_position(ticker, trailing_stop, 'TRAILING_EXIT')
@@ -683,20 +730,23 @@ def send_exit_notification(result: Dict) -> None:
     send_discord_notification(WEBHOOK_URL, message)
 
 
-def force_close_remaining() -> None:
-    """セッション終了時: 全ポジションを強制決済してtrade_results.csvに確実に記録する
+def force_close_remaining(reason: str = 'SESSION_END') -> None:
+    """セッション終了時またはタイム・エグジット時: 全ポジションを強制決済してtrade_results.csvに確実に記録する
 
     ポジションが残ったままセッションが終了すると、PMワークフローの
     "Clear positions.json" ステップでポジションが消失し、trade_results.csv に
     記録されず「取引なし」と判定されてしまう問題を防止する。
+
+    Args:
+        reason: 決済理由（'SESSION_END', 'TIME_EXIT', 'MAX_RUNTIME'等）
     """
     positions = position_manager.get_all_positions()
     if not positions:
-        logger.info("強制決済: 残ポジションなし")
+        logger.info(f"強制決済({reason}): 残ポジションなし")
         return
 
     tickers_to_close = list(positions.keys())
-    logger.info(f"セッション終了: {len(tickers_to_close)}件のポジションを強制決済します")
+    logger.info(f"強制決済({reason}): {len(tickers_to_close)}件のポジションを決済します")
 
     # 最新価格を取得して決済
     current_prices = {}
@@ -718,11 +768,11 @@ def force_close_remaining() -> None:
             current_prices[ticker] = positions[ticker].get('entry_price', 0)
             logger.warning(f"強制決済: {ticker}の最新価格を取得できず、エントリー価格で決済します")
 
-    results = position_manager.force_close_all(current_prices)
+    results = position_manager.force_close_all(current_prices, reason)
     for result in results:
         send_exit_notification(result)
 
-    logger.info(f"強制決済完了: {len(results)}件をtrade_results.csvに記録しました")
+    logger.info(f"強制決済完了({reason}): {len(results)}件をtrade_results.csvに記録しました")
 
 
 def send_daily_summary() -> None:
@@ -911,14 +961,26 @@ def monitor():
             elapsed_minutes = (time.time() - start_run_time) / 60
             if elapsed_minutes > max_runtime_minutes:
                 send_discord_notification(WEBHOOK_URL, f"⚠️ **最大実行時間（{max_runtime_minutes}分）に達したため正常終了します。**")
-                force_close_remaining()
+                force_close_remaining('MAX_RUNTIME')
                 send_daily_summary()
                 break
+
+            # ⑥ タイム・エグジット: FORCE_CLOSE_TIME到達で全ポジション強制決済
+            # （MONITOR_END_TIMEより前に実行。AMは11:20、PMは14:50が目安）
+            force_close_time_str = os.environ.get('FORCE_CLOSE_TIME', '')
+            if force_close_time_str:
+                force_close_time = dt_time.fromisoformat(force_close_time_str)
+                if current_time >= force_close_time and position_manager.get_all_positions():
+                    logger.info(f"タイム・エグジット({force_close_time_str}): 全ポジションを強制決済します")
+                    send_discord_notification(WEBHOOK_URL,
+                        f"⏰ **タイム・エグジット ({force_close_time_str} JST)**\n"
+                        f"全ポジションを強制決済します（大引け前リスク回避）")
+                    force_close_remaining('TIME_EXIT')
 
             if current_time >= monitor_end_time:
                 # 監視終了時刻に達した → 残ポジションを強制決済してからサマリー通知
                 logger.info(f"監視終了時刻({monitor_end_time_str})に達しました。終了処理を開始します。")
-                force_close_remaining()
+                force_close_remaining('SESSION_END')
                 send_daily_summary()
                 break
 

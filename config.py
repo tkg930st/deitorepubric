@@ -81,6 +81,9 @@ SIGNAL_THRESHOLDS = {
     'rsi_overbought': 70,    # LONGエントリー禁止: RSIがこの値以上（過熱）
     'rsi_oversold': 30,      # SHORTエントリー禁止: RSIがこの値以下（売られ過ぎ）
     'vwap_dev_max': 2.5,     # エントリー禁止: VWAP乖離率がこの値（%）を超える場合
+    # ③ 出来高急増フィルター（Ver 14.1）
+    'vol_surge_lookback': 10,  # 平均出来高を算出する直近バー数（5分足×10本 = 50分）
+    'vol_surge_threshold': 2.0, # 現在出来高 / 平均出来高がこの倍率以上で急増と判定
 }
 
 # 取引時間設定（JST）

@@ -2,9 +2,9 @@ name: 2. Trade Monitor PM
 
 on:
   schedule:
-    # JST 月-金 11:30 (UTC 月-金 02:30) に起動
-    # 12:30開始のため1時間前に起動 → 最大2時間のスケジューラ遅延が発生しても13:30から監視可能
-    - cron: '30 2 * * 1-5'
+    # JST 月-金 10:30 (UTC 月-金 01:30) に起動
+    # 12:30開始のため2時間前に起動 → 最大2時間のスケジューラ遅延が発生しても12:30から監視可能
+    - cron: '30 1 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -46,15 +46,17 @@ jobs:
       - name: Run Monitor
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # PMセッション: 11:30 JST起動 → 12:30まで待機 → 14:55に自己終了
-          # スケジューラが2時間遅延しても 13:30 JSTから最低1.5時間は監視できる
+          # PMセッション: 10:30 JST起動 → 12:30まで待機 → 14:55に自己終了
+          # スケジューラが2時間遅延しても 12:30 JSTから監視開始可能
           MONITOR_START_TIME: '12:30'   # 12:30まで待機してから監視開始（後場開始に合わせる）
           MONITOR_END_TIME: '14:55'     # 14:55に自己終了（15:00の5分前）
-          MAX_RUNTIME_MINUTES: '200'    # 11:35起動→14:55終了 = 最大200分（安全網）
+          MAX_RUNTIME_MINUTES: '265'    # 10:35起動→14:55終了 = 最大265分（安全網）
           # ③ 後場エントリーカットオフ: 14:00以降は新規エントリーしない（大引け前を回避）
           ENTRY_CUTOFF_TIME: '14:00'
-        # 11:30〜15:00 = 最大215分のタイムアウト（余裕を持たせる）
-        timeout-minutes: 215
+          # ⑥ タイム・エグジット: 14:50に全ポジションを強制決済（大引け前の急変リスク回避）
+          FORCE_CLOSE_TIME: '14:50'
+        # 10:30〜15:00 = 最大275分のタイムアウト（余裕を持たせる）
+        timeout-minutes: 275
         run: python monitor.py
 
       - name: Clear positions.json

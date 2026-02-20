@@ -260,25 +260,27 @@ class PositionManager:
         """全ポジションを取得"""
         return self.positions
     
-    def force_close_all(self, current_prices: Dict[str, float]) -> List[Dict]:
+    def force_close_all(self, current_prices: Dict[str, float],
+                        reason: str = '15:00強制決済') -> List[Dict]:
         """
-        全ポジションを強制決済（15:00用）
-        
+        全ポジションを強制決済
+
         Args:
             current_prices: {ticker: 現在価格} の辞書
-        
+            reason: 決済理由（デフォルト: '15:00強制決済'、タイム・エグジット時: 'TIME_EXIT'等）
+
         Returns:
             決済結果のリスト
         """
         results = []
         tickers_to_close = list(self.positions.keys())
-        
+
         for ticker in tickers_to_close:
             if ticker in current_prices:
                 exit_price = current_prices[ticker]
-                result = self.close_position(ticker, exit_price, '15:00強制決済')
+                result = self.close_position(ticker, exit_price, reason)
                 if result:
                     results.append(result)
-        
-        logger.info(f"全ポジション強制決済完了: {len(results)}件")
+
+        logger.info(f"全ポジション強制決済完了({reason}): {len(results)}件")
         return results
