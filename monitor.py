@@ -962,7 +962,10 @@ def monitor():
             if elapsed_minutes > max_runtime_minutes:
                 send_discord_notification(WEBHOOK_URL, f"⚠️ **最大実行時間（{max_runtime_minutes}分）に達したため正常終了します。**")
                 force_close_remaining('MAX_RUNTIME')
-                send_daily_summary()
+                if os.environ.get('SKIP_DAILY_SUMMARY', 'false').lower() != 'true':
+                    send_daily_summary()
+                else:
+                    logger.info("SKIP_DAILY_SUMMARY=true: サマリー通知をスキップします")
                 break
 
             # ⑥ タイム・エグジット: FORCE_CLOSE_TIME到達で全ポジション強制決済
@@ -981,7 +984,10 @@ def monitor():
                 # 監視終了時刻に達した → 残ポジションを強制決済してからサマリー通知
                 logger.info(f"監視終了時刻({monitor_end_time_str})に達しました。終了処理を開始します。")
                 force_close_remaining('SESSION_END')
-                send_daily_summary()
+                if os.environ.get('SKIP_DAILY_SUMMARY', 'false').lower() != 'true':
+                    send_daily_summary()
+                else:
+                    logger.info("SKIP_DAILY_SUMMARY=true: サマリー通知をスキップします")
                 break
 
             # --- メインデータ取得・シグナル処理 ---
@@ -1020,13 +1026,19 @@ def monitor():
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt: 終了処理を実行します")
         force_close_remaining()
-        send_daily_summary()
+        if os.environ.get('SKIP_DAILY_SUMMARY', 'false').lower() != 'true':
+            send_daily_summary()
+        else:
+            logger.info("SKIP_DAILY_SUMMARY=true: サマリー通知をスキップします")
     except Exception as e:
         # 予期せぬ例外でもポジションを確実に決済して記録を残す
         logger.error(f"monitor() 予期せぬ例外: {str(e)}")
         try:
             force_close_remaining()
-            send_daily_summary()
+            if os.environ.get('SKIP_DAILY_SUMMARY', 'false').lower() != 'true':
+                send_daily_summary()
+            else:
+                logger.info("SKIP_DAILY_SUMMARY=true: サマリー通知をスキップします")
         except Exception as e2:
             logger.error(f"終了処理中のエラー: {str(e2)}")
 

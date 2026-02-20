@@ -2,9 +2,9 @@ name: 2. Trade Monitor AM
 
 on:
   schedule:
-    # JST 月-金 08:00 (UTC 日-木 23:00) に起動
-    # 09:30開始のため1.5時間前に起動 → 最大2時間のスケジューラ遅延が発生しても10:00から監視可能
-    - cron: '0 23 * * 0-4'
+    # JST 月-金 07:30 (UTC 日-木 22:30) に起動
+    # 09:30開始のため2時間前に起動 → 最大2時間のスケジューラ遅延が発生しても09:30から監視可能
+    - cron: '30 22 * * 0-4'
 
   workflow_dispatch:
 
@@ -66,19 +66,19 @@ jobs:
       - name: Run Monitor
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # AMセッション: 08:00 JST起動 → 09:30まで待機 → 11:25に自己終了
-          # スケジューラが2時間遅延しても 10:00 JSTから最低1.5時間は監視できる
-          MONITOR_START_TIME: '09:30'   # 09:30まで待機してから監視開始
-          MONITOR_END_TIME: '11:25'     # 11:25に自己終了（11:30の5分前）
-          MAX_RUNTIME_MINUTES: '200'    # 08:05起動→11:25終了 = 最大200分（安全網）
+          # AMセッション: 07:30 JST起動 → 09:30まで待機 → 11:35に自己終了
+          # スケジューラが2時間遅延しても 09:30 JSTから監視開始可能
+          MONITOR_START_TIME: '09:30'
+          MONITOR_END_TIME: '11:35'
+          # 前場はサマリーを送信しない（後場終了時に1日分をまとめて送信）
+          SKIP_DAILY_SUMMARY: 'true'
+          MAX_RUNTIME_MINUTES: '300'
           # ③ 前場エントリーカットオフ: 10:30以降は新規エントリーしない
           ENTRY_CUTOFF_TIME: '10:30'
           # ⑥ タイム・エグジット: 11:20に全ポジションを強制決済（前場引け前のリスク回避）
           FORCE_CLOSE_TIME: '11:20'
-          # セッション終了時に残ポジションを強制決済してtrade_results.csvに記録
-          # （PMで引き継がず、AMで完結させてデータ消失を防止）
-        # 08:00〜11:30 = 最大210分のタイムアウト（余裕を持たせる）
-        timeout-minutes: 210
+        # 07:30〜11:35 = 最大310分のタイムアウト（余裕を持たせる）
+        timeout-minutes: 310
         run: python monitor.py
 
       - name: Commit and Push trade records
