@@ -1,0 +1,43 @@
+name: Daily Gemini Review
+
+on:
+  schedule:
+    - cron: '0 21 * * *' # 日本時間の毎朝6時（UTC 21:00）に実行
+  workflow_dispatch: # 手動でいつでも実行できるようにするボタン
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write # Issueを作るために必要
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install google-generativeai
+
+      - name: Run Gemini Review
+        id: gemini_review
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # スクリプトを実行し、結果を変数に格納
+          python gemini_reviewer.py > review_result.txt
+
+      - name: Create Issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # 分析結果をGitHubのIssueとして投稿
+          gh issue create \
+            --title "Daily AI Review: $(date +'%Y-%m-%d')" \
+            --body-file review_result.txt
