@@ -143,6 +143,12 @@ RETRY_OPTIMIZATION = {
     'iterations_per_retry': 500, # 1回あたりの最適化試行数
 }
 
+# リスク管理設定（Ver 14.2: デイリー・ストップロス）
+RISK_MANAGEMENT = {
+    'daily_stop_loss_pct': -3.0,  # 1日の通算損益がこの値(%)以下で緊急停止
+    'check_interval_loops': 1,    # 何ループごとにDSLチェックを行うか（1=毎回）
+}
+
 # 出力ファイル
 OUTPUT_CONFIG = 'best_config.json'
 
