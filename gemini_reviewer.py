@@ -1,10 +1,9 @@
 import os
-import google.generativeai as genai
+from google import genai
 from pathlib import Path
 
-# Geminiの設定
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash") # 高速なFlashモデルを使用
+# Geminiの設定（最新のgoogle-genaiライブラリを使用）
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 def collect_files():
     """分析対象のファイルを読み集める"""
@@ -41,9 +40,13 @@ def main():
 日本語で、簡潔かつ建設的なフィードバックをお願いします。
 """
 
-    response = model.generate_content(prompt)
+    # 最新のAPI形式で生成
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt
+    )
     
-    # 分析結果を出力（GitHub Actionsでキャッチするため）
+    # 分析結果を出力
     print(response.text)
 
 if __name__ == "__main__":
