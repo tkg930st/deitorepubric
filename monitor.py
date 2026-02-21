@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-monitor.py - Version 14.1 プロ版
+monitor.py - Version 14.2 プロ版
 変更点:
 - スケジューラ遅延対応: MONITOR_START_TIME環境変数で待機時刻を制御（2時間遅延許容）
 - ① TP1/TRAILING_EXIT後も当日クールダウンを適用（往復ビンタ防止）
@@ -11,6 +11,7 @@ monitor.py - Version 14.1 プロ版
 - ⑥ FORCE_CLOSE_TIME: 14:50等のタイム・エグジットで全ポジション強制決済
 - ⑦ ATR動的調整: 銘柄ごとのATR比に基づきSL/TP幅を動的に調整
 - ⑧ PositionManager互換性: set_trailing_stop/update_trailing_stopの防御的呼び出し
+- ⑨ デイリー・ストップロス: 確定損益+含み損益が-3.0%以下で全決済・新規停止
 """
 import json
 import logging
@@ -29,7 +30,7 @@ from config import (
     WEBHOOK_URL, LOG_FILE, LOG_LEVEL, OUTPUT_CONFIG, DATA_FETCH,
     MARKET_SENTIMENT, MONITORING_LOOP, POSITION_MANAGEMENT,
     DAILY_COOLDOWN, DIVERGENCE, TREND_FILTER, TRADE_JOURNAL,
-    SIGNAL_THRESHOLDS, SECTOR_ALIGNMENT
+    SIGNAL_THRESHOLDS, SECTOR_ALIGNMENT, RISK_MANAGEMENT
 )
 from utils import (
     super_flatten_columns, fetch_yfinance_data,
@@ -56,6 +57,7 @@ position_manager = PositionManager()
 opening_drives: Dict[str, Dict] = {}
 macro_sentiment: Dict[str, float] = {}  # V3: マクロ指標（Ver 11.0）
 rival_data_cache: Dict[str, pd.DataFrame] = {}  # Ver 13.5: ライバルデータキャッシュ
+daily_stop_triggered: bool = False  # Ver 14.2: デイリー・ストップロス発動フラグ
 
 
 def load_config() -> Optional[Dict]:
@@ -303,10 +305,15 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
                      cooldown: Dict, market_sentiment_value: float,
                      sector: str = '', disabled: Dict = None,
                      rivals: list = None) -> None:
-    """新規シグナルチェック (Ver 14.0: エントリーフィルター強化 + VIXリスク調整)"""
+    """新規シグナルチェック (Ver 14.2: エントリーフィルター強化 + VIXリスク調整 + DSL)"""
     if disabled is None:
         disabled = {'long': False, 'short': False}
     if df.empty or len(df) < 50: return
+
+    # Ver 14.2: デイリー・ストップロス発動中は新規エントリー一切禁止
+    global daily_stop_triggered
+    if daily_stop_triggered:
+        return
 
     # ③ 時間帯フィルター: エントリーカットオフ後は新規エントリー禁止
     # ENTRY_CUTOFF_TIME環境変数で上書き可能（AMワークフロー: 10:30, PMワークフロー: 14:00）
@@ -730,6 +737,58 @@ def send_exit_notification(result: Dict) -> None:
     send_discord_notification(WEBHOOK_URL, message)
 
 
+def calculate_daily_pnl(current_prices: Dict[str, float] = None) -> float:
+    """当日の通算損益（確定損益＋含み損益）を計算する（Ver 14.2: デイリー・ストップロス用）
+
+    Args:
+        current_prices: {ticker: 現在価格} の辞書。Noneの場合は確定損益のみ返す。
+
+    Returns:
+        通算損益（%）
+    """
+    realized_pnl = 0.0
+    unrealized_pnl = 0.0
+
+    # --- 確定損益: trade_results.csv の当日分を合算 ---
+    results_file = POSITION_MANAGEMENT['trade_results_file']
+    if os.path.exists(results_file):
+        try:
+            df_results = pd.read_csv(results_file)
+            if not df_results.empty:
+                df_results['exit_time'] = pd.to_datetime(df_results['exit_time'])
+                today = datetime.now().date()
+                df_today = df_results[df_results['exit_time'].dt.date == today]
+                realized_pnl = df_today['total_profit'].sum() if not df_today.empty else 0.0
+        except Exception as e:
+            logger.error(f"DSL: 確定損益計算エラー: {str(e)}")
+
+    # --- 含み損益: 保有ポジションの評価損益を合算 ---
+    positions = position_manager.get_all_positions()
+    if positions and current_prices:
+        for ticker, pos in positions.items():
+            if ticker not in current_prices:
+                continue
+            entry_price = pos['entry_price']
+            current_price = current_prices[ticker]
+            remaining_ratio = pos.get('remaining_ratio', 1.0)
+            side = pos['side']
+
+            if entry_price == 0:
+                continue
+
+            if side == 'LONG':
+                pnl = ((current_price / entry_price) - 1) * 100
+            else:
+                pnl = (1 - (current_price / entry_price)) * 100
+
+            # TP1済みの場合は残り50%の含み損益のみ加算（TP1確定分は既にrealized_pnlに含まれる）
+            unrealized_pnl += pnl * remaining_ratio
+
+    total_pnl = realized_pnl + unrealized_pnl
+    logger.debug(f"DSL: 確定損益={realized_pnl:.2f}%, 含み損益={unrealized_pnl:.2f}%, 合計={total_pnl:.2f}%")
+    return total_pnl
+
+
 def force_close_remaining(reason: str = 'SESSION_END') -> None:
     """セッション終了時またはタイム・エグジット時: 全ポジションを強制決済してtrade_results.csvに確実に記録する
 
@@ -998,6 +1057,30 @@ def monitor():
                     fetch_rival_data(list(all_rival_tickers))
 
                 raw_data = fetch_yfinance_data(tickers, period='5d', interval='5m')
+
+                # Ver 14.2: デイリー・ストップロスチェック
+                # 全銘柄の最新価格を収集し、確定損益+含み損益の合算で判定
+                global daily_stop_triggered
+                if not daily_stop_triggered:
+                    dsl_prices = {}
+                    for t in tickers:
+                        try:
+                            t_df = super_flatten_columns(raw_data[t] if len(tickers) > 1 else raw_data)
+                            if not t_df.empty:
+                                dsl_prices[t] = t_df['close'].iloc[-1]
+                        except Exception:
+                            pass
+                    dsl_threshold = RISK_MANAGEMENT.get('daily_stop_loss_pct', -3.0)
+                    total_pnl = calculate_daily_pnl(dsl_prices)
+                    if total_pnl <= dsl_threshold:
+                        daily_stop_triggered = True
+                        logger.info(f"デイリー・ストップロス発動: 通算損益={total_pnl:.2f}% <= {dsl_threshold}%")
+                        send_discord_notification(WEBHOOK_URL,
+                            f"🚨 **デイリー・ストップロス発動**\n"
+                            f"通算損益: {total_pnl:+.2f}% （閾値: {dsl_threshold}%）\n"
+                            f"全ポジションを決済し、当日の新規エントリーを停止します。")
+                        force_close_remaining('DAILY_STOP_LOSS')
+
                 for ticker in tickers:
                     try:
                         df = super_flatten_columns(raw_data[ticker] if len(tickers)>1 else raw_data)
