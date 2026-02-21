@@ -2,7 +2,7 @@ name: Daily Gemini Review
 
 on:
   schedule:
-    - cron: '0 21 * * *' # 日本時間の毎朝6時（UTC 21:00）に実行
+    - cron: '0 9 * * *' # 日本時間の毎日18:00 (UTC 09:00) に実行
   workflow_dispatch: # 手動でいつでも実行できるようにするボタン
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install google-generativeai
+          pip install google-genai
 
       - name: Run Gemini Review
         id: gemini_review
