@@ -7,3 +7,22 @@ pytz
 python-dotenv
 xlrd
 holidays
+
+# --- 基礎インフラ ---
+pandas>=2.0.0
+numpy>=1.24.0
+python-dotenv>=1.0.0  # APIキーや通知トークンの管理用
+
+# --- データ取得 (analyzer.py / monitor.py 共通) ---
+yfinance>=0.2.0       # 株価データの取得
+requests>=2.31.0      # Web API連携（LINE/Slack通知、スクレイピング等）
+
+# --- テクニカル分析 (analyzer.py) ---
+pandas-ta>=0.3.14b    # 移動平均、RSI、ボリバン等の計算を簡略化
+
+# --- 実行制御 (monitor.py) ---
+schedule>=1.2.0       # 指定間隔での監視実行用
+beautifulsoup4>=4.12.0 # 特定サイトからのリアルタイムデータ抽出用（必要に応じて）
+
+# --- 可視化 (任意) ---
+matplotlib>=3.7.0     # 分析結果のグラフ確認用
