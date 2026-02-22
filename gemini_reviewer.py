@@ -205,7 +205,7 @@ def main():
     try:
         print("[INFO] Gemini API にリクエスト送信中...", file=sys.stderr)
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3.1-pro-preview",
             contents=prompt
         )
         # 分析結果を stdout に出力（workflow で review_result.txt にリダイレクト）
