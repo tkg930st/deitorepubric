@@ -96,18 +96,25 @@ def get_jpx_list_with_sector() -> pd.DataFrame:
         res.raise_for_status()
         
         df = pd.read_excel(io.BytesIO(res.content), engine='xlrd')
-        target_markets = ['プライム（内国株式）']
-        
+        target_markets = ['プライム（内国株式）', 'スタンダード（内国株式）', 'グロース（内国株式）']
+
         # 必要な列を抽出
         df_filtered = df[df['市場・商品区分'].isin(target_markets)].copy()
         df_filtered['ticker'] = df_filtered['コード'].apply(lambda x: f"{str(x)}.T")
-        
+
         # セクター情報を取得（33業種区分）
         sector_column = '33業種区分' if '33業種区分' in df_filtered.columns else '業種'
-        
+
         # 規模区分を取得
         size_column = '規模区分' if '規模区分' in df_filtered.columns else None
-        
+
+        # 超大型株を除外（値動きが重くデイトレに不向きなため）
+        if size_column:
+            exclude_sizes = ['TOPIX Core30', 'TOPIX Large70']
+            before_count = len(df_filtered)
+            df_filtered = df_filtered[~df_filtered[size_column].isin(exclude_sizes)].copy()
+            logger.info(f"超大型株除外: {before_count}銘柄 → {len(df_filtered)}銘柄 (Core30/Large70を除外)")
+
         if size_column:
             result = df_filtered[['ticker', sector_column, size_column]].rename(
                 columns={sector_column: 'sector', size_column: 'size_category'}

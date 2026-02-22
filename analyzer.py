@@ -97,7 +97,7 @@ def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame) -> List[
             print(f"   進捗: {min(processed, len(all_tickers))}/{len(all_tickers)} ({min(processed, len(all_tickers))/len(all_tickers)*100:.1f}%)")
         
         try:
-            batch_data = fetch_yfinance_data(chunk, period='3mo', interval='1d')
+            batch_data = fetch_yfinance_data(chunk, period='1mo', interval='1d')
             
             if batch_data.empty:
                 continue
@@ -731,18 +731,23 @@ def main():
         print("📋 STEP 4: 最終銘柄選定（期待利益上位）")
         print("=" * 60)
         
-        # Ver 13.5: raw profitでソート（5%ガード前の生数値を使用）
+        # 期待損益が0%以下の銘柄を除外（足切り）
+        before_filter = len(ticker_results)
+        ticker_results = [r for r in ticker_results if r['profit'] > 0]
+        print(f"\n   足切り: {before_filter}銘柄 → {len(ticker_results)}銘柄（profit > 0% のみ残存）")
+
+        # 最終的な期待損益（profit）でソート
         for r in ticker_results:
-            r['sort_key'] = r.get('raw_long_profit', 0) + r.get('raw_short_profit', 0)
-        
+            r['sort_key'] = r['profit']
+
         final_top = sorted(
             ticker_results,
             key=lambda x: x['sort_key'],
             reverse=True
         )[:FINAL_MONITORING]
-        
-        print(f"\n✅ 全{len(ticker_results)}銘柄の最適化完了")
-        print(f"   期待利益上位{len(final_top)}銘柄を最終選定（raw profitベースでソート）")
+
+        print(f"\n✅ 全{before_filter}銘柄の最適化完了")
+        print(f"   期待利益上位{len(final_top)}銘柄を最終選定（期待損益ベースでソート）")
         
         # 6. 結果表示
         print("\n" + "=" * 60)
