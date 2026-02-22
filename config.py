@@ -19,7 +19,7 @@ LOG_LEVEL = 'INFO'
 LIQUIDITY_THRESHOLD = 5_000_000_000  # 売買代金50億円以上
 MIN_PRICE = 500  # 最低株価
 ATR_CHECK_COUNT = 50   # ATRスクリーニング対象銘柄数
-TOP_CANDIDATES = 15    # 解析対象の主力銘柄数（最適化実行数）
+TOP_CANDIDATES = 30    # 解析対象の主力銘柄数（最適化実行数）
 FINAL_MONITORING = 8   # 最終監視銘柄数（Ver 11.0: 5→8に拡張）
 MIN_SCORE_THRESHOLD = 60.0  # スコア閾値の下限ガード（Ver 10.3）
 
