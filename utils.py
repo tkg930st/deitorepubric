@@ -366,7 +366,18 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         
         # カラム名を小文字化
         df.columns = [str(c).lower() for c in df.columns]
-        
+
+        # 一目均衡表（プロ手法: 雲によるトレンドコンフルエンス確認）
+        # ※NaN値は意味を持つため fillna(0) の後に配置し、NaNを保持する
+        tenkan_sen = (df['high'].rolling(window=9).max() + df['low'].rolling(window=9).min()) / 2
+        kijun_sen = (df['high'].rolling(window=26).max() + df['low'].rolling(window=26).min()) / 2
+        senkou_span_a = ((tenkan_sen + kijun_sen) / 2).shift(26)
+        senkou_span_b = ((df['high'].rolling(window=52).max() + df['low'].rolling(window=52).min()) / 2).shift(26)
+        df['tenkan_sen'] = tenkan_sen
+        df['kijun_sen'] = kijun_sen
+        df['senkou_span_a'] = senkou_span_a
+        df['senkou_span_b'] = senkou_span_b
+
         logger.debug(f"テクニカル指標計算完了: {df.columns.tolist()}")
         
     except Exception as e:
