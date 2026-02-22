@@ -23,13 +23,15 @@ import random
 
 import numpy as np
 import pandas as pd
+import yfinance as yf
 
 from config import (
     LOG_FILE, LOG_LEVEL, LIQUIDITY_THRESHOLD, MIN_PRICE,
     TOP_CANDIDATES, FINAL_MONITORING, OPTIMIZATION_ITERATIONS,
     MIN_DATA_POINTS, PARAM_RANGES, DATA_FETCH, OUTPUT_CONFIG,
     WEBHOOK_URL, PRECISE_CHECK_COUNT, TREND_FILTER, ATR_CHECK_COUNT,
-    MIN_SCORE_THRESHOLD, RETRY_OPTIMIZATION, SECTOR_ALIGNMENT
+    MIN_SCORE_THRESHOLD, RETRY_OPTIMIZATION, SECTOR_ALIGNMENT,
+    FUNDAMENTAL_FILTER
 )
 from utils import (
     get_jpx_list_with_sector, super_flatten_columns, fetch_yfinance_data,
@@ -154,6 +156,40 @@ def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame) -> List[
             logger.warning(f"チャンク処理エラー: {str(e)}")
             continue
     
+    # ファンダメンタルズ・スクリーニング（プロ手法: ROE & PEGレシオ）
+    if FUNDAMENTAL_FILTER.get('enabled', False) and candidates:
+        min_roe = FUNDAMENTAL_FILTER.get('min_roe', 0.10)
+        max_peg = FUNDAMENTAL_FILTER.get('max_peg', 1.0)
+        print(f"\n🔬 ファンダメンタルズ・スクリーニング中... (ROE>={min_roe*100:.0f}%, PEG<={max_peg})")
+        filtered_candidates = []
+        for idx, candidate in enumerate(candidates):
+            ticker = candidate['t']
+            try:
+                info = yf.Ticker(ticker).info
+                roe = info.get('returnOnEquity')
+                peg = info.get('pegRatio')
+
+                # データ欠損（None）の場合は厳格に除外せず通過させる
+                if roe is not None and roe < min_roe:
+                    logger.debug(f"{ticker}: ROE不足 ({roe:.2%} < {min_roe:.0%}) → 除外")
+                    continue
+                if peg is not None and peg > max_peg:
+                    logger.debug(f"{ticker}: PEG超過 ({peg:.2f} > {max_peg}) → 除外")
+                    continue
+
+                filtered_candidates.append(candidate)
+                logger.debug(f"{ticker}: ファンダメンタルズ通過 (ROE={roe}, PEG={peg})")
+            except Exception as e:
+                # 取得エラーの場合は除外せず通過
+                filtered_candidates.append(candidate)
+                logger.debug(f"{ticker}: ファンダメンタルズ取得エラー ({str(e)}) → 通過")
+
+            if idx % 10 == 9:
+                time.sleep(1)  # API制限対策
+
+        print(f"   ファンダメンタルズ: {len(candidates)}銘柄 → {len(filtered_candidates)}銘柄")
+        candidates = filtered_candidates
+
     sorted_candidates = sorted(candidates, key=lambda x: x['volatility_score'], reverse=True)
     
     elite = []

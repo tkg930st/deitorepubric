@@ -436,6 +436,23 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
             if r in rival_data_cache:
                 rival_dfs_for_ticker[r] = rival_data_cache[r]
 
+    # 一目均衡表の雲フィルター（プロ手法: コンフルエンス強化）
+    # LONG: 価格が雲の上限を上抜けていること、SHORT: 雲の下限を下抜けていること
+    # NaN（データ不足で雲が未計算）の場合はフィルターを通過させる（フェイルセーフ）
+    span_a = safe_get(confirmed_row, 'senkou_span_a', np.nan)
+    span_b = safe_get(confirmed_row, 'senkou_span_b', np.nan)
+    cloud_long_ok = True
+    cloud_short_ok = True
+    if not (pd.isna(span_a) or pd.isna(span_b)):
+        cloud_top = max(span_a, span_b)
+        cloud_bottom = min(span_a, span_b)
+        if current_price <= cloud_top:
+            cloud_long_ok = False
+            logger.debug(f"{ticker}: LONG - 一目均衡表の雲上限以下 (price={current_price:.1f}, cloud_top={cloud_top:.1f})")
+        if current_price >= cloud_bottom:
+            cloud_short_ok = False
+            logger.debug(f"{ticker}: SHORT - 一目均衡表の雲下限以上 (price={current_price:.1f}, cloud_bottom={cloud_bottom:.1f})")
+
     # LONG
     if not disabled.get('long', False):
         # ③ RSI過熱感チェック: 既にRSI≥70の場合はオーバーボート → LONGスキップ
@@ -455,7 +472,7 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
             threshold_long = params_long['threshold'] + threshold_adjustment + v3_threshold_adj
 
             if score_long >= threshold_long:
-                if check_trend_filter(current_price, ma15_value, 'LONG'):
+                if cloud_long_ok and check_trend_filter(current_price, ma15_value, 'LONG'):
                     journal_entry = {
                         'ticker': ticker, 'side': 'LONG', 'entry_price': current_price,
                         'entry_time': confirmed_row.name.isoformat(),
@@ -507,7 +524,7 @@ def check_new_signal(ticker: str, df: pd.DataFrame, params_long: Dict,
             threshold_short = params_short['threshold'] + threshold_adjustment + v3_threshold_adj
 
             if score_short >= threshold_short:
-                if check_trend_filter(current_price, ma15_value, 'SHORT'):
+                if cloud_short_ok and check_trend_filter(current_price, ma15_value, 'SHORT'):
                     journal_entry = {
                         'ticker': ticker, 'side': 'SHORT', 'entry_price': current_price,
                         'entry_time': confirmed_row.name.isoformat(),

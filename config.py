@@ -191,3 +191,10 @@ MONITORING_LOOP = {
     # ⑤ リスク・リワード比の最低保証
     'min_rr_ratio': 1.5,         # tp_mul >= sl_mul * min_rr_ratio を強制
 }
+
+# ファンダメンタルズ設定（プロ手法組み込み）
+FUNDAMENTAL_FILTER = {
+    'enabled': True,
+    'min_roe': 0.10,      # ROE 10%以上
+    'max_peg': 1.0        # PEGレシオ 1.0以下（割安）
+}
