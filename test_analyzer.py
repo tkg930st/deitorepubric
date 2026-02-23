@@ -107,8 +107,10 @@ class NpEncoder(json.JSONEncoder):
 
 def main():
     if os.path.exists(TEST_LOG):
-        try: os.remove(TEST_LOG)
-        except: with open(TEST_LOG, 'w'): pass
+        try:
+            os.remove(TEST_LOG)
+        except Exception:
+            with open(TEST_LOG, 'w'): pass
 
     start_time = time.time()
     print("\n🚀 [TEST MODE] Ver 15.12 高速検証 (Monthly / Weekly 対応)")
