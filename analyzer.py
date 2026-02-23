@@ -94,7 +94,6 @@ def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict
         l_prof = res_l['profit']; s_prof = res_s['profit']
         is_l_valid = l_prof >= hurdle
         is_s_valid = s_prof >= hurdle
-        
         valid_l = l_prof if is_l_valid else 0.0
         valid_s = s_prof if is_s_valid else 0.0
         total = valid_l + valid_s

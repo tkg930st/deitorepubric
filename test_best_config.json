@@ -1,0 +1,316 @@
+{
+  "timestamp": "2026-02-23T15:12:39.744785",
+  "version": "15.10-TEST",
+  "details": [
+    {
+      "t": "3103.T",
+      "profit": 241.9678079627287,
+      "long_profit": 241.9678079627287,
+      "short_profit": 0.0,
+      "params": {
+        "long": {
+          "w_rsi": 35,
+          "w_vwap": 35,
+          "w_rvol": 29,
+          "w_adx": 24,
+          "threshold": 65,
+          "sl_mul": 1.1558952995026297,
+          "tp_mul": 5.437613909907386,
+          "use_rsi_filter": false,
+          "use_vwap_filter": true
+        },
+        "short": {
+          "w_rsi": 10,
+          "w_vwap": 11,
+          "w_rvol": 35,
+          "w_adx": 22,
+          "threshold": 71,
+          "sl_mul": 1.0,
+          "tp_mul": 5.650473913090481,
+          "use_rsi_filter": false,
+          "use_vwap_filter": true
+        }
+      },
+      "logic_type": "Long(1Month)"
+    },
+    {
+      "t": "6301.T",
+      "profit": 35.10710939933645,
+      "long_profit": 35.10710939933645,
+      "short_profit": 0.0,
+      "params": {
+        "long": {
+          "w_rsi": 22,
+          "w_vwap": 12,
+          "w_rvol": 25,
+          "w_adx": 28,
+          "threshold": 64,
+          "sl_mul": 1.083944371643167,
+          "tp_mul": 3.0238383183120625,
+          "use_rsi_filter": true,
+          "use_vwap_filter": true
+        },
+        "short": {
+          "w_rsi": 11,
+          "w_vwap": 11,
+          "w_rvol": 27,
+          "w_adx": 23,
+          "threshold": 73,
+          "sl_mul": 1.232593150822499,
+          "tp_mul": 4.9744479846870515,
+          "use_rsi_filter": true,
+          "use_vwap_filter": true
+        }
+      },
+      "logic_type": "Long(1Month)"
+    },
+    {
+      "t": "7014.T",
+      "profit": 32.413043609625824,
+      "long_profit": 32.413043609625824,
+      "short_profit": 0.0,
+      "params": {
+        "long": {
+          "w_rsi": 18,
+          "w_vwap": 32,
+          "w_rvol": 24,
+          "w_adx": 20,
+          "threshold": 79,
+          "sl_mul": 1.0,
+          "tp_mul": 4.659945191193553,
+          "use_rsi_filter": true,
+          "use_vwap_filter": true
+        },
+        "short": {
+          "w_rsi": 24,
+          "w_vwap": 13,
+          "w_rvol": 38,
+          "w_adx": 46,
+          "threshold": 49,
+          "sl_mul": 2.4599165943775785,
+          "tp_mul": 5.810343052102303,
+          "use_rsi_filter": true,
+          "use_vwap_filter": false
+        }
+      },
+      "logic_type": "Long(1Month)"
+    },
+    {
+      "t": "7012.T",
+      "profit": 32.36750682154993,
+      "long_profit": 32.36750682154993,
+      "short_profit": 0.0,
+      "params": {
+        "long": {
+          "w_rsi": 26,
+          "w_vwap": 31,
+          "w_rvol": 47,
+          "w_adx": 43,
+          "threshold": 72,
+          "sl_mul": 1.2234961594139715,
+          "tp_mul": 4.533198514493218,
+          "use_rsi_filter": true,
+          "use_vwap_filter": true
+        },
+        "short": {
+          "w_rsi": 11,
+          "w_vwap": 38,
+          "w_rvol": 40,
+          "w_adx": 34,
+          "threshold": 67,
+          "sl_mul": 1.445771139333526,
+          "tp_mul": 5.654719760523073,
+          "use_rsi_filter": false,
+          "use_vwap_filter": false
+        }
+      },
+      "logic_type": "Long(1Month)"
+    },
+    {
+      "t": "6701.T",
+      "profit": 32.239898459851155,
+      "long_profit": 0.0,
+      "short_profit": 32.239898459851155,
+      "params": {
+        "long": {
+          "w_rsi": 28,
+          "w_vwap": 26,
+          "w_rvol": 41,
+          "w_adx": 27,
+          "threshold": 79,
+          "sl_mul": 2.5278313392189555,
+          "tp_mul": 3.7791931995474117,
+          "use_rsi_filter": true,
+          "use_vwap_filter": false
+        },
+        "short": {
+          "w_rsi": 21,
+          "w_vwap": 14,
+          "w_rvol": 34,
+          "w_adx": 46,
+          "threshold": 62,
+          "sl_mul": 1.0,
+          "tp_mul": 3.528171676153743,
+          "use_rsi_filter": true,
+          "use_vwap_filter": true
+        }
+      },
+      "logic_type": "Long(1Month)"
+    },
+    {
+      "t": "5101.T",
+      "profit": 30.664272158027586,
+      "long_profit": 30.664272158027586,
+      "short_profit": 0.0,
+      "params": {
+        "long": {
+          "w_rsi": 28,
+          "w_vwap": 17,
+          "w_rvol": 22,
+          "w_adx": 29,
+          "threshold": 70,
+          "sl_mul": 1.0,
+          "tp_mul": 4.661058427740521,
+          "use_rsi_filter": true,
+          "use_vwap_filter": false
+        },
+        "short": {
+          "w_rsi": 26,
+          "w_vwap": 17,
+          "w_rvol": 38,
+          "w_adx": 28,
+          "threshold": 80,
+          "sl_mul": 1.8338562951346729,
+          "tp_mul": 4.899278686112771,
+          "use_rsi_filter": true,
+          "use_vwap_filter": false
+        }
+      },
+      "logic_type": "Long(1Month)"
+    },
+    {
+      "t": "5838.T",
+      "profit": 29.593259945096342,
+      "long_profit": 29.593259945096342,
+      "short_profit": 0.0,
+      "params": {
+        "long": {
+          "w_rsi": 16,
+          "w_vwap": 23,
+          "w_rvol": 21,
+          "w_adx": 32,
+          "threshold": 69,
+          "sl_mul": 1.0,
+          "tp_mul": 5.420106925009684,
+          "use_rsi_filter": false,
+          "use_vwap_filter": true
+        },
+        "short": {
+          "w_rsi": 39,
+          "w_vwap": 36,
+          "w_rvol": 24,
+          "w_adx": 41,
+          "threshold": 77,
+          "sl_mul": 1.0,
+          "tp_mul": 2.5117608313052493,
+          "use_rsi_filter": false,
+          "use_vwap_filter": false
+        }
+      },
+      "logic_type": "Long(1Month)"
+    },
+    {
+      "t": "5101.T",
+      "profit": 17.42661946861892,
+      "long_profit": 17.42661946861892,
+      "short_profit": 0.0,
+      "params": {
+        "long": {
+          "w_rsi": 28,
+          "w_vwap": 21,
+          "w_rvol": 30,
+          "w_adx": 46,
+          "threshold": 61,
+          "sl_mul": 1.0,
+          "tp_mul": 3.97109598979416,
+          "use_rsi_filter": false,
+          "use_vwap_filter": false
+        },
+        "short": {
+          "w_rsi": 23,
+          "w_vwap": 30,
+          "w_rvol": 20,
+          "w_adx": 50,
+          "threshold": 58,
+          "sl_mul": 1.1282473321484472,
+          "tp_mul": 3.680801853928723,
+          "use_rsi_filter": false,
+          "use_vwap_filter": false
+        }
+      },
+      "logic_type": "Short(1Week)"
+    },
+    {
+      "t": "4519.T",
+      "profit": 8.432721512072538,
+      "long_profit": 8.432721512072538,
+      "short_profit": 0.0,
+      "params": {
+        "long": {
+          "w_rsi": 27,
+          "w_vwap": 14,
+          "w_rvol": 47,
+          "w_adx": 20,
+          "threshold": 49,
+          "sl_mul": 1.2092651166822683,
+          "tp_mul": 3.654631155241606,
+          "use_rsi_filter": true,
+          "use_vwap_filter": true
+        },
+        "short": {
+          "w_rsi": 28,
+          "w_vwap": 20,
+          "w_rvol": 27,
+          "w_adx": 44,
+          "threshold": 47,
+          "sl_mul": 2.8950044755023097,
+          "tp_mul": 3.76268667724964,
+          "use_rsi_filter": false,
+          "use_vwap_filter": false
+        }
+      },
+      "logic_type": "Short(1Week)"
+    },
+    {
+      "t": "9984.T",
+      "profit": 7.3064375414548035,
+      "long_profit": 0.0,
+      "short_profit": 7.3064375414548035,
+      "params": {
+        "long": {
+          "w_rsi": 25,
+          "w_vwap": 33,
+          "w_rvol": 23,
+          "w_adx": 41,
+          "threshold": 65,
+          "sl_mul": 1.7699877892701468,
+          "tp_mul": 5.025226798376926,
+          "use_rsi_filter": false,
+          "use_vwap_filter": true
+        },
+        "short": {
+          "w_rsi": 34,
+          "w_vwap": 20,
+          "w_rvol": 40,
+          "w_adx": 44,
+          "threshold": 60,
+          "sl_mul": 1.099070742932936,
+          "tp_mul": 4.463715133996224,
+          "use_rsi_filter": false,
+          "use_vwap_filter": false
+        }
+      },
+      "logic_type": "Short(1Week)"
+    }
+  ]
+}
