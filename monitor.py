@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-monitor.py - Version 15.2 統合戦略監視
-変更点:
-- 動的フィルター最適化フラグ (RSI/VWAP ON/OFF) を反映
-- 実行ログ出力の強化
+monitor.py - Version 15.13 統合戦略監視 (詳細通知フォーマット 完全復元版)
+主な機能:
+1. 🛡️ 詳細エントリー通知 (Ver 13.5形式)
+2. ✅ TP1達成通知 (50%利確・リスク低減詳細)
+3. 🛑 詳細エグジット通知 (損益・理由)
+4. ℹ️ 地合い調整 & 📈/📉 構造検知通知
+5. 📊 運用終了後の詳細サマリー報告
 """
 import json
 import logging
@@ -11,42 +14,61 @@ import time
 import csv
 import os
 from datetime import datetime, time as dt_time
-from typing import Dict, Optional, Set, List
+from typing import Dict, Optional, Set, List, Any
 import pytz
 import numpy as np
 import pandas as pd
 
 from config import (
     WEBHOOK_URL, LOG_FILE, LOG_LEVEL, OUTPUT_CONFIG, DATA_FETCH,
-    MONITORING_LOOP, TREND_FILTER, POSITION_MANAGEMENT
+    MONITORING_LOOP, TREND_FILTER, POSITION_MANAGEMENT, SIGNAL_THRESHOLDS
 )
 from utils import (
     super_flatten_columns, fetch_yfinance_data,
     calculate_technical_indicators, calculate_ma_from_higher_timeframe,
     send_discord_notification, detect_market_structure, check_trend_filter,
-    safe_get
+    safe_get, fetch_macro_sentiment
 )
 from position_manager import PositionManager
 
-# ロギング設定 (UTF-8, 追記モード)
+# ロギング設定
 logging.basicConfig(
-    filename=LOG_FILE,
-    filemode='a',
-    encoding='utf-8',
+    filename=LOG_FILE, filemode='a', encoding='utf-8',
     level=getattr(logging, LOG_LEVEL),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-processed_timestamps: Set[str] = set()
 position_manager = PositionManager()
 last_structure_signals: Dict[str, str] = {}
+current_macro_adjustments: Dict[str, Any] = {}
 
 def load_config() -> Optional[Dict]:
     try:
         with open(OUTPUT_CONFIG, 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception: return None
+
+def apply_macro_adjustments(sentiment: Dict[str, float]):
+    """VIX等に基づいた動的パラメータ調整と通知"""
+    global current_macro_adjustments
+    vix = sentiment.get('vix_value', 18.0)
+    
+    if vix > 20:
+        adjustment_msg = "ℹ️ **市場ボラティリティ上昇検知 (VIX > 20)**\n"
+        adjustment_msg += "リスク管理のため以下の調整を自動適用しました：\n"
+        adjustment_msg += "• エントリー閾値: +5.0 (厳格化)\n"
+        adjustment_msg += "• 利確幅(TP): ×1.25 (拡大)\n"
+        adjustment_msg += "• 損切幅(SL): ×1.15 (拡大)"
+        
+        current_macro_adjustments = {
+            'threshold_add': 5.0,
+            'tp_mul': 1.25,
+            'sl_mul': 1.15
+        }
+        send_discord_notification(WEBHOOK_URL, adjustment_msg)
+    else:
+        current_macro_adjustments = {'threshold_add': 0.0, 'tp_mul': 1.0, 'sl_mul': 1.0}
 
 def check_structure_signal(ticker: str, df: pd.DataFrame):
     global last_structure_signals
@@ -55,8 +77,11 @@ def check_structure_signal(ticker: str, df: pd.DataFrame):
         sig_key = f"{ticker}_{structure['type']}_{structure['direction']}"
         if last_structure_signals.get(ticker) != sig_key:
             desc = "トレンド継続" if structure['type'] == 'BOS' else "トレンド転換"
-            msg = f"[SIGNAL] {ticker} ｜ 検出：{structure['type']} ({structure['direction']} / {desc})"
-            logger.info(msg)
+            emoji = "📈" if structure['direction'] == 'LONG' else "📉"
+            msg = (f"{emoji} **[STRUCTURE] {ticker}**\n"
+                   f"検出：{structure['type']} ({structure['direction']})\n"
+                   f"状況：{desc}\n"
+                   f"節目価格：¥{structure['price']:,.1f}")
             send_discord_notification(WEBHOOK_URL, msg)
             last_structure_signals[ticker] = sig_key
 
@@ -65,47 +90,88 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
     
     row = df.iloc[-1]
     side_params = detail['params']
+    tp1_mul_base = POSITION_MANAGEMENT.get('tp1_multiplier', 1.5)
+    trailing_atr_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
+    adj = current_macro_adjustments
     
-    # 判定ロジック
     for side in ['long', 'short']:
         params = side_params[side]
         if detail.get(f'{side}_disabled', False): continue
         
-        # フィルター最適化フラグの反映
         rsi_val = safe_get(row, 'rsi_14', 50)
         vwap_dev = safe_get(row, 'vwap_dev', 0)
-        
         if params.get('use_rsi_filter', True):
-            if side == 'long' and rsi_val >= 70: continue
-            if side == 'short' and rsi_val <= 30: continue
-            
+            if (side == 'long' and rsi_val >= 75) or (side == 'short' and rsi_val <= 25): continue
         if params.get('use_vwap_filter', True):
-            if side == 'long' and vwap_dev >= 2.5: continue
-            if side == 'short' and vwap_dev <= -2.5: continue
+            if (side == 'long' and vwap_dev >= 3.0) or (side == 'short' and vwap_dev <= -3.0): continue
             
-        # スコア計算 (簡易版 - backtest_engineと共通)
         score = 0.0
         if side == 'long':
-            if rsi_val < 35: score += params['w_rsi'] * 1.5
-            if vwap_dev < -1.0: score += params['w_vwap'] * 1.5
+            if rsi_val < 40: score += params['w_rsi'] * 1.2
+            if vwap_dev < -0.5: score += params['w_vwap'] * 1.2
         else:
-            if rsi_val > 65: score += params['w_rsi'] * 1.5
-            if vwap_dev > 1.0: score += params['w_vwap'] * 1.5
-            
-        if safe_get(row, 'rvol', 1.0) > 1.5: score += params['w_rvol'] * 2.0
-        if safe_get(row, 'adx_14', 0) > 25: score += params['w_adx'] * 1.0
+            if rsi_val > 60: score += params['w_rsi'] * 1.2
+            if vwap_dev > 0.5: score += params['w_vwap'] * 1.2
+        if safe_get(row, 'rvol', 1.0) > 1.8: score += params['w_rvol'] * 2.5
+        if safe_get(row, 'adx_14', 0) > 25: score += params['w_adx'] * 2.0
         
-        if score >= params['threshold']:
-            if TREND_FILTER['enabled'] and not check_trend_filter(row['close'], row.get('ma_15m_20', 0), side.upper()): continue
+        if score >= (params['threshold'] + adj.get('threshold_add', 0)):
+            if TREND_FILTER['enabled']:
+                ma15 = row.get('ma_15m_20', 0)
+                if not check_trend_filter(row['close'], ma15, side.upper()): continue
+
+            atr = row.get('atr_14', row['close'] * 0.02)
+            detail['atr'] = atr
+            entry_price = row['close']
             
-            # エントリー実行
-            entry_msg = f"[ENTRY] {ticker} ({side.upper()}) ｜ 選定ロジック：{detail['logic_type']} ｜ スコア: {score:.1f}"
-            logger.info(entry_msg)
-            send_discord_notification(WEBHOOK_URL, entry_msg)
-            position_manager.add_position(ticker, side.upper(), row['close'], detail)
+            sl_dist = atr * params['sl_mul'] * adj.get('sl_mul', 1.0)
+            sl = entry_price - sl_dist if side == 'long' else entry_price + sl_dist
+            tp1_dist = atr * tp1_mul_base * adj.get('tp_mul', 1.0)
+            tp1 = entry_price + tp1_dist if side == 'long' else entry_price - tp1_dist
+            
+            # 🛡️ 新規シグナル通知 (Ver 13.5形式 復元)
+            msg = (f"🛡️ **新規シグナル (Ver 15.13): {side.upper()}**\n"
+                   f"銘柄: {ticker} ({detail['logic_type']})\n"
+                   f"価格: ¥{entry_price:,.1f}\n"
+                   f"TP1: ¥{tp1:,.1f} (ATR×{tp1_mul_base * adj.get('tp_mul', 1.0):.1f}) → 50%決済\n"
+                   f"TP2: トレーリング (ATR×{trailing_atr_mul}幅)\n"
+                   f"SL: ¥{sl:,.1f} (ATR×{params['sl_mul']:.1f})\n"
+                   f"スコア: {score:.1f} (RSI:{rsi_val:.1f}, VWAP:{vwap_dev:.2f})")
+            
+            send_discord_notification(WEBHOOK_URL, msg)
+            position_manager.add_position(ticker, side.upper(), entry_price, detail)
             break
 
+def monitor_positions(ticker: str, current_price: float):
+    """保有中ポジションの状態更新と通知"""
+    event = position_manager.update_price(ticker, current_price)
+    pos = position_manager.get_position(ticker)
+    if not pos: return
+
+    if event == 'TP1_HIT':
+        trailing_atr_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
+        profit = ((current_price / pos['entry_price'] - 1) * 100) if pos['side'] == 'LONG' else ((1 - current_price / pos['entry_price']) * 100)
+        
+        # ✅ TP1達成通知 (復元)
+        msg = (f"✅ **TP1達成: {ticker}**\n"
+               f"🎯 50%利確完了\n"
+               f"・価格: ¥{current_price:,.1f}\n"
+               f"・損益: {profit:+.2f}%\n"
+               f"・リスクを半分に縮小しました\n"
+               f"・残り50%はトレーリングTP (ATR×{trailing_atr_mul}) で追従中")
+        send_discord_notification(WEBHOOK_URL, msg)
+
+    elif event == 'STOP_LOSS':
+        res = position_manager.close_position(ticker, current_price, 'STOP_LOSS')
+        # 🛑 詳細エグジット通知 (復元)
+        msg = (f"🛑 **[EXIT] {res['ticker']}**\n"
+               f"理由：STOP_LOSS (逆指値決済)\n"
+               f"損益：{res['profit_pct']:+.2f}% ({res['logic_type']})\n"
+               f"決済単価：¥{res['exit_price']:,.1f}")
+        send_discord_notification(WEBHOOK_URL, msg)
+
 def send_daily_summary():
+    """本日の最終結果サマリー通知"""
     results_file = POSITION_MANAGEMENT['trade_results_file']
     if not os.path.exists(results_file): return
     try:
@@ -116,12 +182,15 @@ def send_daily_summary():
         if df_today.empty: return
 
         total_profit = df_today['profit_pct'].sum()
-        msg = f"📊 **本日の最終結果サマリー**\n\n💰 **総合結果: {total_profit:+.2f}%**\n━━━━━━━━━━━━━━\n"
-        for label, count in [("Long(1Month)", 7), ("Short(1Week)", 3)]:
+        msg = f"📊 **本日の最終結果サマリー**\n\n"
+        msg += f"💰 **総合損益: {total_profit:+.2f}%**\n"
+        msg += f"━━━━━━━━━━━━━━\n"
+        for label in ["Monthly", "Weekly"]:
             res = df_today[df_today['logic_type'] == label]
-            msg += f"📅 **{label} - {count}銘柄対象**\n"
+            msg += f"📅 **{label} 戦略結果**\n"
             if not res.empty:
-                for _, r in res.iterrows(): msg += f"• {r['ticker']}: {r['profit_pct']:+.2f}% ({r['exit_reason']})\n"
+                for _, r in res.iterrows():
+                    msg += f"• {r['ticker']} ({r['side']}): {r['profit_pct']:+.2f}% [{r['exit_reason']}]\n"
             else: msg += "• 取引なし\n"
             msg += "\n"
         send_discord_notification(WEBHOOK_URL, msg)
@@ -133,36 +202,39 @@ def monitor():
     details = {d['t']: d for d in config['details']}
     tickers = list(details.keys())
     
-    start_msg = f"📡 **Version 15.2 統合戦略監視 起動** ({len(tickers)}銘柄)"
-    print(start_msg); logger.info(start_msg)
+    # 起動時レポート
+    sentiment = fetch_macro_sentiment()
+    start_msg = (f"📡 **Version 15.13 統合戦略監視 起動**\n"
+                 f"━━━━━━━━━━━━━━\n"
+                 f"🌍 **マクロ地合い情報**:\n"
+                 f"• VIX: {sentiment['vix_value']} ({sentiment['vix_chg']:+.2f}%)\n"
+                 f"• SOX: {sentiment['sox_chg']:+.2f}%\n"
+                 f"• JPY: {sentiment['jpy_chg']:+.2f}%\n\n"
+                 f"🎯 **監視対象銘柄**: {', '.join(tickers)}")
     send_discord_notification(WEBHOOK_URL, start_msg)
+    apply_macro_adjustments(sentiment)
 
     try:
         while True:
             now = datetime.now(pytz.timezone('Asia/Tokyo')).time()
             if now >= dt_time(15, 0):
-                prices = {}
+                # 引け処理
                 raw_data = fetch_yfinance_data(tickers, period='1d', interval='5m')
-                for t in tickers:
-                    df = super_flatten_columns(raw_data[t] if len(tickers)>1 else raw_data)
-                    if not df.empty: prices[t] = df['close'].iloc[-1]
+                prices = {t: super_flatten_columns(raw_data[t] if len(tickers)>1 else raw_data)['close'].iloc[-1] for t in tickers}
                 results = position_manager.force_close_all(prices, '大引け強制決済')
                 for r in results:
-                    send_discord_notification(WEBHOOK_URL, f"🛑 [EXIT] {r['ticker']} | 損益: {r['profit_pct']:+.2f}% ({r['logic_type']})")
+                    send_discord_notification(WEBHOOK_URL, f"🛑 **[EXIT] {r['ticker']}**\n理由：大引け強制決済\n損益：{r['profit_pct']:+.2f}% ({r['logic_type']})")
                 send_daily_summary(); break
 
             try:
                 raw_data = fetch_yfinance_data(tickers, period='2d', interval='5m')
                 for ticker in tickers:
-                    df = super_flatten_columns(raw_data[ticker] if len(tickers)>1 else raw_data)
+                    ticker_data = raw_data[ticker] if len(tickers) > 1 else raw_data
+                    df = super_flatten_columns(ticker_data)
                     if df.empty: continue
                     check_structure_signal(ticker, df)
                     if position_manager.has_position(ticker):
-                        current_price = df['close'].iloc[-1]
-                        exit_reason = position_manager.update_price(ticker, current_price)
-                        if exit_reason:
-                            res = position_manager.close_position(ticker, current_price, exit_reason)
-                            send_discord_notification(WEBHOOK_URL, f"🛑 [EXIT] {res['ticker']} | 理由: {exit_reason} | 損益: {res['profit_pct']:+.2f}% ({res['logic_type']})")
+                        monitor_positions(ticker, df['close'].iloc[-1])
                     else:
                         check_new_signal(ticker, df, details[ticker])
             except Exception as e: logger.error(f"Loop error: {e}")

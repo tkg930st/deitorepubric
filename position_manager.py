@@ -1,9 +1,8 @@
 """
-position_manager.py - Version 15.0 仮想トレード・ポジション管理
-主な機能:
-1. 買値から-5%の固定損切り
-2. 最高値更新から-5%のトレーリングストップ
-3. 長期・短期ロジックの判別保存
+position_manager.py - Version 15.13 仮想トレード・ポジション管理
+変更点:
+- update_price の戻り値をイベント形式 ('TP1_HIT', 'STOP_LOSS', None) に変更
+- 通知ロジックを monitor.py に集約するため、内部での通知送信を廃止
 """
 import json
 import csv
@@ -37,80 +36,81 @@ class PositionManager:
     def has_position(self, ticker: str) -> bool:
         return ticker in self.positions
     
-    def add_position(self, ticker: str, side: str, entry_price: float, params: Dict) -> None:
-        # 固定損切り: -5%
-        fixed_sl = entry_price * 0.95 if side == 'LONG' else entry_price * 1.05
+    def add_position(self, ticker: str, side: str, entry_price: float, detail: Dict) -> None:
+        atr = detail.get('atr', entry_price * 0.02)
+        logic_side = side.lower()
+        params = detail['params'][logic_side]
+        
+        sl_dist = atr * params['sl_mul']
+        fixed_sl = entry_price - sl_dist if side == 'LONG' else entry_price + sl_dist
+        
+        tp1_dist = atr * POSITION_MANAGEMENT.get('tp1_multiplier', 1.5)
+        tp1_price = entry_price + tp1_dist if side == 'LONG' else entry_price - tp1_dist
         
         position = {
             'ticker': ticker,
             'side': side,
             'entry_price': entry_price,
+            'entry_atr': atr,
             'fixed_sl': fixed_sl,
-            'highest_price': entry_price if side == 'LONG' else entry_price,
-            'lowest_price': entry_price if side == 'SHORT' else entry_price,
+            'tp1': tp1_price,
+            'tp1_hit': False,
+            'highest_price': entry_price,
+            'lowest_price': entry_price,
             'trailing_sl': fixed_sl,
             'entry_time': datetime.now().isoformat(),
-            'logic_type': params.get('logic_type', 'Unknown'),
+            'logic_type': detail.get('logic_type', 'Unknown'),
             'params': params
         }
         self.positions[ticker] = position
         self.save_positions()
-        logger.info(f"Position Added: {ticker} ({position['logic_type']}) @ {entry_price}")
+        logger.info(f"Position Added: {ticker} ({side}) SL={fixed_sl:.1f}, TP1={tp1_price:.1f}")
 
     def update_price(self, ticker: str, current_price: float) -> Optional[str]:
-        """価格更新と損切り判定"""
+        """
+        価格更新とイベント判定
+        戻り値: 'TP1_HIT', 'STOP_LOSS', または None
+        """
         if ticker not in self.positions: return None
         pos = self.positions[ticker]
         side = pos['side']
+        atr = pos['entry_atr']
         
-        # 最高値/最安値の更新
+        event = None
+        
+        # TP1達成チェック
+        if not pos['tp1_hit']:
+            if (side == 'LONG' and current_price >= pos['tp1']) or \
+               (side == 'SHORT' and current_price <= pos['tp1']):
+                pos['tp1_hit'] = True
+                # リスク低減 (リスクを半分に)
+                if side == 'LONG':
+                    pos['trailing_sl'] = max(pos['trailing_sl'], pos['entry_price'] - (atr * 0.5))
+                else:
+                    pos['trailing_sl'] = min(pos['trailing_sl'], pos['entry_price'] + (atr * 0.5))
+                event = 'TP1_HIT'
+
+        # 決済判定 (STOP_LOSS)
         if side == 'LONG':
-            if current_price > pos['highest_price']:
-                pos['highest_price'] = current_price
-                # トレーリングストップ引き上げ: 最高値から-5%
-                new_tsl = current_price * 0.95
-                if new_tsl > pos['trailing_sl']:
-                    pos['trailing_sl'] = new_tsl
-            
-            # 損切り判定
-            if current_price <= pos['trailing_sl']: return 'TRAILING_SL'
-            if current_price <= pos['fixed_sl']: return 'FIXED_SL'
-            
+            if current_price <= pos['trailing_sl']: event = 'STOP_LOSS'
         else: # SHORT
-            if current_price < pos['lowest_price']:
-                pos['lowest_price'] = current_price
-                # トレーリングストップ引き下げ: 最安値から+5%
-                new_tsl = current_price * 1.05
-                if new_tsl < pos['trailing_sl']:
-                    pos['trailing_sl'] = new_tsl
-            
-            # 損切り判定
-            if current_price >= pos['trailing_sl']: return 'TRAILING_SL'
-            if current_price >= pos['fixed_sl']: return 'FIXED_SL'
+            if current_price >= pos['trailing_sl']: event = 'STOP_LOSS'
             
         self.save_positions()
-        return None
+        return event
 
     def close_position(self, ticker: str, exit_price: float, reason: str) -> Dict:
         if ticker not in self.positions: return {}
         pos = self.positions[ticker]
         entry_price = pos['entry_price']
         side = pos['side']
-        
         profit_pct = ((exit_price / entry_price - 1) * 100) if side == 'LONG' else ((1 - exit_price / entry_price) * 100)
         
         result = {
-            'ticker': ticker,
-            'side': side,
-            'entry_price': entry_price,
-            'exit_price': exit_price,
-            'exit_time': datetime.now().isoformat(),
-            'exit_reason': reason,
-            'profit_pct': profit_pct,
-            'logic_type': pos['logic_type']
+            'ticker': ticker, 'side': side, 'entry_price': entry_price,
+            'exit_price': exit_price, 'exit_time': datetime.now().isoformat(),
+            'exit_reason': reason, 'profit_pct': profit_pct, 'logic_type': pos['logic_type']
         }
-        
-        # CSV保存
         self.save_trade_result(result)
         del self.positions[ticker]
         self.save_positions()
@@ -124,12 +124,6 @@ class PositionManager:
                 if not file_exists: writer.writeheader()
                 writer.writerow(result)
         except Exception: pass
-
-    def get_position(self, ticker: str) -> Optional[Dict]:
-        return self.positions.get(ticker)
-    
-    def get_all_positions(self) -> Dict:
-        return self.positions
 
     def force_close_all(self, current_prices: Dict[str, float], reason: str = 'FORCE_CLOSE') -> List[Dict]:
         results = []
