@@ -1,8 +1,8 @@
 """
-position_manager.py - Version 15.10 仮想トレード・ポジション管理
+position_manager.py - Version 15.13 仮想トレード・ポジション管理
 変更点:
-- ATRベースの動的損切り(sl_mul)に対応
-- TP1達成後のSL引き上げロジックをバックテストと同期
+- update_price の戻り値をイベント形式 ('TP1_HIT', 'STOP_LOSS', None) に変更
+- 通知ロジックを monitor.py に集約するため、内部での通知送信を廃止
 """
 import json
 import csv
@@ -10,7 +10,6 @@ import logging
 from datetime import datetime
 from typing import Dict, Optional, List
 import os
-import pandas as pd
 from config import POSITION_MANAGEMENT
 
 logger = logging.getLogger(__name__)
@@ -38,9 +37,6 @@ class PositionManager:
         return ticker in self.positions
     
     def add_position(self, ticker: str, side: str, entry_price: float, detail: Dict) -> None:
-        """
-        ポジション追加
-        """
         atr = detail.get('atr', entry_price * 0.02)
         logic_side = side.lower()
         params = detail['params'][logic_side]
@@ -71,28 +67,37 @@ class PositionManager:
         logger.info(f"Position Added: {ticker} ({side}) SL={fixed_sl:.1f}, TP1={tp1_price:.1f}")
 
     def update_price(self, ticker: str, current_price: float) -> Optional[str]:
+        """
+        価格更新とイベント判定
+        戻り値: 'TP1_HIT', 'STOP_LOSS', または None
+        """
         if ticker not in self.positions: return None
         pos = self.positions[ticker]
         side = pos['side']
         atr = pos['entry_atr']
         
+        event = None
+        
+        # TP1達成チェック
         if not pos['tp1_hit']:
             if (side == 'LONG' and current_price >= pos['tp1']) or \
                (side == 'SHORT' and current_price <= pos['tp1']):
                 pos['tp1_hit'] = True
+                # リスク低減 (リスクを半分に)
                 if side == 'LONG':
                     pos['trailing_sl'] = max(pos['trailing_sl'], pos['entry_price'] - (atr * 0.5))
                 else:
                     pos['trailing_sl'] = min(pos['trailing_sl'], pos['entry_price'] + (atr * 0.5))
-                logger.info(f"TP1 Hit: {ticker} -> SL raised to {pos['trailing_sl']:.1f}")
+                event = 'TP1_HIT'
 
+        # 決済判定 (STOP_LOSS)
         if side == 'LONG':
-            if current_price <= pos['trailing_sl']: return 'STOP_LOSS'
-        else:
-            if current_price >= pos['trailing_sl']: return 'STOP_LOSS'
+            if current_price <= pos['trailing_sl']: event = 'STOP_LOSS'
+        else: # SHORT
+            if current_price >= pos['trailing_sl']: event = 'STOP_LOSS'
             
         self.save_positions()
-        return None
+        return event
 
     def close_position(self, ticker: str, exit_price: float, reason: str) -> Dict:
         if ticker not in self.positions: return {}
