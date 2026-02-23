@@ -13,7 +13,7 @@ WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 # ログ設定
 LOG_FILE = 'execution_log.txt'
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'DEBUG'
 
 # 銘柄選定基準
 LIQUIDITY_THRESHOLD = 5_000_000_000  # 売買代金50億円以上に戻す
@@ -43,23 +43,23 @@ PARAM_RANGES = {
 # トレンドフィルター設定
 TREND_FILTER = {
     'enabled': True,
-    'ma_period': 20,
+    'ma_period': 20,  # 15分足20MA
     'timeframe': '15m'
 }
 
 # ダイバージェンス設定
 DIVERGENCE = {
     'enabled': True,
-    'lookback': 25,
-    'rsi_threshold': 5.0,
-    'price_threshold': 0.5
+    'lookback': 25,  # 検知期間
+    'rsi_threshold': 5.0,  # RSI差分閾値
+    'price_threshold': 0.5  # 価格変化率閾値（%）
 }
 
 # 当日制限設定
 DAILY_COOLDOWN = {
     'enabled': True,
     'cooldown_file': 'daily_cooldown.json',
-    'reset_time': '09:00'
+    'reset_time': '09:00'  # リセット時刻
 }
 
 # トレードジャーナル設定
@@ -90,7 +90,7 @@ TRADING_HOURS = {
     'morning_end': '11:30',
     'afternoon_start': '12:30',
     'afternoon_end': '15:00',
-    'avoid_close_minutes': 10
+    'avoid_close_minutes': 10  # 大引け前の除外時間（分）
 }
 
 # データ取得設定
@@ -134,7 +134,7 @@ RETRY_OPTIMIZATION = {
     'enabled': True,
     'max_retries': 10,
     'retry_top_n': 5,
-    'target_profit': 5.0, # 5%に戻す
+    'target_profit': 5.0,
     'iterations_per_retry': 500,
 }
 
