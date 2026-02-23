@@ -55,9 +55,11 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
             if not position['tp1_hit']:
                 if (side == 'long' and h >= position['tp1']) or (side == 'short' and l <= position['tp1']):
                     position['tp1_hit'] = True
+                    # TP1後はリスクを半分に縮小した位置にSLを移動
                     if side == 'long': position['sl'] = max(position['sl'], position['entry_price'] - (position['atr'] * 0.5))
                     else: position['sl'] = min(position['sl'], position['entry_price'] + (position['atr'] * 0.5))
             
+            # 決済判定
             if (side == 'long' and l <= position['sl']) or (side == 'short' and h >= position['sl']):
                 exit_reason = "STOP_LOSS"
             elif idx == len(df) - 1:
@@ -72,6 +74,7 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
                 position = None
             continue
 
+        # エントリーフィルター
         rsi_val = safe_get(row, 'rsi_14', 50)
         vwap_dev = safe_get(row, 'vwap_dev', 0)
         if params.get('use_rsi_filter', True):

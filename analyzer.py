@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-analyzer.py - Version 15.9 統合戦略実装
-主な機能:
-1. 2段階進化型最適化 (Phase 1: 広域 / Phase 2: 局所進化)
-2. Fitness Ver 2 (リスク対効果評価) による実戦再現性重視
-3. ボラティリティ比例型SLの最適化保存
+analyzer.py - Version 15.11 統合戦略実装
+変更点:
+- long_disabled / short_disabled フラグを明示的に保存し、Monitorでの誤動作を防止
+- 解析対象母数 50銘柄、試行回数 500回 (config準拠)
+- 期間名称を Monthly / Weekly に統一
 """
 import json
 import logging
@@ -30,7 +30,6 @@ from utils import (
 )
 from backtest_engine import optimize_parameters
 
-# 解析対象の母数を拡大
 CANDIDATE_COUNT = 50
 
 logging.basicConfig(
@@ -78,14 +77,21 @@ def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict
         res_s = optimize_parameters(df, pd.DataFrame(), 'short', OPTIMIZATION_ITERATIONS)
         
         l_prof = res_l['profit']; s_prof = res_s['profit']
-        valid_l = l_prof if l_prof >= hurdle else 0.0
+        
+        # ハードル判定と無効化フラグ
+        is_l_valid = l_prof >= hurdle
+        is_s_valid = s_prof >= hurdle
+        
+        valid_l = l_prof if is_l_valid else 0.0
         valid_s = s_prof if s_prof >= hurdle else 0.0
         total = valid_l + valid_s
         
         if total <= 0: return None
 
         return {
-            't': ticker, 'profit': total, 'long_profit': valid_l, 'short_profit': valid_s,
+            't': ticker, 'profit': total, 
+            'long_profit': valid_l, 'short_profit': valid_s,
+            'long_disabled': not is_l_valid, 'short_disabled': not is_s_valid,
             'params': {'long': res_l['params'], 'short': res_s['params']}
         }
     except Exception as e:
@@ -102,7 +108,7 @@ def run_session(elite: List[Dict], period: str, count: int, label: str, hurdle: 
             if res:
                 res['logic_type'] = label
                 results.append(res)
-                print(f"   ✅ {res['t']} 完了 (期待値: {res['profit']:.2f}%)")
+                print(f"   ✅ {res['t']} 完了 (有効利益: {res['profit']:.2f}%)")
     return sorted(results, key=lambda x: x['profit'], reverse=True)[:count]
 
 class NpEncoder(json.JSONEncoder):
@@ -113,25 +119,26 @@ class NpEncoder(json.JSONEncoder):
 
 def main():
     start_time = time.time()
-    print("\n📊 Version 15.9 統合戦略構築開始")
-    
+    print("\n📊 Version 15.11 統合戦略構築開始")
     sector_df = get_jpx_list_with_sector()
     elite = select_high_volatility_stocks(sector_df['ticker'].tolist(), count=CANDIDATE_COUNT)
     
-    long_res = run_session(elite, '1mo', 7, "Long(1Month)", 5.0)
-    short_res = run_session(elite, '1wk', 3, "Short(1Week)", 3.0)
+    # Monthly（1ヶ月/7銘柄/5.0%ハードル）
+    long_res = run_session(elite, '1mo', 7, "Monthly", 5.0)
+    # Weekly（1週間/3銘柄/3.0%ハードル）
+    short_res = run_session(elite, '1wk', 3, "Weekly", 3.0)
     
     combined = long_res + short_res
     if not combined:
-        print("❌ 条件を満たす銘柄が見つかりませんでした。母数や期間を再検討してください。"); return
+        print("❌ 条件を満たす銘柄が見つかりませんでした。"); return
 
-    best_config = {'timestamp': datetime.now().isoformat(), 'version': '15.9', 'details': combined}
+    best_config = {'timestamp': datetime.now().isoformat(), 'version': '15.11', 'details': combined}
     with open(OUTPUT_CONFIG, 'w', encoding='utf-8') as f:
         json.dump(best_config, f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
-    print(f"\n✅ Version 15.9 構築完了！ ({elapsed/60:.1f}分)")
-    send_discord_notification(WEBHOOK_URL, f"✅ **Version 15.9 構築完了**\n選定数: {len(combined)}")
+    print(f"\n✅ Version 15.11 構築完了！ ({elapsed/60:.1f}分)")
+    send_discord_notification(WEBHOOK_URL, f"✅ **Version 15.11 構築完了**\n選定数: {len(combined)}")
 
 if __name__ == "__main__":
     main()
