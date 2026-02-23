@@ -118,11 +118,29 @@ def fetch_yfinance_data(tickers: List[str], period: str, interval: str, group_by
 
 
 def send_discord_notification(webhook_url: str, message: str) -> bool:
+    if not webhook_url: return False
     try:
-        res = requests.post(webhook_url, json={"content": message}, timeout=10)
-        res.raise_for_status()
+        # Discordの文字数制限(2000文字)に対応するための分割送信
+        MAX_LEN = 1900 
+        if len(message) <= MAX_LEN:
+            res = requests.post(webhook_url, json={"content": message}, timeout=10)
+            res.raise_for_status()
+        else:
+            # 行単位で分割
+            lines = message.split('\n')
+            current_chunk = ""
+            for line in lines:
+                if len(current_chunk) + len(line) + 1 > MAX_LEN:
+                    requests.post(webhook_url, json={"content": current_chunk}, timeout=10)
+                    current_chunk = line + '\n'
+                else:
+                    current_chunk += line + '\n'
+            if current_chunk:
+                requests.post(webhook_url, json={"content": current_chunk}, timeout=10)
         return True
-    except Exception: return False
+    except Exception as e:
+        logger.error(f"Discord通知送信エラー: {str(e)}")
+        return False
 
 
 def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
