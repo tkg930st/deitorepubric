@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-test_analyzer.py - Version 15.11 高速検証
-同期ルール：analyzer.py と同一の解析ロジックを保持。
+test_analyzer.py - Version 15.12 高速検証 (通知なし版)
+同期ルール：analyzer.py と同一の解析ロジックを保持。テスト時はDiscord通知を行わない。
 """
 import json
 import logging
@@ -19,9 +19,8 @@ from config import (
     WEBHOOK_URL, TREND_FILTER
 )
 from utils import (
-    super_flatten_columns, fetch_yfinance_data,
-    calculate_technical_indicators, filter_trading_hours,
-    send_discord_notification
+    get_jpx_list_with_sector, super_flatten_columns, fetch_yfinance_data,
+    calculate_technical_indicators, filter_trading_hours
 )
 from backtest_engine import optimize_parameters
 
@@ -51,7 +50,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def worker_analyze_ticker(ticker: str, period: str, hurdle: float) -> Dict:
+def worker_analyze_ticker(ticker: str, sector_df: pd.DataFrame, period: str, hurdle: float) -> Dict:
     try:
         data = fetch_yfinance_data([ticker], period=period, interval=DATA_FETCH['analyzer_interval'])
         df = super_flatten_columns(data)
@@ -59,13 +58,11 @@ def worker_analyze_ticker(ticker: str, period: str, hurdle: float) -> Dict:
         if len(df) < 20: return None
         df = calculate_technical_indicators(df)
         
-        # Ver 15.11 ロジック (500回試行)
+        # Ver 15.12 ロジック
         res_l = optimize_parameters(df, pd.DataFrame(), 'long', OPTIMIZATION_ITERATIONS)
         res_s = optimize_parameters(df, pd.DataFrame(), 'short', OPTIMIZATION_ITERATIONS)
         
         l_prof = res_l['profit']; s_prof = res_s['profit']
-        
-        # ハードル判定と無効化フラグ (Ver 15.11 同期)
         is_l_valid = l_prof >= hurdle
         is_s_valid = s_prof >= hurdle
         valid_l = l_prof if is_l_valid else 0.0
@@ -74,19 +71,26 @@ def worker_analyze_ticker(ticker: str, period: str, hurdle: float) -> Dict:
         
         if total <= 0: return None
 
+        s_info = sector_df[sector_df['ticker'] == ticker]
+        sector = s_info['sector'].iloc[0] if not s_info.empty else '不明'
+        size = s_info['size_category'].iloc[0] if not s_info.empty else '-'
+        atr_pct = (df['atr_14'].iloc[-1] / df['close'].iloc[-1]) * 100
+
         return {
             't': ticker, 'profit': total, 
             'long_profit': valid_l, 'short_profit': valid_s,
+            'raw_long_profit': l_prof, 'raw_short_profit': s_prof,
             'long_disabled': not is_l_valid, 'short_disabled': not is_s_valid,
+            'atr_pct': atr_pct, 'sector': sector, 'size_category': size,
             'params': {'long': res_l['params'], 'short': res_s['params']}
         }
     except Exception: return None
 
-def run_test_session(tickers: List[str], period: str, count: int, label: str, hurdle: float):
+def run_test_session(tickers: List[str], sector_df: pd.DataFrame, period: str, count: int, label: str, hurdle: float):
     print(f"\n🔬 {label} 解析中 (ハードル: {hurdle}%)")
     results = []
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
-        futures = {executor.submit(worker_analyze_ticker, t, period, hurdle): t for t in tickers}
+        futures = {executor.submit(worker_analyze_ticker, t, sector_df, period, hurdle): t for t in tickers}
         for f in as_completed(futures):
             res = f.result()
             if res:
@@ -104,27 +108,26 @@ class NpEncoder(json.JSONEncoder):
 def main():
     if os.path.exists(TEST_LOG):
         try: os.remove(TEST_LOG)
-        except: 
-            with open(TEST_LOG, 'w'): pass
+        except: with open(TEST_LOG, 'w'): pass
 
     start_time = time.time()
-    print(\"\n🚀 [TEST MODE] Ver 15.11 高速検証 (Monthly / Weekly 対応)\")
+    print("\n🚀 [TEST MODE] Ver 15.12 高速検証 (Monthly / Weekly 対応)")
     
-    # Monthly（1ヶ月/7銘柄/5.0%ハードル）
-    long_res = run_test_session(TEST_TICKERS, '1mo', 7, \"Monthly\", 5.0)
-    # Weekly（1週間/3銘柄/3.0%ハードル）
-    short_res = run_test_session(TEST_TICKERS, '1wk', 3, \"Weekly\", 3.0)
+    sector_df = get_jpx_list_with_sector()
+    
+    long_res = run_test_session(TEST_TICKERS, sector_df, '1mo', 7, "Monthly", 5.0)
+    short_res = run_test_session(TEST_TICKERS, sector_df, '1wk', 3, "Weekly", 3.0)
     
     combined = long_res + short_res
-    output_file = \"test_best_config.json\"
+    output_file = "test_best_config.json"
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump({'timestamp': datetime.now().isoformat(), 'version': '15.11-TEST', 'details': combined}, 
+        json.dump({'timestamp': datetime.now().isoformat(), 'version': '15.12-TEST', 'details': combined}, 
                   f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
-    print(f\"\n✅ テスト完了！ ({elapsed/60:.1f}分)\")
-    if combined: print(f\"選定数: {len(combined)} / 10\")
-    else: print(\"❌ 銘柄が選定されませんでした。\")
+    print(f"\n✅ テスト完了！ ({elapsed/60:.1f}分)")
+    if combined: print(f"選定数: {len(combined)} / 10")
+    else: print("❌ 銘柄が選定されませんでした。")
 
-if __name__ == \"__main__\":
+if __name__ == "__main__":
     main()
