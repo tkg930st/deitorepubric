@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-analyzer.py - Version 15.2 統合戦略実装
+analyzer.py - Version 15.3 統合戦略実装
 主な機能:
 1. 長期（1ヶ月）7銘柄 ＆ 短期（1週間）3銘柄の統合選定
 2. 利益率ハードル 5.0%
 3. pandas-ta 依存排除による安定動作
+4. 実行ログ出力の強化 (execution_log.txtへの追記)
 """
 import json
 import logging
@@ -30,9 +31,10 @@ from utils import (
 )
 from backtest_engine import optimize_parameters
 
-# ロギング設定
+# ロギング設定 (追記モード)
 logging.basicConfig(
     filename=LOG_FILE,
+    filemode='a',
     level=getattr(logging, LOG_LEVEL),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
@@ -47,6 +49,8 @@ def calculate_liquidity_score(df: pd.DataFrame, ticker: str) -> Tuple[float, flo
     except Exception: return 0.0, 0.0
 
 def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame, count: int = 15) -> List[Dict]:
+    msg = f"🔍 スクリーニング開始 (売買代金閾値: {LIQUIDITY_THRESHOLD/1e8:.1f}億円)"
+    print(msg); logger.info(msg)
     candidates = []
     chunk_size = DATA_FETCH.get('chunk_size', 50)
     for i in range(0, len(all_tickers), chunk_size):
@@ -79,6 +83,8 @@ def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame, count: i
                 except Exception: continue
         except Exception: continue
     
+    msg = f"✅ スクリーニング通過: {len(candidates)}銘柄"
+    print(msg); logger.info(msg)
     sorted_candidates = sorted(candidates, key=lambda x: x['volatility_score'], reverse=True)
     elite = []
     used_sectors = set()
@@ -91,7 +97,7 @@ def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame, count: i
 
 def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
     ticker = ticker_info['t']
-    profit_hurdle = 5.0 # 目標を5%に戻す
+    profit_hurdle = 5.0
     try:
         ticker_data = fetch_yfinance_data([ticker], period=period, interval=DATA_FETCH['analyzer_interval'])
         if ticker_data.empty: return None
@@ -121,10 +127,13 @@ def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
             'sector': ticker_info['sector'], 'size_category': ticker_info.get('size_category', ''),
             'params': {'long': result_long['params'], 'short': result_short['params']}
         }
-    except Exception: return None
+    except Exception as e:
+        logger.error(f"解析エラー ({ticker}): {str(e)}")
+        return None
 
 def run_analysis_session(elite_stocks: List[Dict], period: str, count: int, label: str) -> List[Dict]:
-    print(f"\n🔬 {label} 解析開始 (期間: {period}, 目標: {count}銘柄)")
+    msg = f"\n🔬 {label} 解析開始 (期間: {period}, 目標: {count}銘柄)"
+    print(msg); logger.info(msg)
     results = []
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         futures = {executor.submit(worker_analyze_ticker, s, period): s for s in elite_stocks}
@@ -133,7 +142,8 @@ def run_analysis_session(elite_stocks: List[Dict], period: str, count: int, labe
             if res:
                 res['logic_type'] = label
                 results.append(res)
-                print(f"   ✅ {res['t']} 完了 (利益: {res['profit']:.2f}%)")
+                msg = f"   ✅ {res['t']} 完了 (利益: {res['profit']:.2f}%)"
+                print(msg); logger.info(msg)
     return sorted(results, key=lambda x: x['profit'], reverse=True)[:count]
 
 class NpEncoder(json.JSONEncoder):
@@ -146,13 +156,16 @@ class NpEncoder(json.JSONEncoder):
 
 def main():
     start_time = time.time()
-    print("\n📊 Version 15.2 統合戦略 戦略構築開始")
+    msg = "📊 Version 15.3 統合戦略 戦略構築開始"
+    print("\n" + msg); logger.info(msg)
+    
     sector_df = get_jpx_list_with_sector()
     all_tickers = sector_df['ticker'].tolist()
     elite_candidates = select_main_stocks(all_tickers, sector_df, count=20)
     
     if not elite_candidates:
-        print("❌ 解析対象の銘柄が見つかりませんでした。")
+        msg = "❌ 解析対象の銘柄が見が見つかりませんでした。"
+        print(msg); logger.error(msg)
         return
 
     # 長期（1ヶ月/7銘柄）
@@ -162,12 +175,13 @@ def main():
     
     combined_results = long_term_results + short_term_results
     if not combined_results:
-        print("\n❌ 銘柄が選定されませんでした（利益5%目標）")
+        msg = "❌ 銘柄が選定されませんでした（利益5%目標）"
+        print(msg); logger.warning(msg)
         return
 
     best_config = {
         'timestamp': datetime.now().isoformat(),
-        'version': '15.2',
+        'version': '15.3',
         'details': combined_results
     }
     
@@ -175,12 +189,15 @@ def main():
         json.dump(best_config, f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
-    msg = f"✅ **Version 15.2 統合戦略構築完了！**\n⏱️ 実行時間: {elapsed/60:.1f}分\n\n"
-    for r in combined_results:
-        msg += f"• **{r['t']}** | {r['logic_type']} | 期待: {r['profit']:.2f}%\n"
+    msg = f"✅ Version 15.3 統合戦略構築完了！ (実行時間: {elapsed/60:.1f}分)"
+    print("\n" + msg); logger.info(msg)
     
-    send_discord_notification(WEBHOOK_URL, msg)
-    print(f"\n✅ 設定ファイル保存完了: {OUTPUT_CONFIG}")
+    discord_msg = f"✅ **Version 15.3 統合戦略構築完了！**\n⏱️ 実行時間: {elapsed/60:.1f}分\n\n"
+    for r in combined_results:
+        discord_msg += f"• **{r['t']}** | {r['logic_type']} | 期待: {r['profit']:.2f}%\n"
+    
+    send_discord_notification(WEBHOOK_URL, discord_msg)
+    print(f"✅ 設定ファイル保存完了: {OUTPUT_CONFIG}")
 
 if __name__ == "__main__":
     main()
