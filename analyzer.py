@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-\"\"\"
+"""
 analyzer.py - Version 15.0 統合戦略実装
 主な機能:
 1. 長期（1ヶ月）7銘柄 ＆ 短期（1週間）3銘柄の統合選定
 2. セクター重複排除（1セクター1銘柄）
 3. ハイブリッド・バックテスト（2段階評価）
 4. 並列処理による高速化
-\"\"\"
+"""
 import json
 import logging
 import time
@@ -102,7 +102,7 @@ def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
         df = filter_trading_hours(df)
         if len(df) < MIN_DATA_POINTS: return None
         df = calculate_technical_indicators(df)
-        if TREND_FILTER['enabled']:
+        if TREND_FILTER['enabled']:\
             df['ma_15m_20'] = calculate_ma_from_higher_timeframe(df, TREND_FILTER['ma_period'])
         df_15m = df[['ma_15m_20']].copy() if TREND_FILTER['enabled'] else pd.DataFrame()
         result_long = optimize_parameters(df, df_15m, 'long', OPTIMIZATION_ITERATIONS, PRECISE_CHECK_COUNT)
@@ -124,7 +124,7 @@ def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
     except Exception: return None
 
 def run_analysis_session(elite_stocks: List[Dict], period: str, count: int, label: str) -> List[Dict]:
-    print(f\"\\n🔬 {label} 解析開始 (期間: {period}, 目標: {count}銘柄)\")
+    print(f"\n🔬 {label} 解析開始 (期間: {period}, 目標: {count}銘柄)")
     results = []
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         futures = {executor.submit(worker_analyze_ticker, s, period): s for s in elite_stocks}
@@ -133,7 +133,7 @@ def run_analysis_session(elite_stocks: List[Dict], period: str, count: int, labe
             if res:
                 res['logic_type'] = label
                 results.append(res)
-                print(f\"   ✅ {res['t']} 完了 (利益: {res['profit']:.2f}%)\")
+                print(f"   ✅ {res['t']} 完了 (利益: {res['profit']:.2f}%)")
     return sorted(results, key=lambda x: x['profit'], reverse=True)[:count]
 
 class NpEncoder(json.JSONEncoder):
@@ -146,19 +146,19 @@ class NpEncoder(json.JSONEncoder):
 
 def main():
     start_time = time.time()
-    print(\"\\n📊 Version 15.0 統合戦略 戦略構築開始\")
+    print("\n📊 Version 15.0 統合戦略 戦略構築開始")
     sector_df = get_jpx_list_with_sector()
     all_tickers = sector_df['ticker'].tolist()
     elite_candidates = select_main_stocks(all_tickers, sector_df, count=15)
     
     # 長期（1ヶ月/7銘柄）
-    long_term_results = run_analysis_session(elite_candidates, '1mo', 7, \"Long(1Month)\")
+    long_term_results = run_analysis_session(elite_candidates, '1mo', 7, "Long(1Month)")
     # 短期（1週間/3銘柄）
-    short_term_results = run_analysis_session(elite_candidates, '1wk', 3, \"Short(1Week)\")
+    short_term_results = run_analysis_session(elite_candidates, '1wk', 3, "Short(1Week)")
     
     combined_results = long_term_results + short_term_results
     if not combined_results:
-        print(\"\\n❌ 銘柄が選定されませんでした\")
+        print("\n❌ 銘柄が選定されませんでした")
         return
 
     best_config = {
@@ -171,12 +171,12 @@ def main():
         json.dump(best_config, f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
-    msg = f\"✅ **Version 15.0 統合戦略構築完了！**\\n⏱️ 実行時間: {elapsed/60:.1f}分\\n\\n\"
+    msg = f"✅ **Version 15.0 統合戦略構築完了！**\n⏱️ 実行時間: {elapsed/60:.1f}分\n\n"
     for r in combined_results:
-        msg += f\"• **{r['t']}** | {r['logic_type']} | 期待: {r['profit']:.2f}%\\n\"
+        msg += f"• **{r['t']}** | {r['logic_type']} | 期待: {r['profit']:.2f}%\n"
     
     send_discord_notification(WEBHOOK_URL, msg)
-    print(f\"\\n✅ 設定ファイル保存完了: {OUTPUT_CONFIG}\")
+    print(f"\n✅ 設定ファイル保存完了: {OUTPUT_CONFIG}")
 
-if __name__ == \"__main__\":
+if __name__ == "__main__":
     main()
