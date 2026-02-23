@@ -33,6 +33,12 @@ class PositionManager:
                 json.dump(self.positions, f, indent=2, ensure_ascii=False)
         except Exception as e: logger.error(f"Save positions error: {str(e)}")
     
+    def get_position(self, ticker: str) -> Optional[Dict]:
+        """
+        指定された銘柄のポジション情報を取得
+        """
+        return self.positions.get(ticker)
+    
     def has_position(self, ticker: str) -> bool:
         return ticker in self.positions
     
