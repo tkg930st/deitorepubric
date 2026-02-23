@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-analyzer.py - Version 15.11 統合戦略実装
-変更点:
-- long_disabled / short_disabled フラグを明示的に保存し、Monitorでの誤動作を防止
-- 解析対象母数 50銘柄、試行回数 500回 (config準拠)
-- 期間名称を Monthly / Weekly に統一
+analyzer.py - Version 15.12 統合戦略実装
+主な機能:
+1. 2段階進化型最適化 (Phase 1: 広域 / Phase 2: 局所進化)
+2. 詳細なDiscordレポート通知の完全復元 (Ver 13.5形式 + ライバル銘柄表示)
+3. ボラティリティ比例型SL & フィルター個別最適化
 """
 import json
 import logging
 import time
 import os
+import multiprocessing
 from datetime import datetime
 from typing import List, Dict, Tuple
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -39,7 +40,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def select_high_volatility_stocks(all_tickers: List[str], count: int = 50) -> List[Dict]:
+def get_rival_tickers(ticker: str, sector: str, sector_df: pd.DataFrame, count: int = 5) -> List[str]:
+    """同一セクターからライバル銘柄を抽出"""
+    rivals = sector_df[sector_df['sector'] == sector]['ticker'].tolist()
+    rivals = [r for r in rivals if r != ticker]
+    return rivals[:count]
+
+def select_high_volatility_stocks(all_tickers: List[str], sector_df: pd.DataFrame, count: int = 50) -> List[Dict]:
     msg = f"🔍 スクリーニング開始 (主力候補 {count}銘柄を抽出)"
     print(msg); logger.info(msg)
     candidates = []
@@ -59,7 +66,15 @@ def select_high_volatility_stocks(all_tickers: List[str], count: int = 50) -> Li
                     if avg_val < LIQUIDITY_THRESHOLD: continue
                     
                     atr_pct = (df['atr_14'].iloc[-1] / price) * 100
-                    candidates.append({'t': ticker, 'atr_pct': atr_pct})
+                    s_info = sector_df[sector_df['ticker'] == ticker]
+                    sector = s_info['sector'].iloc[0] if not s_info.empty else '不明'
+                    size = s_info['size_category'].iloc[0] if not s_info.empty else '-'
+                    
+                    candidates.append({
+                        't': ticker, 'atr_pct': atr_pct, 
+                        'sector': sector, 'size_category': size,
+                        'rivals': get_rival_tickers(ticker, sector, sector_df)
+                    })
                 except Exception: continue
         except Exception: continue
     return sorted(candidates, key=lambda x: x['atr_pct'], reverse=True)[:count]
@@ -77,13 +92,11 @@ def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict
         res_s = optimize_parameters(df, pd.DataFrame(), 'short', OPTIMIZATION_ITERATIONS)
         
         l_prof = res_l['profit']; s_prof = res_s['profit']
-        
-        # ハードル判定と無効化フラグ
         is_l_valid = l_prof >= hurdle
         is_s_valid = s_prof >= hurdle
         
         valid_l = l_prof if is_l_valid else 0.0
-        valid_s = s_prof if s_prof >= hurdle else 0.0
+        valid_s = s_prof if is_s_valid else 0.0
         total = valid_l + valid_s
         
         if total <= 0: return None
@@ -91,7 +104,11 @@ def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict
         return {
             't': ticker, 'profit': total, 
             'long_profit': valid_l, 'short_profit': valid_s,
+            'raw_long_profit': l_prof, 'raw_short_profit': s_prof,
             'long_disabled': not is_l_valid, 'short_disabled': not is_s_valid,
+            'atr_pct': ticker_info['atr_pct'],
+            'sector': ticker_info['sector'], 'size_category': ticker_info['size_category'],
+            'rivals': ticker_info['rivals'],
             'params': {'long': res_l['params'], 'short': res_s['params']}
         }
     except Exception as e:
@@ -119,26 +136,60 @@ class NpEncoder(json.JSONEncoder):
 
 def main():
     start_time = time.time()
-    print("\n📊 Version 15.11 統合戦略構築開始")
-    sector_df = get_jpx_list_with_sector()
-    elite = select_high_volatility_stocks(sector_df['ticker'].tolist(), count=CANDIDATE_COUNT)
+    print("\n📊 Version 15.12 統合戦略構築開始")
     
-    # Monthly（1ヶ月/7銘柄/5.0%ハードル）
+    sector_df = get_jpx_list_with_sector()
+    all_tickers = sector_df['ticker'].tolist()
+    elite = select_high_volatility_stocks(all_tickers, sector_df, count=CANDIDATE_COUNT)
+    
+    # Monthly / Weekly 解析
     long_res = run_session(elite, '1mo', 7, "Monthly", 5.0)
-    # Weekly（1週間/3銘柄/3.0%ハードル）
     short_res = run_session(elite, '1wk', 3, "Weekly", 3.0)
     
     combined = long_res + short_res
     if not combined:
         print("❌ 条件を満たす銘柄が見つかりませんでした。"); return
 
-    best_config = {'timestamp': datetime.now().isoformat(), 'version': '15.11', 'details': combined}
+    best_config = {'timestamp': datetime.now().isoformat(), 'version': '15.12', 'details': combined}
     with open(OUTPUT_CONFIG, 'w', encoding='utf-8') as f:
         json.dump(best_config, f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
-    print(f"\n✅ Version 15.11 構築完了！ ({elapsed/60:.1f}分)")
-    send_discord_notification(WEBHOOK_URL, f"✅ **Version 15.11 構築完了**\n選定数: {len(combined)}")
+    
+    finish_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    msg = f"✅ **Version 15.12 統合戦略構築完了！**\n\n"
+    msg += f"⏱️ **実行時間**: {elapsed:.1f}秒 ({elapsed/60:.1f}分)\n"
+    msg += f"📅 **完了時刻**: {finish_time} JST\n"
+    msg += f"🚀 **並列処理**: {os.cpu_count()}コア活用\n\n"
+    msg += f"🎯 **選定された監視銘柄 TOP{len(combined)}（raw利益順）**:\n\n"
+    
+    for r in combined:
+        l_status = "🚫" if r['long_disabled'] else "✅"
+        s_status = "🚫" if r['short_disabled'] else "✅"
+        raw_total = r['raw_long_profit'] + r['raw_short_profit']
+        msg += f"**{r['t']}** [{r['sector']}] ({r['size_category']})\n"
+        msg += f"期待利益: {r['profit']:.2f}% (raw: {raw_total:.2f}%)\n"
+        msg += f"L: {r['long_profit']:.1f}% {l_status} (raw:{r['raw_long_profit']:.1f}%) / S: {r['short_profit']:.1f}% {s_status} (raw:{r['raw_short_profit']:.1f}%)\n"
+        msg += f"ボラティリティ: {r['atr_pct']:.2f}%\n"
+        msg += f"ライバル5銘柄: {', '.join(r['rivals'])}\n"
+        msg += f"タイプ: {r['logic_type']}\n\n"
+
+    msg += f"📊 **最優秀銘柄**: {combined[0]['t']}\n"
+    msg += f"   期待利益: {combined[0]['profit']:.2f}%\n"
+    msg += f"   ボラティリティ: {combined[0]['atr_pct']:.2f}%\n\n"
+    
+    msg += f"🆕 **Version 15.12 改良点**:\n"
+    msg += f"   • 2段階進化型最適化 (Phase 1: 広域 / Phase 2: 局所進化)\n"
+    msg += f"   • Fitness Ver 2 (リスク対効果・RR効率評価)\n"
+    msg += f"   • ボラティリティ比例型動的損切り (ATR基準)\n"
+    msg += f"   • フィルターON/OFF個別最適化 (RSI/VWAP)\n"
+    msg += f"   • 月次(Monthly) / 週次(Weekly) 独立戦略構築\n\n"
+    
+    msg += f"🔔 **次のステップ**:\n"
+    msg += f"   python monitor.py で監視を開始してください！"
+    
+    send_discord_notification(WEBHOOK_URL, msg)
+    print(f"\n✅ Version 15.12 構築完了！ ({elapsed/60:.1f}分)")
 
 if __name__ == "__main__":
     main()
