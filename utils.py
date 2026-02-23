@@ -1,6 +1,6 @@
 """
-共通ユーティリティ関数
-データ処理、エラーハンドリング、時間管理などの共通機能
+共通ユーティリティ関数 - Ver 15.3 (pandas-ta 依存排除版)
+データ処理、テクニカル指標計算、時間管理などの共通機能
 """
 import yfinance as yf
 import pandas as pd
@@ -21,9 +21,6 @@ logger = logging.getLogger(__name__)
 
 def retry_on_error(max_retries: int = DATA_FETCH['max_retries'], 
                    delay: float = DATA_FETCH['retry_delay']):
-    """
-    エラー時のリトライデコレータ
-    """
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -34,14 +31,10 @@ def retry_on_error(max_retries: int = DATA_FETCH['max_retries'],
                 except Exception as e:
                     last_exception = e
                     if attempt < max_retries - 1:
-                        logger.warning(
-                            f"{func.__name__} failed (attempt {attempt + 1}/{max_retries}): {str(e)}"
-                        )
+                        logger.warning(f"{func.__name__} failed (attempt {attempt + 1}/{max_retries}): {str(e)}")
                         time.sleep(delay * (attempt + 1))
                     else:
-                        logger.error(
-                            f"{func.__name__} failed after {max_retries} attempts: {str(e)}"
-                        )
+                        logger.error(f"{func.__name__} failed after {max_retries} attempts: {str(e)}")
             raise last_exception
         return wrapper
     return decorator
@@ -49,9 +42,6 @@ def retry_on_error(max_retries: int = DATA_FETCH['max_retries'],
 
 @retry_on_error()
 def get_jpx_list_with_sector() -> pd.DataFrame:
-    """
-    JPXから銘柄リストとセクター情報、規模区分を取得
-    """
     try:
         url = "https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls"
         res = requests.get(url, timeout=15)
@@ -137,32 +127,34 @@ def send_discord_notification(webhook_url: str, message: str) -> bool:
 
 def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
     """
-    テクニカル指標を計算（pandas-taに依存せず自前で実装）
+    テクニカル指標を計算 (RSI, ATR, VWAP, ADX, 一目均衡表)
     """
     if df.empty or len(df) < 20: return df
     df = df.copy()
     try:
         # RSI
         delta = df['close'].diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-        rs = gain / loss
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        avg_gain = gain.rolling(window=14).mean()
+        avg_loss = loss.rolling(window=14).mean()
+        rs = avg_gain / avg_loss
         df['rsi_14'] = 100 - (100 / (1 + rs))
         
-        # ATR (True Range -> Moving Average)
+        # ATR
         high_low = df['high'] - df['low']
         high_cp = np.abs(df['high'] - df['close'].shift())
         low_cp = np.abs(df['low'] - df['close'].shift())
         tr = pd.concat([high_low, high_cp, low_cp], axis=1).max(axis=1)
         df['atr_14'] = tr.rolling(window=14).mean()
         
-        # VWAP (Volume Weighted Average Price)
+        # VWAP
         v = df['volume']
         tp = (df['high'] + df['low'] + df['close']) / 3
         df['vwap'] = (tp * v).cumsum() / v.cumsum()
         df['vwap_dev'] = ((df['close'] - df['vwap']) / df['vwap']) * 100
         
-        # ADX (簡易実装)
+        # ADX
         up_move = df['high'].diff()
         down_move = df['low'].diff().abs()
         plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
@@ -195,6 +187,33 @@ def safe_get(row: pd.Series, key: str, default: Any = 0) -> Any:
     except: return default
 
 
+def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
+    from config import DIVERGENCE
+    result = {'bullish': False, 'bearish': False, 'reverse_bullish': False, 'reverse_bearish': False}
+    if not DIVERGENCE['enabled']: return result
+    if df.empty or len(df) < lookback + 5: return result
+    try:
+        recent = df.iloc[-lookback:].copy()
+        if 'rsi_14' not in recent.columns or 'close' not in recent.columns: return result
+        p_start, p_end = recent['close'].iloc[0], recent['close'].iloc[-1]
+        r_start, r_end = recent['rsi_14'].iloc[0], recent['rsi_14'].iloc[-1]
+        if pd.isna(p_start) or pd.isna(p_end) or pd.isna(r_start) or pd.isna(r_end): return result
+        p_chg = ((p_end / p_start) - 1) * 100
+        r_chg = r_end - r_start
+        rsi_t, prc_t = DIVERGENCE['rsi_threshold'], DIVERGENCE['price_threshold']
+        if p_chg < -prc_t and r_chg > rsi_t: result['bullish'] = True
+        if p_chg > prc_t and r_chg < -rsi_t: result['bearish'] = True
+        if p_chg > prc_t and r_chg < -rsi_t: result['reverse_bearish'] = True
+        if p_chg < -prc_t and r_chg > rsi_t: result['reverse_bullish'] = True
+    except Exception: pass
+    return result
+
+
+def check_trend_filter(current_price: float, ma15_value: float, side: str) -> bool:
+    if pd.isna(ma15_value) or ma15_value == 0: return True
+    return current_price > ma15_value if side == 'LONG' else current_price < ma15_value
+
+
 def detect_market_structure(df: pd.DataFrame, lookback: int = 5) -> Dict:
     if len(df) < lookback * 3: return {'type': None, 'direction': None, 'price': 0.0}
     try:
@@ -223,11 +242,6 @@ def calculate_ma_from_higher_timeframe(df_5m: pd.DataFrame, ma_period: int = 20)
         ma_15m = df_15m['close'].rolling(window=ma_period).mean()
         return ma_15m.reindex(df_5m.index, method='ffill')
     except Exception: return pd.Series(index=df_5m.index, dtype=float)
-
-
-def check_trend_filter(current_price: float, ma15_value: float, side: str) -> bool:
-    if pd.isna(ma15_value) or ma15_value == 0: return True
-    return current_price > ma15_value if side == 'LONG' else current_price < ma15_value
 
 
 def fetch_macro_sentiment() -> Dict[str, float]:
