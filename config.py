@@ -16,17 +16,17 @@ LOG_FILE = 'execution_log.txt'
 LOG_LEVEL = 'INFO'
 
 # 銘柄選定基準
-LIQUIDITY_THRESHOLD = 2_000_000_000  # 売買代金20億円以上に緩和（旧: 50億円）
+LIQUIDITY_THRESHOLD = 5_000_000_000  # 売買代金50億円以上に戻す
 MIN_PRICE = 500  # 最低株価
 ATR_CHECK_COUNT = 50   # ATRスクリーニング対象銘柄数
-TOP_CANDIDATES = 30    # 解析対象の主力銘柄数（最適化実行数）
-FINAL_MONITORING = 10  # 最終監視銘柄数（Ver 15.0: 10銘柄統合）
+TOP_CANDIDATES = 30    # 解析対象の主力銘柄数
+FINAL_MONITORING = 10  # 最終監視銘柄数
 MIN_SCORE_THRESHOLD = 60.0  # スコア閾値の下限ガード
 
 # バックテスト設定
 OPTIMIZATION_ITERATIONS = 500  # パラメータ最適化試行回数
 PRECISE_CHECK_COUNT = 20       # 精密検証を行う上位数
-MIN_DATA_POINTS = 30  # 必要な最小データポイント数（少し緩和）
+MIN_DATA_POINTS = 40  # 必要な最小データポイント数
 SLIPPAGE = 0.001  # 往復のスリッページ（0.1%）
 
 # パラメータ探索範囲
@@ -134,7 +134,7 @@ RETRY_OPTIMIZATION = {
     'enabled': True,
     'max_retries': 10,
     'retry_top_n': 5,
-    'target_profit': 3.0, # 目標を3%に引き下げ
+    'target_profit': 5.0, # 5%に戻す
     'iterations_per_retry': 500,
 }
 
@@ -181,6 +181,6 @@ MONITORING_LOOP = {
 # ファンダメンタルズ設定
 FUNDAMENTAL_FILTER = {
     'enabled': True,
-    'min_roe': 0.08,      # 少し緩和 (10% -> 8%)
-    'max_peg': 1.2        # 少し緩和 (1.0 -> 1.2)
+    'min_roe': 0.10,
+    'max_peg': 1.0
 }
