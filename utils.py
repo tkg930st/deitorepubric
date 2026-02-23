@@ -1,7 +1,7 @@
-"""
+\"\"\"
 共通ユーティリティ関数
 データ処理、エラーハンドリング、時間管理などの共通機能
-"""
+\"\"\"
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -21,13 +21,13 @@ logger = logging.getLogger(__name__)
 
 def retry_on_error(max_retries: int = DATA_FETCH['max_retries'], 
                    delay: float = DATA_FETCH['retry_delay']):
-    """
+    \"\"\"
     エラー時のリトライデコレータ
     
     Args:
         max_retries: 最大リトライ回数
         delay: リトライ間隔（秒）
-    """
+    \"\"\"
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -39,12 +39,12 @@ def retry_on_error(max_retries: int = DATA_FETCH['max_retries'],
                     last_exception = e
                     if attempt < max_retries - 1:
                         logger.warning(
-                            f"{func.__name__} failed (attempt {attempt + 1}/{max_retries}): {str(e)}"
+                            f\"{func.__name__} failed (attempt {attempt + 1}/{max_retries}): {str(e)}\"
                         )
                         time.sleep(delay * (attempt + 1))  # 指数バックオフ
                     else:
                         logger.error(
-                            f"{func.__name__} failed after {max_retries} attempts: {str(e)}"
+                            f\"{func.__name__} failed after {max_retries} attempts: {str(e)}\"
                         )
             raise last_exception
         return wrapper
@@ -53,15 +53,15 @@ def retry_on_error(max_retries: int = DATA_FETCH['max_retries'],
 
 @retry_on_error()
 def get_jpx_list() -> List[str]:
-    """
+    \"\"\"
     JPX（日本取引所グループ）から全銘柄リストを取得
     
     Returns:
         銘柄コードリスト（例: ['7203.T', '9984.T']）
-    """
+    \"\"\"
     try:
-        url = "https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls"
-        logger.info(f"JPX銘柄リストを取得中: {url}")
+        url = \"https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls\"
+        logger.info(f\"JPX銘柄リストを取得中: {url}\")
         
         res = requests.get(url, timeout=15)
         res.raise_for_status()
@@ -70,27 +70,27 @@ def get_jpx_list() -> List[str]:
         target_markets = ['プライム（内国株式）']
         
         codes = df[df['市場・商品区分'].isin(target_markets)]['コード'].tolist()
-        tickers = [f"{str(code)}.T" for code in codes]
+        tickers = [f\"{str(code)}.T\" for code in codes]
         
-        logger.info(f"取得完了: {len(tickers)}銘柄")
+        logger.info(f\"取得完了: {len(tickers)}銘柄\")
         return tickers
         
     except Exception as e:
-        logger.error(f"JPX銘柄リスト取得エラー: {str(e)}")
+        logger.error(f\"JPX銘柄リスト取得エラー: {str(e)}\")
         raise
 
 
 @retry_on_error()
 def get_jpx_list_with_sector() -> pd.DataFrame:
-    """
+    \"\"\"
     JPXから銘柄リストとセクター情報、規模区分を取得
     
     Returns:
         銘柄コード、セクター、規模区分を含むDataFrame
-    """
+    \"\"\"
     try:
-        url = "https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls"
-        logger.info(f"JPX銘柄リスト（セクター・規模区分付き）を取得中: {url}")
+        url = \"https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls\"
+        logger.info(f\"JPX銘柄リスト（セクター・規模区分付き）を取得中: {url}\")
         
         res = requests.get(url, timeout=15)
         res.raise_for_status()
@@ -100,7 +100,7 @@ def get_jpx_list_with_sector() -> pd.DataFrame:
 
         # 必要な列を抽出
         df_filtered = df[df['市場・商品区分'].isin(target_markets)].copy()
-        df_filtered['ticker'] = df_filtered['コード'].apply(lambda x: f"{str(x)}.T")
+        df_filtered['ticker'] = df_filtered['コード'].apply(lambda x: f\"{str(x)}.T\")
 
         # セクター情報を取得（33業種区分）
         sector_column = '33業種区分' if '33業種区分' in df_filtered.columns else '業種'
@@ -113,7 +113,7 @@ def get_jpx_list_with_sector() -> pd.DataFrame:
             exclude_sizes = ['TOPIX Core30', 'TOPIX Large70']
             before_count = len(df_filtered)
             df_filtered = df_filtered[~df_filtered[size_column].isin(exclude_sizes)].copy()
-            logger.info(f"超大型株除外: {before_count}銘柄 → {len(df_filtered)}銘柄 (Core30/Large70を除外)")
+            logger.info(f\"超大型株除外: {before_count}銘柄 → {len(df_filtered)}銘柄 (Core30/Large70を除外)\")
 
         if size_column:
             result = df_filtered[['ticker', sector_column, size_column]].rename(
@@ -125,16 +125,16 @@ def get_jpx_list_with_sector() -> pd.DataFrame:
             )
             result['size_category'] = ''  # 規模区分がない場合は空文字
         
-        logger.info(f"取得完了: {len(result)}銘柄（セクター・規模区分付き）")
+        logger.info(f\"取得完了: {len(result)}銘柄（セクター・規模区分付き）\")
         return result
         
     except Exception as e:
-        logger.error(f"JPX銘柄リスト（セクター・規模区分）取得エラー: {str(e)}")
+        logger.error(f\"JPX銘柄リスト（セクター・規模区分）取得エラー: {str(e)}\")
         raise
 
 
-def super_flatten_columns(df: pd.DataFrame, ticker: str = "") -> pd.DataFrame:
-    """
+def super_flatten_columns(df: pd.DataFrame, ticker: str = \"\") -> pd.DataFrame:
+    \"\"\"
     MultiIndexカラムを完全にフラット化し、JST時間に変換
     
     Args:
@@ -143,7 +143,7 @@ def super_flatten_columns(df: pd.DataFrame, ticker: str = "") -> pd.DataFrame:
     
     Returns:
         正規化されたDataFrame
-    """
+    \"\"\"
     if df is None or df.empty:
         return pd.DataFrame()
     
@@ -154,11 +154,11 @@ def super_flatten_columns(df: pd.DataFrame, ticker: str = "") -> pd.DataFrame:
         else:
             df.index = df.index.tz_convert('Asia/Tokyo')
     except Exception as e:
-        logger.warning(f"タイムゾーン変換エラー ({ticker}): {str(e)}")
+        logger.warning(f\"タイムゾーン変換エラー ({ticker}): {str(e)}\")
     
     # MultiIndex対応
     if isinstance(df.columns, pd.MultiIndex):
-        df.columns = ["_".join(map(str, col)).lower().strip() for col in df.columns]
+        df.columns = [\"_\".join(map(str, col)).lower().strip() for col in df.columns]
     else:
         df.columns = [str(c).lower().strip() for c in df.columns]
     
@@ -195,7 +195,7 @@ def super_flatten_columns(df: pd.DataFrame, ticker: str = "") -> pd.DataFrame:
 
 
 def is_trading_hours(dt: datetime) -> bool:
-    """
+    \"\"\"
     取引時間内かどうかを判定（昼休み・大引け直前を除外）
     
     Args:
@@ -203,7 +203,7 @@ def is_trading_hours(dt: datetime) -> bool:
     
     Returns:
         取引可能時間ならTrue
-    """
+    \"\"\"
     # 土日を除外
     if dt.weekday() >= 5:
         return False
@@ -247,7 +247,7 @@ def is_trading_hours(dt: datetime) -> bool:
 
 
 def filter_trading_hours(df: pd.DataFrame) -> pd.DataFrame:
-    """
+    \"\"\"
     取引時間外のデータをフィルタリング
     
     Args:
@@ -255,21 +255,21 @@ def filter_trading_hours(df: pd.DataFrame) -> pd.DataFrame:
     
     Returns:
         フィルタリング後のDataFrame
-    """
+    \"\"\"
     if df.empty:
         return df
     
     mask = df.index.to_series().apply(is_trading_hours)
     filtered = df[mask].copy()
     
-    logger.info(f"取引時間フィルタ: {len(df)}行 → {len(filtered)}行")
+    logger.info(f\"取引時間フィルタ: {len(df)}行 → {len(filtered)}行\")
     return filtered
 
 
 @retry_on_error()
 def fetch_yfinance_data(tickers: List[str], period: str, interval: str,
                         group_by: str = 'ticker') -> pd.DataFrame:
-    """
+    \"\"\"
     yfinanceからデータを取得（リトライ機能付き）
     
     Args:
@@ -280,8 +280,8 @@ def fetch_yfinance_data(tickers: List[str], period: str, interval: str,
     
     Returns:
         取得したDataFrame
-    """
-    logger.info(f"データ取得開始: {len(tickers)}銘柄, period={period}, interval={interval}")
+    \"\"\"
+    logger.info(f\"データ取得開始: {len(tickers)}銘柄, period={period}, interval={interval}\")
     
     data = yf.download(
         tickers,
@@ -293,12 +293,12 @@ def fetch_yfinance_data(tickers: List[str], period: str, interval: str,
         threads=True  # 並列ダウンロード
     )
     
-    logger.info(f"データ取得完了: shape={data.shape}")
+    logger.info(f\"データ取得完了: shape={data.shape}\")
     return data
 
 
 def send_discord_notification(webhook_url: str, message: str) -> bool:
-    """
+    \"\"\"
     Discord Webhookで通知を送信
     
     Args:
@@ -307,24 +307,24 @@ def send_discord_notification(webhook_url: str, message: str) -> bool:
     
     Returns:
         成功ならTrue
-    """
+    \"\"\"
     try:
         response = requests.post(
             webhook_url,
-            json={"content": message},
+            json={\"content\": message},
             timeout=10
         )
         response.raise_for_status()
-        logger.info("Discord通知送信成功")
+        logger.info(\"Discord通知送信成功\")
         return True
         
     except Exception as e:
-        logger.error(f"Discord通知送信エラー: {str(e)}")
+        logger.error(f\"Discord通知送信エラー: {str(e)}\")
         return False
 
 
 def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    """
+    \"\"\"
     テクニカル指標を計算（RSI, ADX, ATR, VWAP, RVOL）
     
     Args:
@@ -332,9 +332,9 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
     
     Returns:
         指標を追加したDataFrame
-    """
+    \"\"\"
     if df.empty or len(df) < 14:
-        logger.warning("データ不足のため指標計算をスキップ")
+        logger.warning(\"データ不足のため指標計算をスキップ\")
         return df
     
     df = df.copy()
@@ -385,16 +385,16 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         df['senkou_span_a'] = senkou_span_a
         df['senkou_span_b'] = senkou_span_b
 
-        logger.debug(f"テクニカル指標計算完了: {df.columns.tolist()}")
+        logger.debug(f\"テクニカル指標計算完了: {df.columns.tolist()}\")
         
     except Exception as e:
-        logger.error(f"テクニカル指標計算エラー: {str(e)}")
+        logger.error(f\"テクニカル指標計算エラー: {str(e)}\")
     
     return df
 
 
 def safe_get(row: pd.Series, key: str, default: Any = 0) -> Any:
-    """
+    \"\"\"
     安全にSeriesから値を取得
     
     Args:
@@ -404,7 +404,7 @@ def safe_get(row: pd.Series, key: str, default: Any = 0) -> Any:
     
     Returns:
         値またはデフォルト値
-    """
+    \"\"\"
     try:
         return row.get(key, default)
     except:
@@ -412,7 +412,7 @@ def safe_get(row: pd.Series, key: str, default: Any = 0) -> Any:
 
 
 def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
-    """
+    \"\"\"
     ダイバージェンス検知（Version 9.0）
     
     Args:
@@ -421,7 +421,7 @@ def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
     
     Returns:
         {'bullish': bool, 'bearish': bool, 'reverse_bullish': bool, 'reverse_bearish': bool}
-    """
+    \"\"\"
     from config import DIVERGENCE
     
     result = {
@@ -464,12 +464,12 @@ def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
         # 強気ダイバージェンス（価格↓、RSI↑）
         if price_change_pct < -price_threshold and rsi_change > rsi_threshold:
             result['bullish'] = True
-            logger.debug(f"強気ダイバージェンス検出: 価格{price_change_pct:.2f}%, RSI{rsi_change:+.1f}")
+            logger.debug(f\"強気ダイバージェンス検出: 価格{price_change_pct:.2f}%, RSI{rsi_change:+.1f}\")
         
         # 弱気ダイバージェンス（価格↑、RSI↓）
         if price_change_pct > price_threshold and rsi_change < -rsi_threshold:
             result['bearish'] = True
-            logger.debug(f"弱気ダイバージェンス検出: 価格{price_change_pct:.2f}%, RSI{rsi_change:+.1f}")
+            logger.debug(f\"弱気ダイバージェンス検出: 価格{price_change_pct:.2f}%, RSI{rsi_change:+.1f}\")
         
         # 逆行強気（価格↑、RSI↓） ← 保有中の警告用
         if price_change_pct > price_threshold and rsi_change < -rsi_threshold:
@@ -480,13 +480,13 @@ def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
             result['reverse_bullish'] = True
     
     except Exception as e:
-        logger.error(f"ダイバージェンス検知エラー: {str(e)}")
+        logger.error(f\"ダイバージェンス検知エラー: {str(e)}\")
     
     return result
 
 
 def check_trend_filter(current_price: float, ma15_value: float, side: str) -> bool:
-    """
+    \"\"\"
     トレンドフィルター判定（Version 7.0/8.0）
     
     Args:
@@ -496,7 +496,7 @@ def check_trend_filter(current_price: float, ma15_value: float, side: str) -> bo
     
     Returns:
         トレンド条件を満たすか
-    """
+    \"\"\"
     from config import TREND_FILTER
     
     if not TREND_FILTER['enabled']:
@@ -513,8 +513,68 @@ def check_trend_filter(current_price: float, ma15_value: float, side: str) -> bo
         return current_price < ma15_value
 
 
+def detect_market_structure(df: pd.DataFrame, lookback: int = 5) -> Dict:
+    \"\"\"
+    BOS (Break of Structure) および CHoCH (Change of Character) を検知する
+    
+    Args:
+        df: 株価データフレーム (5m足推奨)
+        lookback: スイングハイ・ローを判定する左右のバー数
+        
+    Returns:
+        検知結果辞書 {'type': 'BOS'|'CHoCH'|None, 'direction': 'LONG'|'SHORT', 'price': float}
+    \"\"\"
+    if len(df) < lookback * 3:
+        return {'type': None, 'direction': None, 'price': 0.0}
+    
+    try:
+        # スイングハイ・ローの特定
+        df = df.copy()
+        
+        # 局所的な高値・安値を抽出
+        df['is_high'] = (df['high'] == df['high'].rolling(window=lookback*2+1, center=True).max())
+        df['is_low'] = (df['low'] == df['low'].rolling(window=lookback*2+1, center=True).min())
+        
+        highs = df[df['is_high']]['high']
+        lows = df[df['is_low']]['low']
+        
+        if len(highs) < 2 or len(lows) < 2:
+            return {'type': None, 'direction': None, 'price': 0.0}
+            
+        last_high = highs.iloc[-1]
+        prev_high = highs.iloc[-2]
+        last_low = lows.iloc[-1]
+        prev_low = lows.iloc[-2]
+        
+        current_price = df['close'].iloc[-1]
+        prev_price = df['close'].iloc[-2]
+        
+        # 検知ロジック
+        # 1. CHoCH (Change of Character - トレンド転換)
+        # 上昇トレンド中の押し安値(prev_low)を下抜ける
+        if prev_price >= last_low > current_price and last_low > prev_low:
+             return {'type': 'CHoCH', 'direction': 'SHORT', 'price': last_low}
+        # 下落トレンド中の戻り高値(prev_high)を上抜ける
+        if prev_price <= last_high < current_price and last_high < prev_high:
+             return {'type': 'CHoCH', 'direction': 'LONG', 'price': last_high}
+             
+        # 2. BOS (Break of Structure - トレンド継続)
+        # 直近の高値(last_high)を上抜ける (上昇トレンド継続)
+        if prev_price <= last_high < current_price:
+            return {'type': 'BOS', 'direction': 'LONG', 'price': last_high}
+        # 直近の安値(last_low)を下抜ける (下落トレンド継続)
+        if prev_price >= last_low > current_price:
+            return {'type': 'BOS', 'direction': 'SHORT', 'price': last_low}
+            
+        return {'type': None, 'direction': None, 'price': 0.0}
+        
+    except Exception as e:
+        logger.error(f\"Market Structure Detection Error: {str(e)}\")
+        return {'type': None, 'direction': None, 'price': 0.0}
+
+
 def calculate_ma_from_higher_timeframe(df_5m: pd.DataFrame, ma_period: int = 20) -> pd.Series:
-    """
+    \"\"\"
     5分足データから15分足相当のMAを計算
     
     Args:
@@ -523,7 +583,7 @@ def calculate_ma_from_higher_timeframe(df_5m: pd.DataFrame, ma_period: int = 20)
     
     Returns:
         15分足20MAに相当するSeries
-    """
+    \"\"\"
     try:
         # 5分足を15分足にリサンプリング
         df_15m = df_5m.resample('15min').agg({
@@ -543,12 +603,12 @@ def calculate_ma_from_higher_timeframe(df_5m: pd.DataFrame, ma_period: int = 20)
         return ma_15m_reindexed
     
     except Exception as e:
-        logger.error(f"15分足MA計算エラー: {str(e)}")
+        logger.error(f\"15分足MA計算エラー: {str(e)}\")
         return pd.Series(index=df_5m.index, dtype=float)
 
 
 def fetch_macro_sentiment() -> Dict[str, float]:
-    """
+    \"\"\"
     V3: マクロ指標取得（前日比変化率 + VIX現在値）
     
     米国市場の前営業日のデータを取得し、変化率を計算します。
@@ -562,7 +622,7 @@ def fetch_macro_sentiment() -> Dict[str, float]:
             'vix_chg': float,      # VIXの前日比変化率（%）
             'jpy_chg': float       # JPY=Xの前日比変化率（%）
         }
-    """
+    \"\"\"
     import warnings
     warnings.filterwarnings('ignore')
     
@@ -584,32 +644,32 @@ def fetch_macro_sentiment() -> Dict[str, float]:
     }
     
     try:
-        logger.info("=" * 60)
-        logger.info("マクロ指標取得開始")
-        logger.info("=" * 60)
+        logger.info(\"=\" * 60)
+        logger.info(\"マクロ指標取得開始\")
+        logger.info(\"=\" * 60)
         
         for key, tickers in ticker_alternatives.items():
             success = False
             
             for ticker in tickers:
                 try:
-                    logger.info(f"試行: {key} <- {ticker}")
+                    logger.info(f\"試行: {key} <- {ticker}\")
                     
                     # yfinanceでデータ取得
                     try:
                         ticker_obj = yf.Ticker(ticker)
                         hist = ticker_obj.history(period='1mo', interval='1d')
                     except Exception as fetch_err:
-                        logger.warning(f"  Ticker取得失敗: {str(fetch_err)}")
+                        logger.warning(f\"  Ticker取得失敗: {str(fetch_err)}\")
                         continue
                     
                     # データ検証
                     if hist is None or hist.empty:
-                        logger.warning(f"  データなし")
+                        logger.warning(f\"  データなし\")
                         continue
                     
                     if len(hist) < 2:
-                        logger.warning(f"  データ不足: {len(hist)}行")
+                        logger.warning(f\"  データ不足: {len(hist)}行\")
                         continue
                     
                     # Close価格を取得
@@ -617,7 +677,7 @@ def fetch_macro_sentiment() -> Dict[str, float]:
                         close_prices = hist['Close'].dropna()
                         
                         if len(close_prices) < 2:
-                            logger.warning(f"  Close価格不足")
+                            logger.warning(f\"  Close価格不足\")
                             continue
                         
                         # 最新2日分
@@ -631,29 +691,29 @@ def fetch_macro_sentiment() -> Dict[str, float]:
                             change = 0.0
                         
                     except (KeyError, IndexError, ValueError) as e:
-                        logger.warning(f"  価格計算エラー: {str(e)}")
+                        logger.warning(f\"  価格計算エラー: {str(e)}\")
                         continue
                     
                     # 結果格納
                     if key == 'SOX':
                         result['sox_chg'] = round(change, 2)
-                        logger.info(f"✅ SOX: {change:+.2f}% (from {ticker})")
+                        logger.info(f\"✅ SOX: {change:+.2f}% (from {ticker})\")
                         success = True
                         
                     elif key == 'TNX':
                         result['tnx_chg'] = round(change, 2)
-                        logger.info(f"✅ TNX: {change:+.2f}% (from {ticker})")
+                        logger.info(f\"✅ TNX: {change:+.2f}% (from {ticker})\")
                         success = True
                         
                     elif key == 'VIX':
                         result['vix_value'] = round(latest, 2)
                         result['vix_chg'] = round(change, 2)
-                        logger.info(f"✅ VIX: {latest:.2f} ({change:+.2f}%) (from {ticker})")
+                        logger.info(f\"✅ VIX: {latest:.2f} ({change:+.2f}%) (from {ticker})\")
                         success = True
                         
                     elif key == 'JPY':
                         result['jpy_chg'] = round(change, 2)
-                        logger.info(f"✅ JPY: {change:+.2f}% (from {ticker})")
+                        logger.info(f\"✅ JPY: {change:+.2f}% (from {ticker})\")
                         success = True
                     
                     # 成功したらループを抜ける
@@ -661,7 +721,7 @@ def fetch_macro_sentiment() -> Dict[str, float]:
                         break
                 
                 except Exception as ticker_err:
-                    logger.warning(f"  {ticker} エラー: {str(ticker_err)}")
+                    logger.warning(f\"  {ticker} エラー: {str(ticker_err)}\")
                     continue
                 
                 finally:
@@ -669,16 +729,16 @@ def fetch_macro_sentiment() -> Dict[str, float]:
                     time.sleep(0.5)
             
             if not success:
-                logger.warning(f"⚠️ {key}: すべてのティッカーで取得失敗（デフォルト値使用）")
+                logger.warning(f\"⚠️ {key}: すべてのティッカーで取得失敗（デフォルト値使用）\")
         
-        logger.info("=" * 60)
-        logger.info("マクロ指標取得完了")
-        logger.info(f"VIX={result['vix_value']:.2f}, SOX={result['sox_chg']:+.2f}%, TNX={result['tnx_chg']:+.2f}%")
-        logger.info("=" * 60)
+        logger.info(\"=\" * 60)
+        logger.info(\"マクロ指標取得完了\")
+        logger.info(f\"VIX={result['vix_value']:.2f}, SOX={result['sox_chg']:+.2f}%, TNX={result['tnx_chg']:+.2f}%\")
+        logger.info(\"=\" * 60)
         
         return result
     
     except Exception as e:
-        logger.error(f"マクロ指標取得全体エラー: {str(e)}")
-        logger.info("デフォルト値を返します")
+        logger.error(f\"マクロ指標取得全体エラー: {str(e)}\")
+        logger.info(\"デフォルト値を返します\")
         return result
