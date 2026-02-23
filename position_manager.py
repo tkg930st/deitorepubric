@@ -1,10 +1,10 @@
-\"\"\"
+"""
 position_manager.py - Version 15.0 仮想トレード・ポジション管理
 主な機能:
 1. 買値から-5%の固定損切り
 2. 最高値更新から-5%のトレーリングストップ
 3. 長期・短期ロジックの判別保存
-\"\"\"
+"""
 import json
 import csv
 import logging
@@ -32,7 +32,7 @@ class PositionManager:
         try:
             with open(self.positions_file, 'w', encoding='utf-8') as f:
                 json.dump(self.positions, f, indent=2, ensure_ascii=False)
-        except Exception as e: logger.error(f\"Save positions error: {str(e)}\")
+        except Exception as e: logger.error(f"Save positions error: {str(e)}")
     
     def has_position(self, ticker: str) -> bool:
         return ticker in self.positions
@@ -55,10 +55,10 @@ class PositionManager:
         }
         self.positions[ticker] = position
         self.save_positions()
-        logger.info(f\"Position Added: {ticker} ({position['logic_type']}) @ {entry_price}\")
+        logger.info(f"Position Added: {ticker} ({position['logic_type']}) @ {entry_price}")
 
     def update_price(self, ticker: str, current_price: float) -> Optional[str]:
-        \"\"\"価格更新と損切り判定\"\"\"
+        """価格更新と損切り判定"""
         if ticker not in self.positions: return None
         pos = self.positions[ticker]
         side = pos['side']
