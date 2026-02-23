@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-test_analyzer.py - 開発・検証用高速エディション (Ver 15.10 ロジック)
+test_analyzer.py - Version 15.11 高速検証
 同期ルール：analyzer.py と同一の解析ロジックを保持。
 """
 import json
@@ -58,21 +58,26 @@ def worker_analyze_ticker(ticker: str, period: str, hurdle: float) -> Dict:
         df = filter_trading_hours(df)
         if len(df) < 20: return None
         df = calculate_technical_indicators(df)
-        df_15m = pd.DataFrame()
         
-        # Ver 15.10 ロジック (500回試行)
-        res_l = optimize_parameters(df, df_15m, 'long', OPTIMIZATION_ITERATIONS)
-        res_s = optimize_parameters(df, df_15m, 'short', OPTIMIZATION_ITERATIONS)
+        # Ver 15.11 ロジック (500回試行)
+        res_l = optimize_parameters(df, pd.DataFrame(), 'long', OPTIMIZATION_ITERATIONS)
+        res_s = optimize_parameters(df, pd.DataFrame(), 'short', OPTIMIZATION_ITERATIONS)
         
         l_prof = res_l['profit']; s_prof = res_s['profit']
-        valid_l = l_prof if l_prof >= hurdle else 0.0
-        valid_s = s_prof if s_prof >= hurdle else 0.0
+        
+        # ハードル判定と無効化フラグ (Ver 15.11 同期)
+        is_l_valid = l_prof >= hurdle
+        is_s_valid = s_prof >= hurdle
+        valid_l = l_prof if is_l_valid else 0.0
+        valid_s = s_prof if is_s_valid else 0.0
         total = valid_l + valid_s
         
         if total <= 0: return None
 
         return {
-            't': ticker, 'profit': total, 'long_profit': valid_l, 'short_profit': valid_s,
+            't': ticker, 'profit': total, 
+            'long_profit': valid_l, 'short_profit': valid_s,
+            'long_disabled': not is_l_valid, 'short_disabled': not is_s_valid,
             'params': {'long': res_l['params'], 'short': res_s['params']}
         }
     except Exception: return None
@@ -80,14 +85,14 @@ def worker_analyze_ticker(ticker: str, period: str, hurdle: float) -> Dict:
 def run_test_session(tickers: List[str], period: str, count: int, label: str, hurdle: float):
     print(f"\n🔬 {label} 解析中 (ハードル: {hurdle}%)")
     results = []
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         futures = {executor.submit(worker_analyze_ticker, t, period, hurdle): t for t in tickers}
         for f in as_completed(futures):
             res = f.result()
             if res:
                 res['logic_type'] = label
                 results.append(res)
-                print(f"   ✅ {res['t']} 完了 (期待値: {res['profit']:.2f}%)")
+                print(f"   ✅ {res['t']} 完了 (有効利益: {res['profit']:.2f}%)")
     return sorted(results, key=lambda x: x['profit'], reverse=True)[:count]
 
 class NpEncoder(json.JSONEncoder):
@@ -103,21 +108,23 @@ def main():
             with open(TEST_LOG, 'w'): pass
 
     start_time = time.time()
-    print("\n🚀 [TEST MODE] Ver 15.10 高速検証 (詳細数値ログ対応)")
+    print(\"\n🚀 [TEST MODE] Ver 15.11 高速検証 (Monthly / Weekly 対応)\")
     
-    long_res = run_test_session(TEST_TICKERS, '1mo', 7, "Long(1Month)", 5.0)
-    short_res = run_test_session(TEST_TICKERS, '1wk', 3, "Short(1Week)", 3.0)
+    # Monthly（1ヶ月/7銘柄/5.0%ハードル）
+    long_res = run_test_session(TEST_TICKERS, '1mo', 7, \"Monthly\", 5.0)
+    # Weekly（1週間/3銘柄/3.0%ハードル）
+    short_res = run_test_session(TEST_TICKERS, '1wk', 3, \"Weekly\", 3.0)
     
     combined = long_res + short_res
-    output_file = "test_best_config.json"
+    output_file = \"test_best_config.json\"
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump({'timestamp': datetime.now().isoformat(), 'version': '15.10-TEST', 'details': combined}, 
+        json.dump({'timestamp': datetime.now().isoformat(), 'version': '15.11-TEST', 'details': combined}, 
                   f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
-    print(f"\n✅ テスト完了！ ({elapsed/60:.1f}分)")
-    if combined: print(f"選定数: {len(combined)} / 10")
-    else: print("❌ 銘柄が選定されませんでした。")
+    print(f\"\n✅ テスト完了！ ({elapsed/60:.1f}分)\")
+    if combined: print(f\"選定数: {len(combined)} / 10\")
+    else: print(\"❌ 銘柄が選定されませんでした。\")
 
-if __name__ == "__main__":
+if __name__ == \"__main__\":
     main()

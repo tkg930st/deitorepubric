@@ -4,6 +4,7 @@ monitor.py - Version 15.10 統合戦略監視
 変更点:
 - ATRベースの動的SL/TPをPositionManagerに渡すよう修正
 - エントリー判定ロジックをVer 15.10と完全同期
+- 期間名称を Monthly / Weekly に統一
 """
 import json
 import logging
