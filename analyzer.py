@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
-analyzer.py - Version 15.3 統合戦略実装
+analyzer.py - Version 15.4 統合戦略実装
 主な機能:
-1. 長期（1ヶ月）7銘柄 ＆ 短期（1週間）3銘柄の統合選定
-2. 利益率ハードル 5.0%
-3. pandas-ta 依存排除による安定動作
-4. 実行ログ出力の強化 (execution_log.txtへの追記)
+1. 長期（1ヶ月/7銘柄/5%）＆ 短期（1週間/3銘柄/3%）の統合選定
+2. フィルター動的最適化（RSI/VWAPフラグ）の保存
 """
 import json
 import logging
@@ -22,7 +20,7 @@ import yfinance as yf
 from config import (
     LOG_FILE, LOG_LEVEL, LIQUIDITY_THRESHOLD, MIN_PRICE,
     OPTIMIZATION_ITERATIONS, MIN_DATA_POINTS, DATA_FETCH, OUTPUT_CONFIG,
-    WEBHOOK_URL, PRECISE_CHECK_COUNT, TREND_FILTER
+    WEBHOOK_URL, PRECISE_CHECK_COUNT, TREND_FILTER, MIN_SCORE_THRESHOLD
 )
 from utils import (
     get_jpx_list_with_sector, super_flatten_columns, fetch_yfinance_data,
@@ -31,10 +29,11 @@ from utils import (
 )
 from backtest_engine import optimize_parameters
 
-# ロギング設定 (追記モード)
+# ロギング設定 (UTF-8, 追記モード)
 logging.basicConfig(
     filename=LOG_FILE,
     filemode='a',
+    encoding='utf-8',
     level=getattr(logging, LOG_LEVEL),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
@@ -95,9 +94,8 @@ def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame, count: i
             if len(elite) >= count * 2: break
     return elite
 
-def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
+def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict:
     ticker = ticker_info['t']
-    profit_hurdle = 5.0
     try:
         ticker_data = fetch_yfinance_data([ticker], period=period, interval=DATA_FETCH['analyzer_interval'])
         if ticker_data.empty: return None
@@ -108,22 +106,23 @@ def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
         if TREND_FILTER['enabled']:
             df['ma_15m_20'] = calculate_ma_from_higher_timeframe(df, TREND_FILTER['ma_period'])
         df_15m = df[['ma_15m_20']].copy() if TREND_FILTER['enabled'] else pd.DataFrame()
+        
         result_long = optimize_parameters(df, df_15m, 'long', OPTIMIZATION_ITERATIONS, PRECISE_CHECK_COUNT)
         result_short = optimize_parameters(df, df_15m, 'short', OPTIMIZATION_ITERATIONS, PRECISE_CHECK_COUNT)
         
         long_profit = float(result_long.get('profit', 0))
         short_profit = float(result_short.get('profit', 0))
         
-        final_long_p = long_profit if long_profit >= profit_hurdle else 0.0
-        final_short_p = short_profit if short_profit >= profit_hurdle else 0.0
+        final_long_p = long_profit if long_profit >= hurdle else 0.0
+        final_short_p = short_profit if short_profit >= hurdle else 0.0
         total_profit = final_long_p + final_short_p
 
         if total_profit <= 0: return None
 
         return {
             't': ticker, 'profit': total_profit,
-            'long_profit': final_long_p, 'short_profit': short_profit,
-            'long_disabled': final_long_p <= 0, 'short_disabled': short_profit <= 0,
+            'long_profit': final_long_p, 'short_profit': final_short_p,
+            'long_disabled': final_long_p <= 0, 'short_disabled': final_short_p <= 0,
             'sector': ticker_info['sector'], 'size_category': ticker_info.get('size_category', ''),
             'params': {'long': result_long['params'], 'short': result_short['params']}
         }
@@ -131,12 +130,12 @@ def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
         logger.error(f"解析エラー ({ticker}): {str(e)}")
         return None
 
-def run_analysis_session(elite_stocks: List[Dict], period: str, count: int, label: str) -> List[Dict]:
-    msg = f"\n🔬 {label} 解析開始 (期間: {period}, 目標: {count}銘柄)"
+def run_analysis_session(elite_stocks: List[Dict], period: str, count: int, label: str, hurdle: float) -> List[Dict]:
+    msg = f"\n🔬 {label} 解析開始 (期間: {period}, 目標: {count}銘柄, ハードル: {hurdle}%)"
     print(msg); logger.info(msg)
     results = []
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
-        futures = {executor.submit(worker_analyze_ticker, s, period): s for s in elite_stocks}
+        futures = {executor.submit(worker_analyze_ticker, s, period, hurdle): s for s in elite_stocks}
         for future in as_completed(futures):
             res = future.result()
             if res:
@@ -156,7 +155,7 @@ class NpEncoder(json.JSONEncoder):
 
 def main():
     start_time = time.time()
-    msg = "📊 Version 15.3 統合戦略 戦略構築開始"
+    msg = "📊 Version 15.4 統合戦略 戦略構築開始"
     print("\n" + msg); logger.info(msg)
     
     sector_df = get_jpx_list_with_sector()
@@ -164,24 +163,24 @@ def main():
     elite_candidates = select_main_stocks(all_tickers, sector_df, count=20)
     
     if not elite_candidates:
-        msg = "❌ 解析対象の銘柄が見が見つかりませんでした。"
+        msg = "❌ 解析対象の銘柄が見つかりませんでした。"
         print(msg); logger.error(msg)
         return
 
-    # 長期（1ヶ月/7銘柄）
-    long_term_results = run_analysis_session(elite_candidates, '1mo', 7, "Long(1Month)")
-    # 短期（1週間/3銘柄）
-    short_term_results = run_analysis_session(elite_candidates, '1wk', 3, "Short(1Week)")
+    # 長期（1ヶ月/7銘柄/5%目標）
+    long_term_results = run_analysis_session(elite_candidates, '1mo', 7, "Long(1Month)", 5.0)
+    # 短期（1週間/3銘柄/3%目標）
+    short_term_results = run_analysis_session(elite_candidates, '1wk', 3, "Short(1Week)", 3.0)
     
     combined_results = long_term_results + short_term_results
     if not combined_results:
-        msg = "❌ 銘柄が選定されませんでした（利益5%目標）"
+        msg = "❌ 銘柄が選定されませんでした。"
         print(msg); logger.warning(msg)
         return
 
     best_config = {
         'timestamp': datetime.now().isoformat(),
-        'version': '15.3',
+        'version': '15.4',
         'details': combined_results
     }
     
@@ -189,10 +188,10 @@ def main():
         json.dump(best_config, f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
-    msg = f"✅ Version 15.3 統合戦略構築完了！ (実行時間: {elapsed/60:.1f}分)"
+    msg = f"✅ Version 15.4 統合戦略構築完了！ (実行時間: {elapsed/60:.1f}分)"
     print("\n" + msg); logger.info(msg)
     
-    discord_msg = f"✅ **Version 15.3 統合戦略構築完了！**\n⏱️ 実行時間: {elapsed/60:.1f}分\n\n"
+    discord_msg = f"✅ **Version 15.4 統合戦略構築完了！**\n⏱️ 実行時間: {elapsed/60:.1f}分\n\n"
     for r in combined_results:
         discord_msg += f"• **{r['t']}** | {r['logic_type']} | 期待: {r['profit']:.2f}%\n"
     
