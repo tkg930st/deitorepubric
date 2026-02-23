@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-analyzer.py - Version 15.1 統合戦略実装（基準緩和版）
+analyzer.py - Version 15.2 統合戦略実装
 主な機能:
 1. 長期（1ヶ月）7銘柄 ＆ 短期（1週間）3銘柄の統合選定
-2. 利益率ハードルの緩和（5% -> 3%）
-3. 解析プロセスの可視化
+2. 利益率ハードル 5.0%
+3. pandas-ta 依存排除による安定動作
 """
 import json
 import logging
@@ -21,8 +21,7 @@ import yfinance as yf
 from config import (
     LOG_FILE, LOG_LEVEL, LIQUIDITY_THRESHOLD, MIN_PRICE,
     OPTIMIZATION_ITERATIONS, MIN_DATA_POINTS, DATA_FETCH, OUTPUT_CONFIG,
-    WEBHOOK_URL, PRECISE_CHECK_COUNT, TREND_FILTER,
-    MIN_SCORE_THRESHOLD
+    WEBHOOK_URL, PRECISE_CHECK_COUNT, TREND_FILTER
 )
 from utils import (
     get_jpx_list_with_sector, super_flatten_columns, fetch_yfinance_data,
@@ -48,7 +47,6 @@ def calculate_liquidity_score(df: pd.DataFrame, ticker: str) -> Tuple[float, flo
     except Exception: return 0.0, 0.0
 
 def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame, count: int = 15) -> List[Dict]:
-    print(f"🔍 スクリーニング開始 (売買代金閾値: {LIQUIDITY_THRESHOLD/1e8:.1f}億円)")
     candidates = []
     chunk_size = DATA_FETCH.get('chunk_size', 50)
     for i in range(0, len(all_tickers), chunk_size):
@@ -81,7 +79,6 @@ def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame, count: i
                 except Exception: continue
         except Exception: continue
     
-    print(f"✅ スクリーニング通過: {len(candidates)}銘柄")
     sorted_candidates = sorted(candidates, key=lambda x: x['volatility_score'], reverse=True)
     elite = []
     used_sectors = set()
@@ -94,7 +91,7 @@ def select_main_stocks(all_tickers: List[str], sector_df: pd.DataFrame, count: i
 
 def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
     ticker = ticker_info['t']
-    profit_hurdle = 3.0 # ハードルを3%に緩和
+    profit_hurdle = 5.0 # 目標を5%に戻す
     try:
         ticker_data = fetch_yfinance_data([ticker], period=period, interval=DATA_FETCH['analyzer_interval'])
         if ticker_data.empty: return None
@@ -111,26 +108,20 @@ def worker_analyze_ticker(ticker_info: Dict, period: str) -> Dict:
         long_profit = float(result_long.get('profit', 0))
         short_profit = float(result_short.get('profit', 0))
         
-        # 利益がハードルを超えた方向のみ有効化
         final_long_p = long_profit if long_profit >= profit_hurdle else 0.0
         final_short_p = short_profit if short_profit >= profit_hurdle else 0.0
         total_profit = final_long_p + final_short_p
 
-        if total_profit <= 0:
-            # ログ用: どの程度の利益だったか記録
-            logger.debug(f"{ticker}: Hurdle failed (L={long_profit:.1f}%, S={short_profit:.1f}%)")
-            return None
+        if total_profit <= 0: return None
 
         return {
             't': ticker, 'profit': total_profit,
-            'long_profit': final_long_p, 'short_profit': final_short_p,
-            'long_disabled': final_long_p <= 0, 'short_disabled': final_short_p <= 0,
+            'long_profit': final_long_p, 'short_profit': short_profit,
+            'long_disabled': final_long_p <= 0, 'short_disabled': short_profit <= 0,
             'sector': ticker_info['sector'], 'size_category': ticker_info.get('size_category', ''),
             'params': {'long': result_long['params'], 'short': result_short['params']}
         }
-    except Exception as e:
-        logger.error(f"Worker error for {ticker}: {str(e)}")
-        return None
+    except Exception: return None
 
 def run_analysis_session(elite_stocks: List[Dict], period: str, count: int, label: str) -> List[Dict]:
     print(f"\n🔬 {label} 解析開始 (期間: {period}, 目標: {count}銘柄)")
@@ -143,8 +134,6 @@ def run_analysis_session(elite_stocks: List[Dict], period: str, count: int, labe
                 res['logic_type'] = label
                 results.append(res)
                 print(f"   ✅ {res['t']} 完了 (利益: {res['profit']:.2f}%)")
-            else:
-                pass # 基準未達
     return sorted(results, key=lambda x: x['profit'], reverse=True)[:count]
 
 class NpEncoder(json.JSONEncoder):
@@ -157,13 +146,13 @@ class NpEncoder(json.JSONEncoder):
 
 def main():
     start_time = time.time()
-    print("\n📊 Version 15.1 統合戦略 戦略構築開始")
+    print("\n📊 Version 15.2 統合戦略 戦略構築開始")
     sector_df = get_jpx_list_with_sector()
     all_tickers = sector_df['ticker'].tolist()
     elite_candidates = select_main_stocks(all_tickers, sector_df, count=20)
     
     if not elite_candidates:
-        print("❌ 解析対象の銘柄が見つかりませんでした。売買代金基準などを確認してください。")
+        print("❌ 解析対象の銘柄が見つかりませんでした。")
         return
 
     # 長期（1ヶ月/7銘柄）
@@ -173,12 +162,12 @@ def main():
     
     combined_results = long_term_results + short_term_results
     if not combined_results:
-        print("\n❌ 利益ハードル（3%）を突破する銘柄が選定されませんでした")
+        print("\n❌ 銘柄が選定されませんでした（利益5%目標）")
         return
 
     best_config = {
         'timestamp': datetime.now().isoformat(),
-        'version': '15.1',
+        'version': '15.2',
         'details': combined_results
     }
     
@@ -186,7 +175,7 @@ def main():
         json.dump(best_config, f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
-    msg = f"✅ **Version 15.1 統合戦略構築完了！**\n⏱️ 実行時間: {elapsed/60:.1f}分\n\n"
+    msg = f"✅ **Version 15.2 統合戦略構築完了！**\n⏱️ 実行時間: {elapsed/60:.1f}分\n\n"
     for r in combined_results:
         msg += f"• **{r['t']}** | {r['logic_type']} | 期待: {r['profit']:.2f}%\n"
     
