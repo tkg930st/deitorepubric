@@ -21,7 +21,8 @@ import pandas as pd
 
 from config import (
     WEBHOOK_URL, LOG_FILE, LOG_LEVEL, OUTPUT_CONFIG, DATA_FETCH,
-    MONITORING_LOOP, TREND_FILTER, POSITION_MANAGEMENT, SIGNAL_THRESHOLDS
+    MONITORING_LOOP, TREND_FILTER, POSITION_MANAGEMENT, SIGNAL_THRESHOLDS,
+    MARKET_SENTIMENT
 )
 from utils import (
     super_flatten_columns, fetch_yfinance_data,
@@ -81,7 +82,7 @@ def check_structure_signal(ticker: str, df: pd.DataFrame):
             msg = (f"{emoji} **[STRUCTURE] {ticker}**\n"
                    f"検出：{structure['type']} ({structure['direction']})\n"
                    f"状況：{desc}\n"
-                   f"節目価格：¥{structure['price']:,.1f}")
+                   f"価格：¥{structure['price']:,.1f}")
             send_discord_notification(WEBHOOK_URL, msg)
             last_structure_signals[ticker] = sig_key
 
@@ -135,7 +136,7 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
                    f"価格: ¥{entry_price:,.1f}\n"
                    f"TP1: ¥{tp1:,.1f} (ATR×{tp1_mul_base * adj.get('tp_mul', 1.0):.1f}) → 50%決済\n"
                    f"TP2: トレーリング (ATR×{trailing_atr_mul}幅)\n"
-                   f"SL: ¥{sl:,.1f} (ATR×{params['sl_mul']:.1f})\n"
+                   f"SL: ¥{sl:,.1f}\n"
                    f"スコア: {score:.1f} (RSI:{rsi_val:.1f}, VWAP:{vwap_dev:.2f})")
             
             send_discord_notification(WEBHOOK_URL, msg)
@@ -190,8 +191,9 @@ def send_daily_summary():
             msg += f"📅 **{label} 戦略結果**\n"
             if not res.empty:
                 for _, r in res.iterrows():
-                    msg += f"• {r['ticker']} ({r['side']}): {r['profit_pct']:+.2f}% [{r['exit_reason']}]\n"
-            else: msg += "• 取引なし\n"
+                    msg += f"• {r['ticker']} ({r['side']}): {r['profit_pct']:+.2f}% ({r['exit_reason']})\n"
+            else:
+                msg += "• 取引なし\n"
             msg += "\n"
         send_discord_notification(WEBHOOK_URL, msg)
     except Exception as e: logger.error(f"Summary error: {e}")

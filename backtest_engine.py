@@ -56,10 +56,8 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
                 if (side == 'long' and h >= position['tp1']) or (side == 'short' and l <= position['tp1']):
                     position['tp1_hit'] = True
                     # TP1後はリスクを半分に縮小した位置にSLを移動
-                    old_sl = position['sl']
                     if side == 'long': position['sl'] = max(position['sl'], position['entry_price'] - (position['atr'] * 0.5))
                     else: position['sl'] = min(position['sl'], position['entry_price'] + (position['atr'] * 0.5))
-                    logger.debug(f"      [BACKTEST] TP1達成 @ {curr_dt} (SL移動: {old_sl:.1f} -> {position['sl']:.1f})")
             
             # 決済判定
             if (side == 'long' and l <= position['sl']) or (side == 'short' and h >= position['sl']):
@@ -73,7 +71,6 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
                     p = ((row['close']/position['entry_price'])-1-SLIPPAGE)*100 if side == 'long' else (1-(row['close']/position['entry_price'])-SLIPPAGE)*100
                 
                 total_profit += p; trades.append(p)
-                logger.debug(f"      [BACKTEST] 決済({exit_reason}) @ {curr_dt} (Profit: {p:.2f}%)")
                 position = None
             continue
 
@@ -94,7 +91,6 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
                 'tp1': row['close'] + (atr * tp1_mul) if side == 'long' else row['close'] - (atr * tp1_mul),
                 'sl': row['close'] - (atr * params['sl_mul']) if side == 'long' else row['close'] + (atr * params['sl_mul'])
             }
-            logger.debug(f"      [BACKTEST] エントリー {side.upper()} @ {row['close']} ({curr_dt}) | RSI:{inds['rsi']:.1f}, VWAP:{inds['vwap_dev']:.2f}, RVOL:{inds['rvol']:.2f}, ADX:{inds['adx']:.1f}")
 
     trade_count = len(trades)
     if trade_count == 0: return {'profit': 0.0, 'rr_score': 0.0, 'fitness': 0.0, 'trade_count': 0}
@@ -144,5 +140,4 @@ def optimize_parameters(df: pd.DataFrame, df_15m: pd.DataFrame, side: str,
             candidates.append({'params': p, **res})
         
     best = sorted(candidates, key=lambda x: x['fitness'], reverse=True)[0]
-    logger.debug(f"   [OPTIMIZE] Best Fitness: {best['fitness']:.2f} | Trades: {best['trade_count']} | RR: {best['rr_score']:.2f}")
     return best

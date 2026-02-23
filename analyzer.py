@@ -141,6 +141,7 @@ def main():
     all_tickers = sector_df['ticker'].tolist()
     elite = select_high_volatility_stocks(all_tickers, sector_df, count=CANDIDATE_COUNT)
     
+    # Monthly / Weekly 解析
     long_res = run_session(elite, '1mo', 7, "Monthly", 5.0)
     short_res = run_session(elite, '1wk', 3, "Weekly", 3.0)
     
@@ -154,7 +155,6 @@ def main():
     
     elapsed = time.time() - start_time
     
-    # --- Discord通知メッセージの構築 (Ver 13.5形式の完全復元) ---
     finish_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     msg = f"✅ **Version 15.12 統合戦略構築完了！**\n\n"
     msg += f"⏱️ **実行時間**: {elapsed:.1f}秒 ({elapsed/60:.1f}分)\n"

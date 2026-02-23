@@ -89,7 +89,7 @@ def worker_analyze_ticker(ticker: str, sector_df: pd.DataFrame, period: str, hur
 def run_test_session(tickers: List[str], sector_df: pd.DataFrame, period: str, count: int, label: str, hurdle: float):
     print(f"\n🔬 {label} 解析中 (ハードル: {hurdle}%)")
     results = []
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         futures = {executor.submit(worker_analyze_ticker, t, sector_df, period, hurdle): t for t in tickers}
         for f in as_completed(futures):
             res = f.result()
