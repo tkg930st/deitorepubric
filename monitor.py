@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-monitor.py - Version 15.0 統合戦略監視
+monitor.py - Version 15.1 統合戦略監視
 変更点:
 - 長期（1ヶ月）/短期（1週間）ロジックの統合監視
 - 損切りロジックの刷新（固定-5% / トレーリング-5%）
 - BOS / CHoCH 独立検知シグナル
 - 詳細サマリー通知（統合・長期個別・短期個別）
+- 実行ログ出力の強化 (execution_log.txtへの追記)
 """
 import json
 import logging
@@ -29,9 +30,10 @@ from utils import (
 )
 from position_manager import PositionManager
 
-# ロギング設定
+# ロギング設定 (追記モード)
 logging.basicConfig(
     filename=LOG_FILE,
+    filemode='a',
     level=getattr(logging, LOG_LEVEL),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
@@ -57,15 +59,13 @@ def check_structure_signal(ticker: str, df: pd.DataFrame):
         if last_structure_signals.get(ticker) != sig_key:
             desc = "トレンド継続" if structure['type'] == 'BOS' else "トレンド転換"
             msg = f"[SIGNAL] {ticker} ｜ 検出：{structure['type']} ({structure['direction']} / {desc})"
+            logger.info(msg)
             send_discord_notification(WEBHOOK_URL, msg)
             last_structure_signals[ticker] = sig_key
 
 def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
-    """エントリー判定"""
+    """エントリー判定 (実装の枠組み)"""
     if position_manager.has_position(ticker): return
-    
-    # 仮のエントリー条件（要件に合わせた通知フォーマットを優先）
-    # 実際にはバックテストエンジン等のスコア計算が必要
     pass
 
 def send_daily_summary():
@@ -79,7 +79,9 @@ def send_daily_summary():
     df_today = df[df['exit_time'].dt.date == today]
 
     if df_today.empty:
-        send_discord_notification(WEBHOOK_URL, "📊 本日の取引はありませんでした。")
+        msg = "📊 本日の取引はありませんでした。"
+        logger.info(msg)
+        send_discord_notification(WEBHOOK_URL, msg)
         return
 
     total_profit = df_today['profit_pct'].sum()
@@ -104,23 +106,30 @@ def send_daily_summary():
             msg += f"• {r['ticker']}: {r['profit_pct']:+.2f}% ({r['exit_reason']})\n"
     else: msg += "• 取引なし\n"
 
+    logger.info("日次サマリー送信完了")
     send_discord_notification(WEBHOOK_URL, msg)
 
 def monitor():
     config = load_config()
-    if not config: return
+    if not config: 
+        logger.error("設定ファイルの読み込みに失敗しました。")
+        return
     
     details = {d['t']: d for d in config['details']}
     tickers = list(details.keys())
     
-    send_discord_notification(WEBHOOK_URL, "📡 **Version 15.0 統合戦略監視 起動**")
+    start_msg = "📡 **Version 15.1 統合戦略監視 起動**"
+    print(start_msg); logger.info(start_msg)
+    send_discord_notification(WEBHOOK_URL, start_msg)
 
     try:
         while True:
             # 取引時間チェック
             now = datetime.now(pytz.timezone('Asia/Tokyo')).time()
             if now >= dt_time(15, 0):
-                # 大引け強制決済
+                msg = "大引け時刻に達しました。強制決済を実行します。"
+                print(msg); logger.info(msg)
+                
                 prices = {}
                 raw_data = fetch_yfinance_data(tickers, period='1d', interval='5m')
                 for t in tickers:
@@ -129,7 +138,9 @@ def monitor():
                 
                 results = position_manager.force_close_all(prices, '大引け強制決済')
                 for r in results:
-                    send_discord_notification(WEBHOOK_URL, f"🛑 [EXIT] {r['ticker']} | 損益: {r['profit_pct']:+.2f}% ({r['logic_type']})")
+                    exit_msg = f"🛑 [EXIT] {r['ticker']} | 損益: {r['profit_pct']:+.2f}% ({r['logic_type']})"
+                    logger.info(exit_msg)
+                    send_discord_notification(WEBHOOK_URL, exit_msg)
                 
                 send_daily_summary()
                 break
@@ -141,7 +152,7 @@ def monitor():
                     df = super_flatten_columns(raw_data[ticker] if len(tickers)>1 else raw_data)
                     if df.empty: continue
                     
-                    # 1. BOS / CHoCH 検知 (売買ロジックとは独立)
+                    # 1. BOS / CHoCH 検知
                     check_structure_signal(ticker, df)
                     
                     # 2. 保有ポジションの監視 (損切り判定)
@@ -150,18 +161,18 @@ def monitor():
                         exit_reason = position_manager.update_price(ticker, current_price)
                         if exit_reason:
                             res = position_manager.close_position(ticker, current_price, exit_reason)
-                            send_discord_notification(WEBHOOK_URL, f"🛑 [EXIT] {res['ticker']} | 理由: {exit_reason} | 損益: {res['profit_pct']:+.2f}% ({res['logic_type']})")
-                    
-                    # 3. 新規エントリー判定 (実装の枠組み)
-                    # check_new_signal(ticker, df, details[ticker])
+                            exit_msg = f"🛑 [EXIT] {res['ticker']} | 理由: {exit_reason} | 損益: {res['profit_pct']:+.2f}% ({res['logic_type']})"
+                            logger.info(exit_msg)
+                            send_discord_notification(WEBHOOK_URL, exit_msg)
                     
             except Exception as e:
-                logger.error(f"Loop error: {str(e)}")
+                logger.error(f"ループ内エラー: {str(e)}")
 
             time.sleep(60)
 
     except KeyboardInterrupt:
-        pass
+        msg = "監視を中断しました。"
+        print(msg); logger.info(msg)
 
 if __name__ == "__main__":
     monitor()
