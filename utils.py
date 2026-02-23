@@ -156,7 +156,7 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         loss = -delta.where(delta < 0, 0)
         avg_gain = gain.rolling(window=14).mean()
         avg_loss = loss.rolling(window=14).mean()
-        rs = avg_gain / avg_loss
+        rs = avg_gain / (avg_loss + 1e-10) # ゼロ除算回避
         df['rsi_14'] = 100 - (100 / (1 + rs))
         
         # ATR
@@ -169,17 +169,17 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         # VWAP
         v = df['volume']
         tp = (df['high'] + df['low'] + df['close']) / 3
-        df['vwap'] = (tp * v).cumsum() / v.cumsum()
-        df['vwap_dev'] = ((df['close'] - df['vwap']) / df['vwap']) * 100
+        df['vwap'] = (tp * v).cumsum() / (v.cumsum() + 1e-10) # ゼロ除算回避
+        df['vwap_dev'] = ((df['close'] - df['vwap']) / (df['vwap'] + 1e-10)) * 100
         
         # ADX
         up_move = df['high'].diff()
         down_move = df['low'].diff().abs()
         plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
         minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
-        plus_di = 100 * (pd.Series(plus_dm, index=df.index).rolling(14).mean() / df['atr_14'])
-        minus_di = 100 * (pd.Series(minus_dm, index=df.index).rolling(14).mean() / df['atr_14'])
-        dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di)
+        plus_di = 100 * (pd.Series(plus_dm, index=df.index).rolling(14).mean() / (df['atr_14'] + 1e-10))
+        minus_di = 100 * (pd.Series(minus_dm, index=df.index).rolling(14).mean() / (df['atr_14'] + 1e-10))
+        dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-10)
         df['adx_14'] = dx.rolling(window=14).mean()
         
         # RVOL

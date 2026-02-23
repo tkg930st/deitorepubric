@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """
-monitor.py - Version 15.13 統合戦略監視 (詳細通知フォーマット 完全復元版)
-主な機能:
-1. 🛡️ 詳細エントリー通知 (Ver 13.5形式)
-2. ✅ TP1達成通知 (50%利確・リスク低減詳細)
-3. 🛑 詳細エグジット通知 (損益・理由)
-4. ℹ️ 地合い調整 & 📈/📉 構造検知通知
-5. 📊 運用終了後の詳細サマリー報告
+monitor.py - Version 15.14 統合戦略監視 (最終安定版)
+変更点:
+- 監視ループ内に指標計算 (RSI, ATR, VWAP等) と 15分MA計算を追加 (致命的バグ修正)
+- PositionManager.get_position への対応
+- 全通知フォーマットの再確認と安定化
 """
 import json
 import logging
@@ -21,8 +19,7 @@ import pandas as pd
 
 from config import (
     WEBHOOK_URL, LOG_FILE, LOG_LEVEL, OUTPUT_CONFIG, DATA_FETCH,
-    MONITORING_LOOP, TREND_FILTER, POSITION_MANAGEMENT, SIGNAL_THRESHOLDS,
-    MARKET_SENTIMENT
+    MONITORING_LOOP, TREND_FILTER, POSITION_MANAGEMENT, SIGNAL_THRESHOLDS
 )
 from utils import (
     super_flatten_columns, fetch_yfinance_data,
@@ -51,22 +48,15 @@ def load_config() -> Optional[Dict]:
     except Exception: return None
 
 def apply_macro_adjustments(sentiment: Dict[str, float]):
-    """VIX等に基づいた動的パラメータ調整と通知"""
     global current_macro_adjustments
     vix = sentiment.get('vix_value', 18.0)
-    
     if vix > 20:
         adjustment_msg = "ℹ️ **市場ボラティリティ上昇検知 (VIX > 20)**\n"
         adjustment_msg += "リスク管理のため以下の調整を自動適用しました：\n"
         adjustment_msg += "• エントリー閾値: +5.0 (厳格化)\n"
         adjustment_msg += "• 利確幅(TP): ×1.25 (拡大)\n"
         adjustment_msg += "• 損切幅(SL): ×1.15 (拡大)"
-        
-        current_macro_adjustments = {
-            'threshold_add': 5.0,
-            'tp_mul': 1.25,
-            'sl_mul': 1.15
-        }
+        current_macro_adjustments = {'threshold_add': 5.0, 'tp_mul': 1.25, 'sl_mul': 1.15}
         send_discord_notification(WEBHOOK_URL, adjustment_msg)
     else:
         current_macro_adjustments = {'threshold_add': 0.0, 'tp_mul': 1.0, 'sl_mul': 1.0}
@@ -130,8 +120,7 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             tp1_dist = atr * tp1_mul_base * adj.get('tp_mul', 1.0)
             tp1 = entry_price + tp1_dist if side == 'long' else entry_price - tp1_dist
             
-            # 🛡️ 新規シグナル通知 (Ver 13.5形式 復元)
-            msg = (f"🛡️ **新規シグナル (Ver 15.13): {side.upper()}**\n"
+            msg = (f"🛡️ **新規シグナル (Ver 15.14): {side.upper()}**\n"
                    f"銘柄: {ticker} ({detail['logic_type']})\n"
                    f"価格: ¥{entry_price:,.1f}\n"
                    f"TP1: ¥{tp1:,.1f} (ATR×{tp1_mul_base * adj.get('tp_mul', 1.0):.1f}) → 50%決済\n"
@@ -144,7 +133,6 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             break
 
 def monitor_positions(ticker: str, current_price: float):
-    """保有中ポジションの状態更新と通知"""
     event = position_manager.update_price(ticker, current_price)
     pos = position_manager.get_position(ticker)
     if not pos: return
@@ -152,8 +140,6 @@ def monitor_positions(ticker: str, current_price: float):
     if event == 'TP1_HIT':
         trailing_atr_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
         profit = ((current_price / pos['entry_price'] - 1) * 100) if pos['side'] == 'LONG' else ((1 - current_price / pos['entry_price']) * 100)
-        
-        # ✅ TP1達成通知 (復元)
         msg = (f"✅ **TP1達成: {ticker}**\n"
                f"🎯 50%利確完了\n"
                f"・価格: ¥{current_price:,.1f}\n"
@@ -161,10 +147,8 @@ def monitor_positions(ticker: str, current_price: float):
                f"・リスクを半分に縮小しました\n"
                f"・残り50%はトレーリングTP (ATR×{trailing_atr_mul}) で追従中")
         send_discord_notification(WEBHOOK_URL, msg)
-
     elif event == 'STOP_LOSS':
         res = position_manager.close_position(ticker, current_price, 'STOP_LOSS')
-        # 🛑 詳細エグジット通知 (復元)
         msg = (f"🛑 **[EXIT] {res['ticker']}**\n"
                f"理由：STOP_LOSS (逆指値決済)\n"
                f"損益：{res['profit_pct']:+.2f}% ({res['logic_type']})\n"
@@ -172,7 +156,6 @@ def monitor_positions(ticker: str, current_price: float):
         send_discord_notification(WEBHOOK_URL, msg)
 
 def send_daily_summary():
-    """本日の最終結果サマリー通知"""
     results_file = POSITION_MANAGEMENT['trade_results_file']
     if not os.path.exists(results_file): return
     try:
@@ -181,19 +164,15 @@ def send_daily_summary():
         today = datetime.now().date()
         df_today = df[df['exit_time'].dt.date == today]
         if df_today.empty: return
-
         total_profit = df_today['profit_pct'].sum()
-        msg = f"📊 **本日の最終結果サマリー**\n\n"
-        msg += f"💰 **総合損益: {total_profit:+.2f}%**\n"
-        msg += f"━━━━━━━━━━━━━━\n"
+        msg = f"📊 **本日の最終結果サマリー**\n\n💰 **総合損益: {total_profit:+.2f}%**\n━━━━━━━━━━━━━━\n"
         for label in ["Monthly", "Weekly"]:
             res = df_today[df_today['logic_type'] == label]
             msg += f"📅 **{label} 戦略結果**\n"
             if not res.empty:
                 for _, r in res.iterrows():
-                    msg += f"• {r['ticker']} ({r['side']}): {r['profit_pct']:+.2f}% ({r['exit_reason']})\n"
-            else:
-                msg += "• 取引なし\n"
+                    msg += f"• {r['ticker']} ({r['side']}): {r['profit_pct']:+.2f}% [{r['exit_reason']}]\n"
+            else: msg += "• 取引なし\n"
             msg += "\n"
         send_discord_notification(WEBHOOK_URL, msg)
     except Exception as e: logger.error(f"Summary error: {e}")
@@ -204,9 +183,8 @@ def monitor():
     details = {d['t']: d for d in config['details']}
     tickers = list(details.keys())
     
-    # 起動時レポート
     sentiment = fetch_macro_sentiment()
-    start_msg = (f"📡 **Version 15.13 統合戦略監視 起動**\n"
+    start_msg = (f"📡 **Version 15.14 統合戦略監視 起動**\n"
                  f"━━━━━━━━━━━━━━\n"
                  f"🌍 **マクロ地合い情報**:\n"
                  f"• VIX: {sentiment['vix_value']} ({sentiment['vix_chg']:+.2f}%)\n"
@@ -220,9 +198,12 @@ def monitor():
         while True:
             now = datetime.now(pytz.timezone('Asia/Tokyo')).time()
             if now >= dt_time(15, 0):
-                # 引け処理
                 raw_data = fetch_yfinance_data(tickers, period='1d', interval='5m')
-                prices = {t: super_flatten_columns(raw_data[t] if len(tickers)>1 else raw_data)['close'].iloc[-1] for t in tickers}
+                prices = {}
+                for t in tickers:
+                    df_raw = raw_data[t] if len(tickers)>1 else raw_data
+                    df_flat = super_flatten_columns(df_raw)
+                    if not df_flat.empty: prices[t] = df_flat['close'].iloc[-1]
                 results = position_manager.force_close_all(prices, '大引け強制決済')
                 for r in results:
                     send_discord_notification(WEBHOOK_URL, f"🛑 **[EXIT] {r['ticker']}**\n理由：大引け強制決済\n損益：{r['profit_pct']:+.2f}% ({r['logic_type']})")
@@ -234,6 +215,12 @@ def monitor():
                     ticker_data = raw_data[ticker] if len(tickers) > 1 else raw_data
                     df = super_flatten_columns(ticker_data)
                     if df.empty: continue
+                    
+                    # テクニカル指標計算 (RSI, ATR, VWAP等) を追加
+                    df = calculate_technical_indicators(df)
+                    # 15分MA計算を追加
+                    df['ma_15m_20'] = calculate_ma_from_higher_timeframe(df, 20)
+                    
                     check_structure_signal(ticker, df)
                     if position_manager.has_position(ticker):
                         monitor_positions(ticker, df['close'].iloc[-1])
