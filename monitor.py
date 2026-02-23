@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-\"\"\"
+"""
 monitor.py - Version 15.0 統合戦略監視
 変更点:
 - 長期（1ヶ月）/短期（1週間）ロジックの統合監視
 - 損切りロジックの刷新（固定-5% / トレーリング-5%）
 - BOS / CHoCH 独立検知シグナル
 - 詳細サマリー通知（統合・長期個別・短期個別）
-\"\"\"
+"""
 import json
 import logging
 import time
@@ -48,37 +48,28 @@ def load_config() -> Optional[Dict]:
     except Exception: return None
 
 def check_structure_signal(ticker: str, df: pd.DataFrame):
-    \"\"\"BOS / CHoCH の検知と通知\"\"\"
+    """BOS / CHoCH の検知と通知"""
     global last_structure_signals
     structure = detect_market_structure(df)
     if structure['type']:
-        sig_key = f\"{ticker}_{structure['type']}_{structure['direction']}\"
+        sig_key = f"{ticker}_{structure['type']}_{structure['direction']}"
         # 重複通知防止
         if last_structure_signals.get(ticker) != sig_key:
-            desc = \"トレンド継続\" if structure['type'] == 'BOS' else \"トレンド転換\"
-            msg = f\"[SIGNAL] {ticker} ｜ 検出：{structure['type']} ({structure['direction']} / {desc})\"
+            desc = "トレンド継続" if structure['type'] == 'BOS' else "トレンド転換"
+            msg = f"[SIGNAL] {ticker} ｜ 検出：{structure['type']} ({structure['direction']} / {desc})"
             send_discord_notification(WEBHOOK_URL, msg)
             last_structure_signals[ticker] = sig_key
 
 def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
-    \"\"\"エントリー判定\"\"\"
+    """エントリー判定"""
     if position_manager.has_position(ticker): return
-    
-    latest = df.iloc[-1]
-    # 簡易スコアリング判定 (詳細はanalyzerのparamsに依存)
-    # ここでは既存のロジックを統合戦略向けに簡略化して呼び出す形にする
-    # 実際の実装では analyzer で計算した閾値を使用
     
     # 仮のエントリー条件（要件に合わせた通知フォーマットを優先）
     # 実際にはバックテストエンジン等のスコア計算が必要
-    
-    # エントリー時の通知
-    # msg = f\"[ENTRY] {ticker} ｜ 選定ロジック：{detail['logic_type']}\"
-    # ...判定ロジック...
     pass
 
 def send_daily_summary():
-    \"\"\"詳細サマリー通知\"\"\"
+    """詳細サマリー通知"""
     results_file = POSITION_MANAGEMENT['trade_results_file']
     if not os.path.exists(results_file): return
 
@@ -88,7 +79,7 @@ def send_daily_summary():
     df_today = df[df['exit_time'].dt.date == today]
 
     if df_today.empty:
-        send_discord_notification(WEBHOOK_URL, \"📊 本日の取引はありませんでした。\")
+        send_discord_notification(WEBHOOK_URL, "📊 本日の取引はありませんでした。")
         return
 
     total_profit = df_today['profit_pct'].sum()
@@ -97,21 +88,21 @@ def send_daily_summary():
     long_results = df_today[df_today['logic_type'] == 'Long(1Month)']
     short_results = df_today[df_today['logic_type'] == 'Short(1Week)']
 
-    msg = f\"📊 **本日の最終結果サマリー**\\n\\n\"
-    msg += f\"💰 **総合結果: {total_profit:+.2f}%**\\n\"
-    msg += f\"━━━━━━━━━━━━━━\\n\"
+    msg = f"📊 **本日の最終結果サマリー**\n\n"
+    msg += f"💰 **総合結果: {total_profit:+.2f}%**\n"
+    msg += f"━━━━━━━━━━━━━━\n"
     
-    msg += f\"📅 **長期ロジック (1Month) - 7銘柄対象**\\n\"
+    msg += f"📅 **長期ロジック (1Month) - 7銘柄対象**\n"
     if not long_results.empty:
         for _, r in long_results.iterrows():
-            msg += f\"• {r['ticker']}: {r['profit_pct']:+.2f}% ({r['exit_reason']})\\n\"
-    else: msg += \"• 取引なし\\n\"
+            msg += f"• {r['ticker']}: {r['profit_pct']:+.2f}% ({r['exit_reason']})\n"
+    else: msg += "• 取引なし\n"
     
-    msg += f\"\\n⏱️ **短期ロジック (1Week) - 3銘柄対象**\\n\"
+    msg += f"\n⏱️ **短期ロジック (1Week) - 3銘柄対象**\n"
     if not short_results.empty:
         for _, r in short_results.iterrows():
-            msg += f\"• {r['ticker']}: {r['profit_pct']:+.2f}% ({r['exit_reason']})\\n\"
-    else: msg += \"• 取引なし\\n\"
+            msg += f"• {r['ticker']}: {r['profit_pct']:+.2f}% ({r['exit_reason']})\n"
+    else: msg += "• 取引なし\n"
 
     send_discord_notification(WEBHOOK_URL, msg)
 
@@ -122,7 +113,7 @@ def monitor():
     details = {d['t']: d for d in config['details']}
     tickers = list(details.keys())
     
-    send_discord_notification(WEBHOOK_URL, \"📡 **Version 15.0 統合戦略監視 起動**\")
+    send_discord_notification(WEBHOOK_URL, "📡 **Version 15.0 統合戦略監視 起動**")
 
     try:
         while True:
@@ -138,7 +129,7 @@ def monitor():
                 
                 results = position_manager.force_close_all(prices, '大引け強制決済')
                 for r in results:
-                    send_discord_notification(WEBHOOK_URL, f\"🛑 [EXIT] {r['ticker']} | 損益: {r['profit_pct']:+.2f}% ({r['logic_type']})\")
+                    send_discord_notification(WEBHOOK_URL, f"🛑 [EXIT] {r['ticker']} | 損益: {r['profit_pct']:+.2f}% ({r['logic_type']})")
                 
                 send_daily_summary()
                 break
@@ -159,18 +150,18 @@ def monitor():
                         exit_reason = position_manager.update_price(ticker, current_price)
                         if exit_reason:
                             res = position_manager.close_position(ticker, current_price, exit_reason)
-                            send_discord_notification(WEBHOOK_URL, f\"🛑 [EXIT] {res['ticker']} | 理由: {exit_reason} | 損益: {res['profit_pct']:+.2f}% ({res['logic_type']})\")
+                            send_discord_notification(WEBHOOK_URL, f"🛑 [EXIT] {res['ticker']} | 理由: {exit_reason} | 損益: {res['profit_pct']:+.2f}% ({res['logic_type']})")
                     
                     # 3. 新規エントリー判定 (実装の枠組み)
                     # check_new_signal(ticker, df, details[ticker])
                     
             except Exception as e:
-                logger.error(f\"Loop error: {str(e)}\")
+                logger.error(f"Loop error: {str(e)}")
 
             time.sleep(60)
 
     except KeyboardInterrupt:
         pass
 
-if __name__ == \"__main__\":
+if __name__ == "__main__":
     monitor()
