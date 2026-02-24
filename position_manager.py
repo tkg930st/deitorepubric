@@ -8,7 +8,7 @@ import json
 import csv
 import logging
 from datetime import datetime
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any
 import os
 from config import POSITION_MANAGEMENT
 
