@@ -1,6 +1,8 @@
 """
-バックテストエンジン (Version 15.10)
-ログ出力を大幅強化：エントリー時の指標生データとエグジット詳細を記録。
+バックtestエンジン (Version 15.15)
+変更点:
+- ダイバージェンス & 出来高加速スコアリングの統合
+- パラメータ探索範囲を config.py と完全同期
 """
 import numpy as np
 import pandas as pd
@@ -10,22 +12,21 @@ from typing import Dict, Tuple, List
 from datetime import datetime, time as dt_time
 from config import (
     SIGNAL_THRESHOLDS, POSITION_MANAGEMENT, TREND_FILTER, 
-    PARAM_RANGES, SLIPPAGE, MIN_SCORE_THRESHOLD
+    PARAM_RANGES, SLIPPAGE, MIN_SCORE_THRESHOLD, SECTOR_ALIGNMENT, DIVERGENCE
 )
-from utils import safe_get, check_trend_filter
+from utils import safe_get, check_trend_filter, check_divergence
 
 logger = logging.getLogger(__name__)
 
-def calculate_single_score(row: pd.Series, params: Dict, side: str) -> Tuple[float, Dict]:
-    """1行分のスコア算出と指標の記録"""
+def calculate_single_score(row: pd.Series, params: Dict, side: str, div_res: Dict = None) -> Tuple[float, Dict]:
+    """1行分のスコア算出と指標の記録 (ボーナス込み)"""
     score = 0.0
     rsi = safe_get(row, 'rsi_14', 50)
     vwap_dev = safe_get(row, 'vwap_dev', 0)
     rvol = safe_get(row, 'rvol', 1.0)
     adx = safe_get(row, 'adx_14', 0)
     
-    indicators = {'rsi': rsi, 'vwap_dev': vwap_dev, 'rvol': rvol, 'adx': adx}
-
+    # 1. 基礎スコア
     if side == 'long':
         if rsi < 40: score += params['w_rsi'] * 1.2
         if vwap_dev < -0.5: score += params['w_vwap'] * 1.2
@@ -36,7 +37,27 @@ def calculate_single_score(row: pd.Series, params: Dict, side: str) -> Tuple[flo
     if rvol > 1.8: score += params['w_rvol'] * 2.5
     if adx > 25: score += params['w_adx'] * 2.0
     
-    return score, indicators
+    # 2. ボーナススコア (Monitorと同一ロジック)
+    vol_accel_bonus = 0.0
+    div_bonus = 0.0
+    
+    if SECTOR_ALIGNMENT['enabled'] and rvol > SECTOR_ALIGNMENT.get('volume_accel_rvol_threshold', 1.2):
+        vol_accel_bonus = SECTOR_ALIGNMENT.get('volume_accel_score', 10)
+        
+    if div_res:
+        if side == 'long' and (div_res['bullish'] or div_res['reverse_bullish']):
+            div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
+        elif side == 'short' and (div_res['bearish'] or div_res['reverse_bearish']):
+            div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
+            
+    total_score = score + vol_accel_bonus + div_bonus
+    
+    indicators = {
+        'rsi': rsi, 'vwap_dev': vwap_dev, 'rvol': rvol, 'adx': adx,
+        'vol_accel_bonus': vol_accel_bonus, 'div_bonus': div_bonus
+    }
+    
+    return total_score, indicators
 
 def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, side: str) -> Dict:
     if df.empty: return {'profit': 0.0, 'rr_score': 0.0, 'fitness': 0.0, 'trade_count': 0}
@@ -44,11 +65,13 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
     trades = []; position = None; total_profit = 0.0
     tp1_mul = POSITION_MANAGEMENT.get('tp1_multiplier', 1.5)
     
+    lookback = DIVERGENCE.get('lookback', 25)
     for idx in range(len(df)):
         row = df.iloc[idx]
         curr_dt = row.name
 
         if position:
+            # ... (決済判定ロジックは変更なし)
             h, l = row['high'], row['low']
             exit_reason = None
             
@@ -82,7 +105,12 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
         if params.get('use_vwap_filter', True):
             if (side == 'long' and vwap_dev >= 3.0) or (side == 'short' and vwap_dev <= -3.0): continue
 
-        score, inds = calculate_single_score(row, params, side)
+        # ダイバージェンス算出 (その時点までの過去データを使用)
+        div_res = None
+        if idx >= lookback:
+            div_res = check_divergence(df.iloc[idx-lookback:idx+1])
+
+        score, inds = calculate_single_score(row, params, side, div_res=div_res)
         if score >= params['threshold']:
             atr = row['atr_14']
             if atr <= 0: continue
@@ -103,21 +131,27 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
     return {'profit': total_profit, 'rr_score': rr_efficiency, 'fitness': fitness, 'trade_count': trade_count}
 
 def get_random_params() -> Dict:
+    r = PARAM_RANGES
     return {
-        'w_rsi': random.randint(10, 40), 'w_vwap': random.randint(10, 40),
-        'w_rvol': random.randint(20, 50), 'w_adx': random.randint(20, 50),
-        'threshold': random.randint(40, 80),
-        'sl_mul': random.uniform(1.2, 3.0), 'tp_mul': random.uniform(2.5, 6.0),
-        'use_rsi_filter': random.choice([True, False]), 'use_vwap_filter': random.choice([True, False])
+        'w_rsi': random.randint(r['w_rsi'][0], r['w_rsi'][1]),
+        'w_vwap': random.randint(r['w_vwap'][0], r['w_vwap'][1]),
+        'w_rvol': random.randint(r['w_rvol'][0], r['w_rvol'][1]),
+        'w_adx': random.randint(r['w_adx'][0], r['w_adx'][1]),
+        'threshold': random.randint(r['threshold'][0], r['threshold'][1]),
+        'sl_mul': random.uniform(r['sl_mul'][0], r['sl_mul'][1]),
+        'tp_mul': random.uniform(r['tp_mul'][0], r['tp_mul'][1]),
+        'use_rsi_filter': random.choice([True, False]),
+        'use_vwap_filter': random.choice([True, False])
     }
 
 def mutate_params(p: Dict) -> Dict:
     new_p = p.copy()
     key = random.choice(['w_rsi', 'w_vwap', 'w_rvol', 'w_adx', 'threshold', 'sl_mul', 'tp_mul'])
+    r = PARAM_RANGES
     if key in ['sl_mul', 'tp_mul']:
-        new_p[key] = max(1.0, min(8.0, new_p[key] + random.uniform(-0.3, 0.3)))
+        new_p[key] = max(r[key][0], min(r[key][1], new_p[key] + random.uniform(-0.2, 0.2)))
     else:
-        new_p[key] = max(10, min(100, new_p[key] + random.randint(-5, 5)))
+        new_p[key] = max(r[key][0], min(r[key][1], new_p[key] + random.randint(-3, 3)))
     return new_p
 
 def optimize_parameters(df: pd.DataFrame, df_15m: pd.DataFrame, side: str, 

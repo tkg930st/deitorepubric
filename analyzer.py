@@ -135,28 +135,28 @@ class NpEncoder(json.JSONEncoder):
 
 def main():
     start_time = time.time()
-    print("\n📊 Version 15.12 統合戦略構築開始")
+    print("\n📊 Version 15.15 統合戦略構築開始")
     
     sector_df = get_jpx_list_with_sector()
     all_tickers = sector_df['ticker'].tolist()
     elite = select_high_volatility_stocks(all_tickers, sector_df, count=CANDIDATE_COUNT)
     
     # Monthly / Weekly 解析
-    long_res = run_session(elite, '1mo', 7, "Monthly", 5.0)
-    short_res = run_session(elite, '1wk', 3, "Weekly", 3.0)
+    long_res = run_session(elite, '1mo', 7, "Monthly", TARGET_PROFIT['Monthly'])
+    short_res = run_session(elite, '1wk', 3, "Weekly", TARGET_PROFIT['Weekly'])
     
     combined = long_res + short_res
     if not combined:
         print("❌ 条件を満たす銘柄が見つかりませんでした。"); return
 
-    best_config = {'timestamp': datetime.now().isoformat(), 'version': '15.12', 'details': combined}
+    best_config = {'timestamp': datetime.now().isoformat(), 'version': '15.15', 'details': combined}
     with open(OUTPUT_CONFIG, 'w', encoding='utf-8') as f:
         json.dump(best_config, f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time
     
     finish_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    msg = f"✅ **Version 15.12 統合戦略構築完了！**\n\n"
+    msg = f"✅ **Version 15.15 統合戦略構築完了！**\n\n"
     msg += f"⏱️ **実行時間**: {elapsed:.1f}秒 ({elapsed/60:.1f}分)\n"
     msg += f"📅 **完了時刻**: {finish_time} JST\n"
     msg += f"🚀 **並列処理**: {os.cpu_count()}コア活用\n\n"
@@ -177,18 +177,18 @@ def main():
     msg += f"   期待利益: {combined[0]['profit']:.2f}%\n"
     msg += f"   ボラティリティ: {combined[0]['atr_pct']:.2f}%\n\n"
     
-    msg += f"🆕 **Version 15.12 改良点**:\n"
-    msg += f"   • 2段階進化型最適化 (Phase 1: 広域 / Phase 2: 局所進化)\n"
-    msg += f"   • Fitness Ver 2 (リスク対効果・RR効率評価)\n"
-    msg += f"   • ボラティリティ比例型動的損切り (ATR基準)\n"
-    msg += f"   • フィルターON/OFF個別最適化 (RSI/VWAP)\n"
-    msg += f"   • 月次(Monthly) / 週次(Weekly) 独立戦略構築\n\n"
+    msg += f"🆕 **Version 15.15 改良点**:\n"
+    msg += f"   • AM/PM 監視セッション連携 (自動ハンドオーバー)\n"
+    msg += f"   • 実行ログの軽量化 (1MB以内) & 通信ノイズ遮断\n"
+    msg += f"   • 取引記録 (ジャーナル・結果) の整合性ガード\n"
+    msg += f"   • ダイバージェンス & 出来高加速スコアリング統合\n"
+    msg += f"   • デイリー・ストップロス (-3.0%) 安全装置実装\n\n"
     
     msg += f"🔔 **次のステップ**:\n"
     msg += f"   python monitor.py で監視を開始してください！"
     
     send_discord_notification(WEBHOOK_URL, msg)
-    print(f"\n✅ Version 15.12 構築完了！ ({elapsed/60:.1f}分)")
+    print(f"\n✅ Version 15.15 構築完了！ ({elapsed/60:.1f}分)")
 
 if __name__ == "__main__":
     main()

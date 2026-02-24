@@ -84,13 +84,19 @@ SIGNAL_THRESHOLDS = {
     'vol_surge_threshold': 2.0,
 }
 
-# 取引時間設定（JST）
+# 解析・バックテスト目標利益 (%)
+TARGET_PROFIT = {
+    'Monthly': 5.0,
+    'Weekly': 3.0
+}
+
+# 取引時間設定 (JST) - Monitorセッションで使用
 TRADING_HOURS = {
-    'morning_start': '09:00',
-    'morning_end': '11:30',
-    'afternoon_start': '12:30',
-    'afternoon_end': '15:00',
-    'avoid_close_minutes': 10  # 大引け前の除外時間（分）
+    'start': '09:30',
+    'end': '15:10',
+    'am_cutoff': '10:30',
+    'pm_cutoff': '14:30',
+    'force_close': '14:55'
 }
 
 # データ取得設定
@@ -174,7 +180,7 @@ MONITORING_LOOP = {
     'loop_interval': 60,
     'use_confirmed_candle': True,
     'am_entry_cutoff': '10:30',
-    'pm_entry_cutoff': '14:00',
+    'pm_entry_cutoff': '14:30',
     'min_rr_ratio': 1.5,
 }
 

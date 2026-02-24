@@ -1,8 +1,10 @@
 """
-position_manager.py - Version 15.13 仮想トレード・ポジション管理
+position_manager.py - Version 15.15 仮想トレード・ポジション管理
 変更点:
-- update_price の戻り値をイベント形式 ('TP1_HIT', 'STOP_LOSS', None) に変更
-- 通知ロジックを monitor.py に集約するため、内部での通知送信を廃止
+- AM/PM 連携用フラグ (pm_active) の日付ベース管理
+- TP2 トレーリングストップ (動的SL引き上げ) 実装
+- タイムスタンプの JST (Asia/Tokyo) 統一
+- 取引結果出力カラムの厳密な固定
 """
 import json
 import csv
@@ -10,9 +12,11 @@ import logging
 from datetime import datetime
 from typing import Dict, Optional, List, Any
 import os
+import pytz
 from config import POSITION_MANAGEMENT
 
 logger = logging.getLogger(__name__)
+tz = pytz.timezone('Asia/Tokyo')
 
 class PositionManager:
     def __init__(self):
@@ -47,7 +51,7 @@ class PositionManager:
             data = {
                 'positions': self.positions,
                 'pm_active': self.pm_active_date,
-                'last_update': datetime.now().isoformat()
+                'last_update': datetime.now(tz).isoformat()
             }
             with open(self.positions_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
@@ -71,35 +75,39 @@ class PositionManager:
     def has_position(self, ticker: str) -> bool:
         return ticker in self.positions
     
-    def add_position(self, ticker: str, side: str, entry_price: float, detail: Dict) -> None:
+    def add_position(self, ticker: str, side: str, entry_price: float, detail: Dict, sl: Optional[float] = None, tp1: Optional[float] = None) -> None:
         atr = detail.get('atr', entry_price * 0.02)
         logic_side = side.lower()
         params = detail['params'][logic_side]
         
-        sl_dist = atr * params['sl_mul']
-        fixed_sl = entry_price - sl_dist if side == 'LONG' else entry_price + sl_dist
+        # 外部から指定があればそれを使用、なければ従来通り計算
+        if sl is None:
+            sl_dist = atr * params['sl_mul']
+            sl = entry_price - sl_dist if side == 'LONG' else entry_price + sl_dist
         
-        tp1_dist = atr * POSITION_MANAGEMENT.get('tp1_multiplier', 1.5)
-        tp1_price = entry_price + tp1_dist if side == 'LONG' else entry_price - tp1_dist
+        if tp1 is None:
+            tp1_dist = atr * POSITION_MANAGEMENT.get('tp1_multiplier', 1.5)
+            tp1 = entry_price + tp1_dist if side == 'LONG' else entry_price - tp1_dist
         
         position = {
             'ticker': ticker,
             'side': side,
             'entry_price': entry_price,
             'entry_atr': atr,
-            'fixed_sl': fixed_sl,
-            'tp1': tp1_price,
+            'fixed_sl': sl,
+            'tp1': tp1,
             'tp1_hit': False,
+            'tp1_profit': 0.0,
             'highest_price': entry_price,
             'lowest_price': entry_price,
-            'trailing_sl': fixed_sl,
-            'entry_time': datetime.now().isoformat(),
+            'trailing_sl': sl,
+            'entry_time': datetime.now(tz).isoformat(),
             'logic_type': detail.get('logic_type', 'Unknown'),
             'params': params
         }
         self.positions[ticker] = position
         self.save_positions()
-        logger.info(f"Position Added: {ticker} ({side}) SL={fixed_sl:.1f}, TP1={tp1_price:.1f}")
+        logger.info(f"Position Added: {ticker} ({side}) SL={sl:.1f}, TP1={tp1:.1f}")
 
     def update_price(self, ticker: str, current_price: float) -> Optional[str]:
         """
@@ -110,22 +118,39 @@ class PositionManager:
         pos = self.positions[ticker]
         side = pos['side']
         atr = pos['entry_atr']
+        trailing_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
         
         event = None
         
-        # TP1達成チェック
+        # 1. 最高値/最安値の更新
+        if side == 'LONG':
+            if current_price > pos['highest_price']:
+                pos['highest_price'] = current_price
+                # TP1ヒット後は高値に合わせてSLを引き上げる (トレーリング)
+                if pos['tp1_hit']:
+                    new_sl = current_price - (atr * trailing_mul)
+                    pos['trailing_sl'] = max(pos['trailing_sl'], new_sl)
+        else: # SHORT
+            if current_price < pos['lowest_price']:
+                pos['lowest_price'] = current_price
+                # TP1ヒット後は安値に合わせてSLを引き下げる (トレーリング)
+                if pos['tp1_hit']:
+                    new_sl = current_price + (atr * trailing_mul)
+                    pos['trailing_sl'] = min(pos['trailing_sl'], new_sl)
+
+        # 2. TP1達成チェック
         if not pos['tp1_hit']:
             if (side == 'LONG' and current_price >= pos['tp1']) or \
                (side == 'SHORT' and current_price <= pos['tp1']):
                 pos['tp1_hit'] = True
-                # リスク低減 (リスクを半分に)
+                # リスク低減 (建値付近へ)
                 if side == 'LONG':
-                    pos['trailing_sl'] = max(pos['trailing_sl'], pos['entry_price'] - (atr * 0.5))
+                    pos['trailing_sl'] = max(pos['trailing_sl'], pos['entry_price'] - (atr * 0.2))
                 else:
-                    pos['trailing_sl'] = min(pos['trailing_sl'], pos['entry_price'] + (atr * 0.5))
+                    pos['trailing_sl'] = min(pos['trailing_sl'], pos['entry_price'] + (atr * 0.2))
                 event = 'TP1_HIT'
 
-        # 決済判定 (STOP_LOSS)
+        # 3. 決済判定 (STOP_LOSS または トレーリング決済)
         if side == 'LONG':
             if current_price <= pos['trailing_sl']: event = 'STOP_LOSS'
         else: # SHORT
@@ -148,7 +173,7 @@ class PositionManager:
             'entry_price': entry_price,
             'entry_time': pos['entry_time'],
             'exit_price': exit_price,
-            'exit_time': datetime.now().isoformat(),
+            'exit_time': datetime.now(tz).isoformat(),
             'exit_reason': reason,
             'tp1_hit': pos.get('tp1_hit', False),
             'tp1_profit': pos.get('tp1_profit', 0.0),
@@ -164,15 +189,16 @@ class PositionManager:
         return result
 
     def save_trade_result(self, result: Dict) -> None:
-        # 保存するカラムを厳密に定義（result内の余計なキーは保存しない）
+        # 保存するカラムを厳密に定義
         fieldnames = [
             'ticker', 'side', 'entry_price', 'entry_time', 'exit_price', 
-            'exit_time', 'exit_reason', 'tp1_hit', 'tp1_profit', 'final_profit', 'total_profit'
+            'exit_time', 'exit_reason', 'tp1_hit', 'tp1_profit', 'final_profit', 
+            'total_profit', 'logic_type'
         ]
         file_exists = os.path.exists(self.results_file)
         try:
             with open(self.results_file, 'a', newline='', encoding='utf-8') as f:
-                # extrasaction='ignore' により定義外のキー(profit_pct等)を無視
+                # extrasaction='ignore' により定義外のキーを無視
                 writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
                 if not file_exists: writer.writeheader()
                 writer.writerow(result)
