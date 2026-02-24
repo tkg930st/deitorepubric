@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-analyzer.py - Version 15.12 統合戦略実装
+analyzer.py - Version 15.15 統合戦略実装
 主な機能:
 1. 2段階進化型最適化 (Phase 1: 広域 / Phase 2: 局所進化)
 2. 詳細なDiscordレポート通知の完全復元 (Ver 13.5形式 + ライバル銘柄表示)
@@ -22,7 +22,7 @@ import yfinance as yf
 from config import (
     LOG_FILE, LOG_LEVEL, LIQUIDITY_THRESHOLD, MIN_PRICE,
     OPTIMIZATION_ITERATIONS, MIN_DATA_POINTS, DATA_FETCH, OUTPUT_CONFIG,
-    WEBHOOK_URL, TREND_FILTER
+    WEBHOOK_URL, TREND_FILTER, TARGET_PROFIT
 )
 from utils import (
     get_jpx_list_with_sector, super_flatten_columns, fetch_yfinance_data,

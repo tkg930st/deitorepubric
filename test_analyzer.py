@@ -16,7 +16,8 @@ import pandas as pd
 
 from config import (
     LOG_FILE, LOG_LEVEL, OPTIMIZATION_ITERATIONS, MIN_DATA_POINTS,
-    DATA_FETCH, WEBHOOK_URL, TREND_FILTER, MIN_PRICE, LIQUIDITY_THRESHOLD
+    DATA_FETCH, WEBHOOK_URL, TREND_FILTER, MIN_PRICE, LIQUIDITY_THRESHOLD,
+    TARGET_PROFIT
 )
 from utils import (
     get_jpx_list_with_sector, super_flatten_columns, fetch_yfinance_data,
@@ -152,8 +153,8 @@ def main():
     elite = sorted(elite, key=lambda x: x['atr_pct'], reverse=True)
     print(f"   -> フィルタ通過: {len(elite)} / {len(TEST_TICKERS)}")
 
-    long_res = run_test_session(elite, '1mo', 7, "Monthly", 5.0)
-    short_res = run_test_session(elite, '1wk', 3, "Weekly", 3.0)
+    long_res = run_test_session(elite, '1mo', 7, "Monthly", TARGET_PROFIT['Monthly'])
+    short_res = run_test_session(elite, '1wk', 3, "Weekly", TARGET_PROFIT['Weekly'])
     
     combined = long_res + short_res
     output_file = "test_best_config.json"
