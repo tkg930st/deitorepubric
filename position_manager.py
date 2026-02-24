@@ -18,47 +18,49 @@ class PositionManager:
     def __init__(self):
         self.positions_file = POSITION_MANAGEMENT['positions_file']
         self.results_file = POSITION_MANAGEMENT['trade_results_file']
-        self.pm_active = False
+        self.pm_active_date = None # True/False ではなく日付文字列を保持
         self.positions = {}
         self.load_from_file()
     
     def load_from_file(self) -> None:
         if not os.path.exists(self.positions_file):
             self.positions = {}
-            self.pm_active = False
+            self.pm_active_date = None
             return
         try:
             with open(self.positions_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 if 'positions' in data:
                     self.positions = data['positions']
-                    self.pm_active = data.get('pm_active', False)
+                    # pm_active キーから日付、または True (互換用) を取得
+                    val = data.get('pm_active')
+                    self.pm_active_date = str(val) if val else None
                 else:
-                    # 互換性維持: 古い形式の場合はそのままpositionsとして扱う
                     self.positions = data
-                    self.pm_active = False
+                    self.pm_active_date = None
         except Exception:
             self.positions = {}
-            self.pm_active = False
+            self.pm_active_date = None
     
     def save_positions(self):
         try:
             data = {
                 'positions': self.positions,
-                'pm_active': self.pm_active,
+                'pm_active': self.pm_active_date,
                 'last_update': datetime.now().isoformat()
             }
             with open(self.positions_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
         except Exception as e: logger.error(f"Save positions error: {str(e)}")
 
-    def set_pm_active(self, active: bool = True):
-        self.pm_active = active
+    def set_pm_active(self, active_val: Any = None):
+        """日付文字列または None を設定"""
+        self.pm_active_date = active_val
         self.save_positions()
 
-    def is_pm_active(self) -> bool:
-        self.load_from_file() # 最新の状態を確認
-        return self.pm_active
+    def get_pm_active_date(self) -> Optional[str]:
+        self.load_from_file()
+        return self.pm_active_date
     
     def get_position(self, ticker: str) -> Optional[Dict]:
         """
@@ -139,8 +141,7 @@ class PositionManager:
         side = pos['side']
         profit_pct = ((exit_price / entry_price - 1) * 100) if side == 'LONG' else ((1 - exit_price / entry_price) * 100)
         
-        # trade_results.csv のヘッダー順序に厳密に合わせる
-        # ticker,side,entry_price,entry_time,exit_price,exit_time,exit_reason,tp1_hit,tp1_profit,final_profit,total_profit
+        # 通知および解析に必要なデータをすべて保持
         result = {
             'ticker': ticker,
             'side': side,
@@ -150,26 +151,33 @@ class PositionManager:
             'exit_time': datetime.now().isoformat(),
             'exit_reason': reason,
             'tp1_hit': pos.get('tp1_hit', False),
-            'tp1_profit': pos.get('tp1_profit', 0.0), # TP1時の利益（もしあれば）
+            'tp1_profit': pos.get('tp1_profit', 0.0),
             'final_profit': profit_pct,
-            'total_profit': profit_pct # 合計損益（50%分割決済などの場合は計算が必要だが現状は簡易化）
+            'total_profit': profit_pct,
+            'profit_pct': profit_pct, # monitor.py の通知用 (互換性)
+            'logic_type': pos.get('logic_type', 'Unknown') # monitor.py の通知用
         }
         
-        # ロジックタイプ（Monthly/Weekly）はジャーナル側に残し、リザルトからは除外するか、
-        # もし必要ならヘッダーを更新する必要があるが、現状は既存ヘッダーへの適合を優先
         self.save_trade_result(result)
         del self.positions[ticker]
         self.save_positions()
         return result
 
     def save_trade_result(self, result: Dict) -> None:
+        # 保存するカラムを厳密に定義（result内の余計なキーは保存しない）
+        fieldnames = [
+            'ticker', 'side', 'entry_price', 'entry_time', 'exit_price', 
+            'exit_time', 'exit_reason', 'tp1_hit', 'tp1_profit', 'final_profit', 'total_profit'
+        ]
         file_exists = os.path.exists(self.results_file)
         try:
             with open(self.results_file, 'a', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=result.keys())
+                # extrasaction='ignore' により定義外のキー(profit_pct等)を無視
+                writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
                 if not file_exists: writer.writeheader()
                 writer.writerow(result)
-        except Exception: pass
+        except Exception as e:
+            logger.error(f"Save result error: {e}")
 
     def force_close_all(self, current_prices: Dict[str, float], reason: str = 'FORCE_CLOSE') -> List[Dict]:
         results = []

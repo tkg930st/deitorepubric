@@ -269,7 +269,13 @@ def monitor():
     # 1. 開始時刻まで待機
     tz = pytz.timezone('Asia/Tokyo')
     start_time_dt = dt_time.fromisoformat(MONITOR_START_TIME)
+    end_time_dt = dt_time.fromisoformat(MONITOR_END_TIME)
     
+    now_jst = datetime.now(tz).time()
+    if now_jst >= end_time_dt:
+        logger.info(f"Current time {now_jst} is past MONITOR_END_TIME {MONITOR_END_TIME}. Market already closed.")
+        return
+
     logger.info(f"Waiting for start time: {MONITOR_START_TIME} (Session: {SESSION_TYPE})")
     while True:
         now_jst = datetime.now(tz).time()
@@ -279,8 +285,9 @@ def monitor():
 
     # 2. PMセッション起動通知 (AMに知らせる)
     if SESSION_TYPE == 'PM':
-        logger.info("PM session starting. Setting active flag.")
-        position_manager.set_pm_active(True)
+        today_str = datetime.now(tz).strftime('%Y-%m-%d')
+        logger.info(f"PM session starting. Setting active flag for {today_str}.")
+        position_manager.set_pm_active(today_str)
         git_sync('push')
 
     sentiment = fetch_macro_sentiment()
@@ -297,6 +304,7 @@ def monitor():
     try:
         while True:
             now_jst = datetime.now(tz).time()
+            today_str = datetime.now(tz).strftime('%Y-%m-%d')
             
             # 3. 終了・強制決済判定
             # 3a. 強制決済 (14:55など)
@@ -323,8 +331,8 @@ def monitor():
             # 3c. AMからPMへの引き継ぎチェック (11:30以降)
             if SESSION_TYPE == 'AM' and now_jst >= dt_time(11, 30):
                 git_sync('pull') # PMのフラグを確認するためにプル
-                if position_manager.is_pm_active():
-                    logger.info("PM session detected. AM session handing over.")
+                if position_manager.get_pm_active_date() == today_str:
+                    logger.info("PM session detected for today. AM session handing over.")
                     send_discord_notification(WEBHOOK_URL, "🔄 **前場監視終了 (後場へ引き継ぎ)**")
                     break
 
