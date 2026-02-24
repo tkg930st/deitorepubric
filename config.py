@@ -13,7 +13,7 @@ WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 # ログ設定
 LOG_FILE = 'execution_log.txt'
-LOG_LEVEL = 'DEBUG'
+LOG_LEVEL = 'INFO'
 
 # 銘柄選定基準
 LIQUIDITY_THRESHOLD = 5_000_000_000  # 売買代金50億円以上に戻す

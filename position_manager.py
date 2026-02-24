@@ -18,20 +18,47 @@ class PositionManager:
     def __init__(self):
         self.positions_file = POSITION_MANAGEMENT['positions_file']
         self.results_file = POSITION_MANAGEMENT['trade_results_file']
-        self.positions = self.load_positions()
+        self.pm_active = False
+        self.positions = {}
+        self.load_from_file()
     
-    def load_positions(self) -> Dict:
-        if not os.path.exists(self.positions_file): return {}
+    def load_from_file(self) -> None:
+        if not os.path.exists(self.positions_file):
+            self.positions = {}
+            self.pm_active = False
+            return
         try:
             with open(self.positions_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception: return {}
+                data = json.load(f)
+                if 'positions' in data:
+                    self.positions = data['positions']
+                    self.pm_active = data.get('pm_active', False)
+                else:
+                    # 互換性維持: 古い形式の場合はそのままpositionsとして扱う
+                    self.positions = data
+                    self.pm_active = False
+        except Exception:
+            self.positions = {}
+            self.pm_active = False
     
     def save_positions(self):
         try:
+            data = {
+                'positions': self.positions,
+                'pm_active': self.pm_active,
+                'last_update': datetime.now().isoformat()
+            }
             with open(self.positions_file, 'w', encoding='utf-8') as f:
-                json.dump(self.positions, f, indent=2, ensure_ascii=False)
+                json.dump(data, f, indent=2, ensure_ascii=False)
         except Exception as e: logger.error(f"Save positions error: {str(e)}")
+
+    def set_pm_active(self, active: bool = True):
+        self.pm_active = active
+        self.save_positions()
+
+    def is_pm_active(self) -> bool:
+        self.load_from_file() # 最新の状態を確認
+        return self.pm_active
     
     def get_position(self, ticker: str) -> Optional[Dict]:
         """
@@ -112,11 +139,24 @@ class PositionManager:
         side = pos['side']
         profit_pct = ((exit_price / entry_price - 1) * 100) if side == 'LONG' else ((1 - exit_price / entry_price) * 100)
         
+        # trade_results.csv のヘッダー順序に厳密に合わせる
+        # ticker,side,entry_price,entry_time,exit_price,exit_time,exit_reason,tp1_hit,tp1_profit,final_profit,total_profit
         result = {
-            'ticker': ticker, 'side': side, 'entry_price': entry_price,
-            'exit_price': exit_price, 'exit_time': datetime.now().isoformat(),
-            'exit_reason': reason, 'profit_pct': profit_pct, 'logic_type': pos['logic_type']
+            'ticker': ticker,
+            'side': side,
+            'entry_price': entry_price,
+            'entry_time': pos['entry_time'],
+            'exit_price': exit_price,
+            'exit_time': datetime.now().isoformat(),
+            'exit_reason': reason,
+            'tp1_hit': pos.get('tp1_hit', False),
+            'tp1_profit': pos.get('tp1_profit', 0.0), # TP1時の利益（もしあれば）
+            'final_profit': profit_pct,
+            'total_profit': profit_pct # 合計損益（50%分割決済などの場合は計算が必要だが現状は簡易化）
         }
+        
+        # ロジックタイプ（Monthly/Weekly）はジャーナル側に残し、リザルトからは除外するか、
+        # もし必要ならヘッダーを更新する必要があるが、現状は既存ヘッダーへの適合を優先
         self.save_trade_result(result)
         del self.positions[ticker]
         self.save_positions()
