@@ -78772,3 +78772,4 @@
 2026-02-24 04:17:10,227 - yfinance - DEBUG - Exiting download()
 2026-02-24 06:54:51,939 - __main__ - INFO - Waiting for start time: 12:30 (Session: PM)
 2026-02-24 06:54:51,939 - __main__ - INFO - PM session starting. Setting active flag.
+2026-02-24 07:10:08,592 - __main__ - INFO - Current time 16:10:08.592431 is past MONITOR_END_TIME 15:10. Market already closed.
