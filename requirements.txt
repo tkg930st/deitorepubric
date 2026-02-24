@@ -6,19 +6,11 @@ pytz
 python-dotenv
 xlrd
 holidays
-
-# --- 基礎インフラ ---
-pandas>=2.0.0
-numpy>=1.24.0
-python-dotenv>=1.0.0
-
-# --- データ取得 (analyzer.py / monitor.py 共通) ---
-yfinance>=0.2.0
-requests>=2.31.0
-
-# --- 実行制御 (monitor.py) ---
-schedule>=1.2.0
-beautifulsoup4>=4.12.0
-
-# --- 可視化 (任意) ---
-matplotlib>=3.7.0
+pandas-ta
+google-genai
+numba
+llvmlite
+curl_cffi
+frozendict
+beautifulsoup4
+typing-extensions

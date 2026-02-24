@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-monitor.py - Version 15.14 統合戦略監視 (最終安定版)
+monitor.py - Version 15.15 統合戦略監視 (最終安定版)
 変更点:
-- 監視ループ内に指標計算 (RSI, ATR, VWAP等) と 15分MA計算を追加 (致命的バグ修正)
-- PositionManager.get_position への対応
-- 全通知フォーマットの再確認と安定化
+- AM/PM 監視セッション連携 (自動ハンドオーバー)
+- 実行ログの軽量化 (1MB以内) & 通信ノイズ遮断
+- 取引記録 (ジャーナル・結果) の整合性ガード
+- ダイバージェンス & 出来高加速スコアリング統合
+- デイリー・ストップロス (-3.0%) 安全装置実装
 """
 import json
 import logging
@@ -47,14 +49,24 @@ logging.getLogger('requests').setLevel(logging.WARNING)
 position_manager = PositionManager()
 last_structure_signals: Dict[str, str] = {}
 current_macro_adjustments: Dict[str, Any] = {}
+current_macro_sentiment: Dict[str, Any] = {} # マクロ指標保持用
 
 def record_trade_journal(entry: Dict) -> None:
-    """エントリー時の詳細を記録"""
+    """エントリー時の詳細を記録 (22カラム対応)"""
     journal_file = 'trade_journal.csv'
+    # 22カラムの厳密な定義
+    fieldnames = [
+        'ticker', 'side', 'entry_price', 'entry_time', 'market_sentiment', 
+        'rsi', 'vwap_dev', 'rvol', 'adx', 'ma15_value', 'ma15_diff_pct', 
+        'vix_value', 'sox_chg', 'tnx_chg', 'divergence_bullish', 
+        'divergence_bearish', 'cooldown_overridden', 'score', 'threshold', 
+        'sector_alignment', 'volume_accel', 'divergence_bonus'
+    ]
     file_exists = os.path.exists(journal_file)
     try:
         with open(journal_file, 'a', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=entry.keys())
+            # extrasaction='ignore' で余計なキー（logic_type等）を落とし、順序を守る
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
             if not file_exists:
                 writer.writeheader()
             writer.writerow(entry)
@@ -75,11 +87,12 @@ def git_sync(action: str = 'pull'):
     except Exception as e:
         logger.error(f"Git sync error: {e}")
 
-# セッション制御用環境変数の読み込み
+# セッション制御用環境変数の読み込み (config.py からのフォールバック付き)
 SESSION_TYPE = os.getenv('SESSION_TYPE', 'AM')
-MONITOR_START_TIME = os.getenv('MONITOR_START_TIME', '09:30')
-MONITOR_END_TIME = os.getenv('MONITOR_END_TIME', '15:10')
-ENTRY_CUTOFF_TIME = os.getenv('ENTRY_CUTOFF_TIME', '14:30' if SESSION_TYPE == 'PM' else '10:30')
+MONITOR_START_TIME = os.getenv('MONITOR_START_TIME', MONITORING_LOOP['start_time'])
+MONITOR_END_TIME = os.getenv('MONITOR_END_TIME', MONITORING_LOOP['end_time'])
+ENTRY_CUTOFF_TIME = os.getenv('ENTRY_CUTOFF_TIME', 
+                              MONITORING_LOOP['pm_entry_cutoff'] if SESSION_TYPE == 'PM' else MONITORING_LOOP['am_entry_cutoff'])
 FORCE_CLOSE_TIME = os.getenv('FORCE_CLOSE_TIME', '14:55' if SESSION_TYPE == 'PM' else '23:59')
 SKIP_DAILY_SUMMARY = os.getenv('SKIP_DAILY_SUMMARY', 'false').lower() == 'true'
 
@@ -114,7 +127,7 @@ def check_structure_signal(ticker: str, df: pd.DataFrame):
             msg = (f"{emoji} **[STRUCTURE] {ticker}**\n"
                    f"検出：{structure['type']} ({structure['direction']})\n"
                    f"状況：{desc}\n"
-                   f"価格：¥{structure['price']:,.1f}")
+                   f"節目価格：¥{structure['price']:,.1f}")
             send_discord_notification(WEBHOOK_URL, msg)
             last_structure_signals[ticker] = sig_key
 
@@ -148,6 +161,16 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
     trailing_atr_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
     adj = current_macro_adjustments
     
+    # ボーナススコアの算出
+    from config import SECTOR_ALIGNMENT, DIVERGENCE
+    vol_accel_bonus = 0.0
+    if SECTOR_ALIGNMENT['enabled']:
+        rvol = safe_get(row, 'rvol', 1.0)
+        if rvol > SECTOR_ALIGNMENT.get('volume_accel_rvol_threshold', 1.2):
+            vol_accel_bonus = SECTOR_ALIGNMENT.get('volume_accel_score', 10)
+
+    div_res = check_divergence(df) if DIVERGENCE['enabled'] else {'bullish': False, 'bearish': False, 'reverse_bullish': False, 'reverse_bearish': False}
+
     for side in ['long', 'short']:
         params = side_params[side]
         if detail.get(f'{side}_disabled', False): continue
@@ -160,16 +183,26 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             if (side == 'long' and vwap_dev >= 3.0) or (side == 'short' and vwap_dev <= -3.0): continue
             
         score = 0.0
+        current_div_bonus = 0.0
         if side == 'long':
             if rsi_val < 40: score += params['w_rsi'] * 1.2
             if vwap_dev < -0.5: score += params['w_vwap'] * 1.2
+            if div_res['bullish'] or div_res['reverse_bullish']:
+                current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
         else:
             if rsi_val > 60: score += params['w_rsi'] * 1.2
             if vwap_dev > 0.5: score += params['w_vwap'] * 1.2
+            if div_res['bearish'] or div_res['reverse_bearish']:
+                current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
+
         if safe_get(row, 'rvol', 1.0) > 1.8: score += params['w_rvol'] * 2.5
         if safe_get(row, 'adx_14', 0) > 25: score += params['w_adx'] * 2.0
         
-        if score >= (params['threshold'] + adj.get('threshold_add', 0)):
+        # 合計スコア
+        total_score = score + vol_accel_bonus + current_div_bonus
+        actual_threshold = params['threshold'] + adj.get('threshold_add', 0)
+        
+        if total_score >= actual_threshold:
             if TREND_FILTER['enabled']:
                 ma15 = row.get('ma_15m_20', 0)
                 if not check_trend_filter(row['close'], ma15, side.upper()): continue
@@ -183,12 +216,34 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             tp1_dist = atr * tp1_mul_base * adj.get('tp_mul', 1.0)
             tp1 = entry_price + tp1_dist if side == 'long' else entry_price - tp1_dist
             
-            # ジャーナルへの詳細記録
+            ma15_val = row.get('ma_15m_20', row['close'])
+            ma15_diff = ((row['close'] / ma15_val - 1) * 100) if ma15_val else 0
+            ms = current_macro_sentiment
+            
+            # ジャーナルへの詳細記録 (22カラム完全版)
             journal_entry = {
-                'ticker': ticker, 'side': side.upper(), 'entry_price': entry_price,
+                'ticker': ticker, 
+                'side': side.upper(), 
+                'entry_price': entry_price,
                 'entry_time': datetime.now(pytz.timezone('Asia/Tokyo')).isoformat(),
-                'rsi': rsi_val, 'vwap_dev': vwap_dev, 'rvol': safe_get(row, 'rvol', 1.0),
-                'adx': safe_get(row, 'adx_14', 0), 'score': score, 'logic_type': detail.get('logic_type', 'Unknown')
+                'market_sentiment': ms.get('market_sentiment', 0.0),
+                'rsi': rsi_val, 
+                'vwap_dev': vwap_dev, 
+                'rvol': safe_get(row, 'rvol', 1.0),
+                'adx': safe_get(row, 'adx_14', 0), 
+                'ma15_value': ma15_val,
+                'ma15_diff_pct': ma15_diff,
+                'vix_value': ms.get('vix_value', 0.0),
+                'sox_chg': ms.get('sox_chg', 0.0),
+                'tnx_chg': ms.get('tnx_chg', 0.0),
+                'divergence_bullish': div_res['bullish'],
+                'divergence_bearish': div_res['bearish'],
+                'cooldown_overridden': False,
+                'score': total_score, 
+                'threshold': actual_threshold,
+                'sector_alignment': 0.0, 
+                'volume_accel': vol_accel_bonus,
+                'divergence_bonus': current_div_bonus
             }
             record_trade_journal(journal_entry)
 
@@ -197,18 +252,18 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
                    f"価格: ¥{entry_price:,.1f}\n"
                    f"TP1: ¥{tp1:,.1f} (ATR×{tp1_mul_base * adj.get('tp_mul', 1.0):.1f}) → 50%決済\n"
                    f"TP2: トレーリング (ATR×{trailing_atr_mul}幅)\n"
-                   f"SL: ¥{sl:,.1f}\n"
-                   f"スコア: {score:.1f} (RSI:{rsi_val:.1f}, VWAP:{vwap_dev:.2f})")
+                   f"SL: ¥{sl:,.1f} (ATR×{params['sl_mul'] * adj.get('sl_mul', 1.0):.1f})\n"
+                   f"スコア: {total_score:.1f} (基礎:{score:.1f} + Bonus:{vol_accel_bonus+current_div_bonus:.1f})\n"
+                   f"指標: RSI:{rsi_val:.1f}, VWAP:{vwap_dev:.2f}")
             
             send_discord_notification(WEBHOOK_URL, msg)
-            position_manager.add_position(ticker, side.upper(), entry_price, detail)
+            position_manager.add_position(ticker, side.upper(), entry_price, detail, sl=sl, tp1=tp1)
             break
-        elif score >= (params['threshold'] + adj.get('threshold_add', 0) - 10):
-            # 惜しくも届かなかったシグナルをログに記録 (サイズ抑制のためINFO)
-            actual_thresh = params['threshold'] + adj.get('threshold_add', 0)
+        elif total_score >= (actual_threshold - 10):
+            # 惜しくも届かなかったシグナルを記録
             logger.info(
                 f"Signal missed: {ticker} ({side.upper()}) "
-                f"Score: {score:.1f} (Req: {actual_thresh:.1f}) "
+                f"Score: {total_score:.1f} (Req: {actual_threshold:.1f}) "
                 f"[RSI:{rsi_val:.1f}, VWAP:{vwap_dev:.2f}, "
                 f"RVOL:{safe_get(row, 'rvol', 1.0):.2f}, ADX:{safe_get(row, 'adx_14', 0):.1f}]"
             )
@@ -225,7 +280,7 @@ def monitor_positions(ticker: str, current_price: float):
                f"🎯 50%利確完了\n"
                f"・価格: ¥{current_price:,.1f}\n"
                f"・損益: {profit:+.2f}%\n"
-               f"・リスクを半分に縮小しました\n"
+               f"・リスクを半分（建値近辺）に縮小しました\n"
                f"・残り50%はトレーリングTP (ATR×{trailing_atr_mul}) で追従中")
         send_discord_notification(WEBHOOK_URL, msg)
     elif event == 'STOP_LOSS':
@@ -241,22 +296,43 @@ def send_daily_summary():
     if not os.path.exists(results_file): return
     try:
         df = pd.read_csv(results_file)
-        df['exit_time'] = pd.to_datetime(df['exit_time'])
+        # 不正な日付や数値をクレンジング
+        df['exit_time'] = pd.to_datetime(df['exit_time'], errors='coerce')
+        df = df.dropna(subset=['exit_time'])
+        
         today = datetime.now().date()
-        df_today = df[df['exit_time'].dt.date == today]
+        df_today = df[df['exit_time'].dt.date == today].copy()
         if df_today.empty: return
-        total_profit = df_today['profit_pct'].sum()
+        
+        df_today['total_profit'] = pd.to_numeric(df_today['total_profit'], errors='coerce')
+        total_profit = df_today['total_profit'].sum()
+        
         msg = f"📊 **本日の最終結果サマリー**\n\n💰 **総合損益: {total_profit:+.2f}%**\n━━━━━━━━━━━━━━\n"
         for label in ["Monthly", "Weekly"]:
             res = df_today[df_today['logic_type'] == label]
             msg += f"📅 **{label} 戦略結果**\n"
             if not res.empty:
                 for _, r in res.iterrows():
-                    msg += f"• {r['ticker']} ({r['side']}): {r['profit_pct']:+.2f}% [{r['exit_reason']}]\n"
+                    msg += f"• {r['ticker']} ({r['side']}): {r['total_profit']:+.2f}% [{r['exit_reason']}]\n"
             else: msg += "• 取引なし\n"
             msg += "\n"
         send_discord_notification(WEBHOOK_URL, msg)
     except Exception as e: logger.error(f"Summary error: {e}")
+
+def get_today_total_profit() -> float:
+    """本日の累計損益を計算"""
+    results_file = POSITION_MANAGEMENT['trade_results_file']
+    if not os.path.exists(results_file): return 0.0
+    try:
+        df = pd.read_csv(results_file)
+        df['exit_time'] = pd.to_datetime(df['exit_time'], errors='coerce')
+        today = datetime.now().date()
+        df_today = df[df['exit_time'].dt.date == today]
+        if df_today.empty: return 0.0
+        return pd.to_numeric(df_today['total_profit'], errors='coerce').sum()
+    except Exception as e:
+        logger.error(f"Error calculating daily profit: {e}")
+        return 0.0
 
 def monitor():
     config = load_config()
@@ -291,6 +367,9 @@ def monitor():
         git_sync('push')
 
     sentiment = fetch_macro_sentiment()
+    global current_macro_sentiment
+    current_macro_sentiment = sentiment
+    
     start_msg = (f"📡 **Version 15.15 統合戦略監視 ({SESSION_TYPE}) 起動**\n"
                  f"━━━━━━━━━━━━━━\n"
                  f"🌍 **マクロ地合い情報**:\n"
@@ -306,10 +385,21 @@ def monitor():
             now_jst = datetime.now(tz).time()
             today_str = datetime.now(tz).strftime('%Y-%m-%d')
             
+            # デイリー・ストップロスチェック
+            today_profit = get_today_total_profit()
+            limit = RISK_MANAGEMENT.get('daily_stop_loss_pct', -3.0)
+            if today_profit <= limit:
+                msg = (f"🚨 **デイリー・ストップロス発動**\n"
+                       f"本日の累計損益 ({today_profit:+.2f}%) が制限値 ({limit:.2f}%) に達しました。\n"
+                       f"安全のため、本日の全自動監視を緊急停止します。")
+                send_discord_notification(WEBHOOK_URL, msg)
+                logger.warning(f"Daily stop loss hit: {today_profit:.2f}%")
+                break
+
             # 3. 終了・強制決済判定
             # 3a. 強制決済 (14:55など)
             if now_jst >= dt_time.fromisoformat(FORCE_CLOSE_TIME):
-                raw_data = fetch_yfinance_data(tickers, period='1d', interval='5m')
+                raw_data = fetch_yfinance_data(tickers, period='1d', interval=DATA_FETCH['monitor_interval'])
                 prices = {}
                 for t in tickers:
                     df_raw = raw_data[t] if len(tickers)>1 else raw_data
@@ -338,7 +428,11 @@ def monitor():
 
             # 4. 監視メインロジック
             try:
-                raw_data = fetch_yfinance_data(tickers, period='2d', interval='5m')
+                raw_data = fetch_yfinance_data(
+                    tickers, 
+                    period=DATA_FETCH['monitor_period'], 
+                    interval=DATA_FETCH['monitor_interval']
+                )
                 for ticker in tickers:
                     ticker_data = raw_data[ticker] if len(tickers) > 1 else raw_data
                     df = super_flatten_columns(ticker_data)

@@ -21,7 +21,7 @@
 ### 2.2 取引データの永続性 (厳格ガード)
 システムの透明性と解析精度維持のため、以下のデータの出力・整合性を最優先事項とする：
 1. **Trade Journal (`trade_journal.csv`)**: エントリー時の詳細（RSI, VWAP, RVOL, ADX, Score）を記録。
-2. **Trade Results (`trade_results.csv`)**: エグジット結果をヘッダー順序（ticker, side, entry_price, entry_time, exit_price, exit_time, exit_reason, tp1_hit, tp1_profit, final_profit, total_profit）に厳密に準拠して記録。
+2. **Trade Results (`trade_results.csv`)**: エグジット結果をヘッダー順序（ticker, side, entry_price, entry_time, exit_price, exit_time, exit_reason, tp1_hit, tp1_profit, final_profit, total_profit, logic_type）に厳密に準拠して記録。
 * **禁止事項**: リファクタリングや最適化の過程で、これらの記録ロジックを削除・バイパスすることを一切禁止する。
 
 ## 3. ログ出力設計 (サイズと価値の最適化)
@@ -29,7 +29,33 @@
 * **ノイズ遮断**: `yfinance`, `urllib3` 等の通信デバッグログを抑制（WARNING以上）。
 * **ニアミス記録**: エントリー閾値に届かなかったが「閾値 - 10」以上のスコアを出した銘柄を、指標と共にログ出力する。
 
-## 4. リスク管理設計
+## 4. アルゴリズム・テクニカル指標の定義 (厳格遵守)
+システムの精度維持のため、以下の計算式を唯一の正解とする：
+
+1. **RSI (Relative Strength Index)**
+   - $RS = \frac{EMA(Gain, 14)}{EMA(Loss, 14)}$
+   - $RSI = 100 - \frac{100}{1 + RS}$
+   - ※ $EMA$ は $Wilder's Smoothing$ (平滑化定数 $\alpha = 1/14$) を使用。
+
+2. **ADX (Average Directional Index)**
+   - $TR = \max(High - Low, |High - Close_{prev}|, |Low - Close_{prev}|)$
+   - $+DM = \text{if } (High - High_{prev} > Low_{prev} - Low) \text{ and } (High - High_{prev} > 0) \text{ then } (High - High_{prev}) \text{ else } 0$
+   - $-DM = \text{if } (Low_{prev} - Low > High - High_{prev}) \text{ and } (Low_{prev} - Low > 0) \text{ then } (Low_{prev} - Low) \text{ else } 0$
+   - $DI = 100 \times \frac{EMA(DM, 14)}{EMA(TR, 14)}$
+   - $DX = 100 \times \frac{|+DI - -DI|}{+DI + -DI}$
+   - $ADX = EMA(DX, 14)$
+
+3. **VWAP (Volume Weighted Average Price)**
+   - $VWAP = \frac{\sum (TypicalPrice \times Volume)}{\sum Volume}$
+   - ※ $\sum$ は当日のセッション開始時（09:00）からの累積とし、日跨ぎの合算は禁止。
+   - $TypicalPrice = \frac{High + Low + Close}{3}$
+
+4. **ATR (Average True Range)**
+   - $ATR = EMA(TR, 14)$
+   - ※ $EMA$ は $\alpha = 1/14$ を使用。
+
+## 5. リスク管理設計
+* **TP2トレーリングストップ**: TP1到達後、直近の高値（買い）/安値（売り）からATRの一定倍率（trailing_atr_multiplier）を引いた価格で逆指値を動的に更新する。
 * **ボラティリティ比例型損切り**: ATRに基づく動的SL。
 * **重複エントリー防止**: 当日既に損切り/利確が完了した銘柄への再エントリーをブロック。
 * **デイリー・ストップロス**: 1日の損益合計 -3.0% で緊急停止。

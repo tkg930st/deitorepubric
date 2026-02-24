@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-test_analyzer.py - Version 15.12 高速検証 (通知なし版)
+test_analyzer.py - Version 15.15 高速検証 (ロジック同期版)
 同期ルール：analyzer.py と同一の解析ロジックを保持。テスト時はDiscord通知を行わない。
 """
 import json
@@ -15,14 +15,21 @@ import numpy as np
 import pandas as pd
 
 from config import (
-    LOG_FILE, LOG_LEVEL, OPTIMIZATION_ITERATIONS, DATA_FETCH,
-    WEBHOOK_URL, TREND_FILTER
+    LOG_FILE, LOG_LEVEL, OPTIMIZATION_ITERATIONS, MIN_DATA_POINTS,
+    DATA_FETCH, WEBHOOK_URL, TREND_FILTER, MIN_PRICE, LIQUIDITY_THRESHOLD
 )
 from utils import (
     get_jpx_list_with_sector, super_flatten_columns, fetch_yfinance_data,
     calculate_technical_indicators, filter_trading_hours
 )
 from backtest_engine import optimize_parameters
+
+# analyzer.py から共有すべき関数
+def get_rival_tickers(ticker: str, sector: str, sector_df: pd.DataFrame, count: int = 5) -> List[str]:
+    """同一セクターからライバル銘柄を抽出"""
+    rivals = sector_df[sector_df['sector'] == sector]['ticker'].tolist()
+    rivals = [r for r in rivals if r != ticker]
+    return rivals[:count]
 
 # 検証用銘柄
 TEST_TICKERS = [
@@ -50,15 +57,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def worker_analyze_ticker(ticker: str, sector_df: pd.DataFrame, period: str, hurdle: float) -> Dict:
+def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict:
+    ticker = ticker_info['t']
     try:
         data = fetch_yfinance_data([ticker], period=period, interval=DATA_FETCH['analyzer_interval'])
         df = super_flatten_columns(data)
         df = filter_trading_hours(df)
-        if len(df) < 20: return None
+        if len(df) < MIN_DATA_POINTS: return None
         df = calculate_technical_indicators(df)
         
-        # Ver 15.12 ロジック
+        # Ver 15.15 ロジック同期
         res_l = optimize_parameters(df, pd.DataFrame(), 'long', OPTIMIZATION_ITERATIONS)
         res_s = optimize_parameters(df, pd.DataFrame(), 'short', OPTIMIZATION_ITERATIONS)
         
@@ -71,26 +79,24 @@ def worker_analyze_ticker(ticker: str, sector_df: pd.DataFrame, period: str, hur
         
         if total <= 0: return None
 
-        s_info = sector_df[sector_df['ticker'] == ticker]
-        sector = s_info['sector'].iloc[0] if not s_info.empty else '不明'
-        size = s_info['size_category'].iloc[0] if not s_info.empty else '-'
-        atr_pct = (df['atr_14'].iloc[-1] / df['close'].iloc[-1]) * 100
-
         return {
             't': ticker, 'profit': total, 
             'long_profit': valid_l, 'short_profit': valid_s,
             'raw_long_profit': l_prof, 'raw_short_profit': s_prof,
             'long_disabled': not is_l_valid, 'short_disabled': not is_s_valid,
-            'atr_pct': atr_pct, 'sector': sector, 'size_category': size,
+            'atr_pct': ticker_info['atr_pct'],
+            'sector': ticker_info['sector'], 'size_category': ticker_info['size_category'],
+            'rivals': ticker_info['rivals'],
             'params': {'long': res_l['params'], 'short': res_s['params']}
         }
-    except Exception: return None
+    except Exception as e:
+        logger.error(f"{ticker} 解析エラー: {e}"); return None
 
-def run_test_session(tickers: List[str], sector_df: pd.DataFrame, period: str, count: int, label: str, hurdle: float):
+def run_test_session(elite: List[Dict], period: str, count: int, label: str, hurdle: float):
     print(f"\n🔬 {label} 解析中 (ハードル: {hurdle}%)")
     results = []
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
-        futures = {executor.submit(worker_analyze_ticker, t, sector_df, period, hurdle): t for t in tickers}
+        futures = {executor.submit(worker_analyze_ticker, s, period, hurdle): s for s in elite}
         for f in as_completed(futures):
             res = f.result()
             if res:
@@ -113,17 +119,46 @@ def main():
             with open(TEST_LOG, 'w'): pass
 
     start_time = time.time()
-    print("\n🚀 [TEST MODE] Ver 15.12 高速検証 (Monthly / Weekly 対応)")
+    print("\n🚀 [TEST MODE] Ver 15.15 高速検証 (ロジック同期版)")
     
     sector_df = get_jpx_list_with_sector()
     
-    long_res = run_test_session(TEST_TICKERS, sector_df, '1mo', 7, "Monthly", 5.0)
-    short_res = run_test_session(TEST_TICKERS, sector_df, '1wk', 3, "Weekly", 3.0)
+    # テスト対象銘柄のスクリーニング
+    print(f"🔍 テスト用スクリーニング開始 ({len(TEST_TICKERS)} 銘柄対象)")
+    elite = []
+    batch = fetch_yfinance_data(TEST_TICKERS, period='1mo', interval='1d')
+    for ticker in TEST_TICKERS:
+        try:
+            df = super_flatten_columns(batch[ticker] if len(TEST_TICKERS)>1 else batch)
+            if df.empty or len(df) < 15: continue
+            df = calculate_technical_indicators(df)
+            price = df['close'].iloc[-1]
+            if price <= MIN_PRICE: continue
+            avg_val = (df['close'] * df['volume']).mean()
+            if avg_val < LIQUIDITY_THRESHOLD: continue
+            
+            atr_pct = (df['atr_14'].iloc[-1] / price) * 100
+            s_info = sector_df[sector_df['ticker'] == ticker]
+            sector = s_info['sector'].iloc[0] if not s_info.empty else '不明'
+            size = s_info['size_category'].iloc[0] if not s_info.empty else '-'
+            
+            elite.append({
+                't': ticker, 'atr_pct': atr_pct, 
+                'sector': sector, 'size_category': size,
+                'rivals': get_rival_tickers(ticker, sector, sector_df)
+            })
+        except Exception: continue
+    
+    elite = sorted(elite, key=lambda x: x['atr_pct'], reverse=True)
+    print(f"   -> フィルタ通過: {len(elite)} / {len(TEST_TICKERS)}")
+
+    long_res = run_test_session(elite, '1mo', 7, "Monthly", 5.0)
+    short_res = run_test_session(elite, '1wk', 3, "Weekly", 3.0)
     
     combined = long_res + short_res
     output_file = "test_best_config.json"
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump({'timestamp': datetime.now().isoformat(), 'version': '15.12-TEST', 'details': combined}, 
+        json.dump({'timestamp': datetime.now().isoformat(), 'version': '15.15-TEST', 'details': combined}, 
                   f, indent=2, ensure_ascii=False, cls=NpEncoder)
     
     elapsed = time.time() - start_time

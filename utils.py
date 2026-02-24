@@ -132,6 +132,7 @@ def send_discord_notification(webhook_url: str, message: str) -> bool:
             for line in lines:
                 if len(current_chunk) + len(line) + 1 > MAX_LEN:
                     requests.post(webhook_url, json={"content": current_chunk}, timeout=10)
+                    time.sleep(1.0) # レート制限回避
                     current_chunk = line + '\n'
                 else:
                     current_chunk += line + '\n'
@@ -150,13 +151,14 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty or len(df) < 20: return df
     df = df.copy()
     try:
-        # RSI
+        # RSI (Wilder方式: EMAを使用)
         delta = df['close'].diff()
         gain = delta.where(delta > 0, 0)
         loss = -delta.where(delta < 0, 0)
-        avg_gain = gain.rolling(window=14).mean()
-        avg_loss = loss.rolling(window=14).mean()
-        rs = avg_gain / (avg_loss + 1e-10) # ゼロ除算回避
+        # alpha=1/14 は Wilder's Smoothing (RMA) に相当
+        avg_gain = gain.ewm(alpha=1/14, min_periods=14, adjust=False).mean()
+        avg_loss = loss.ewm(alpha=1/14, min_periods=14, adjust=False).mean()
+        rs = avg_gain / (avg_loss + 1e-10)
         df['rsi_14'] = 100 - (100 / (1 + rs))
         
         # ATR
@@ -166,21 +168,29 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         tr = pd.concat([high_low, high_cp, low_cp], axis=1).max(axis=1)
         df['atr_14'] = tr.rolling(window=14).mean()
         
-        # VWAP
+        # VWAP (日次リセット版)
         v = df['volume']
         tp = (df['high'] + df['low'] + df['close']) / 3
-        df['vwap'] = (tp * v).cumsum() / (v.cumsum() + 1e-10) # ゼロ除算回避
+        df['date_group'] = df.index.date
+        cumsum_pv = (tp * v).groupby(df['date_group']).cumsum()
+        cumsum_vol = v.groupby(df['date_group']).cumsum()
+        df['vwap'] = cumsum_pv / (cumsum_vol + 1e-10) # ゼロ除算回避
         df['vwap_dev'] = ((df['close'] - df['vwap']) / (df['vwap'] + 1e-10)) * 100
+        df.drop(columns=['date_group'], inplace=True)
         
-        # ADX
+        # ADX (Wilder方式)
         up_move = df['high'].diff()
-        down_move = df['low'].diff().abs()
+        down_move = -df['low'].diff()
+        
         plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
         minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
-        plus_di = 100 * (pd.Series(plus_dm, index=df.index).rolling(14).mean() / (df['atr_14'] + 1e-10))
-        minus_di = 100 * (pd.Series(minus_dm, index=df.index).rolling(14).mean() / (df['atr_14'] + 1e-10))
+        
+        # 指数移動平均 (Wilder's RMA) を使用
+        plus_di = 100 * (pd.Series(plus_dm, index=df.index).ewm(alpha=1/14, adjust=False).mean() / (df['atr_14'] + 1e-10))
+        minus_di = 100 * (pd.Series(minus_dm, index=df.index).ewm(alpha=1/14, adjust=False).mean() / (df['atr_14'] + 1e-10))
+        
         dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-10)
-        df['adx_14'] = dx.rolling(window=14).mean()
+        df['adx_14'] = dx.ewm(alpha=1/14, adjust=False).mean()
         
         # RVOL
         df['rvol'] = df['volume'] / df['volume'].rolling(window=5).mean()
@@ -219,10 +229,14 @@ def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
         p_chg = ((p_end / p_start) - 1) * 100
         r_chg = r_end - r_start
         rsi_t, prc_t = DIVERGENCE['rsi_threshold'], DIVERGENCE['price_threshold']
+        # 通常の強気: 価格安値切り下げ、RSI安値切り上げ
         if p_chg < -prc_t and r_chg > rsi_t: result['bullish'] = True
+        # 通常の弱気: 価格高値切り上げ、RSI高値切り下げ
         if p_chg > prc_t and r_chg < -rsi_t: result['bearish'] = True
-        if p_chg > prc_t and r_chg < -rsi_t: result['reverse_bearish'] = True
-        if p_chg < -prc_t and r_chg > rsi_t: result['reverse_bullish'] = True
+        # 隠れた(リバース)強気: 価格安値切り上げ、RSI安値切り下げ
+        if p_chg > prc_t and r_chg < -rsi_t: result['reverse_bullish'] = True
+        # 隠れた(リバース)弱気: 価格高値切り下げ、RSI高値切り上げ
+        if p_chg < -prc_t and r_chg > rsi_t: result['reverse_bearish'] = True
     except Exception: pass
     return result
 
