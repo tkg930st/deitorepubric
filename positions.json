@@ -1,56 +1,5 @@
 {
-  "positions": {
-    "5706.T": {
-      "ticker": "5706.T",
-      "side": "LONG",
-      "entry_price": 31180.0,
-      "entry_atr": 120.71428571428571,
-      "fixed_sl": 31058.37284723636,
-      "tp1": 31361.071428571428,
-      "tp1_hit": true,
-      "highest_price": 31180.0,
-      "lowest_price": 31180.0,
-      "trailing_sl": 31119.64285714286,
-      "entry_time": "2026-02-23T23:07:08.420520",
-      "logic_type": "Monthly",
-      "params": {
-        "w_rsi": 13,
-        "w_vwap": 22,
-        "w_rvol": 50,
-        "w_adx": 43,
-        "threshold": 53,
-        "sl_mul": 1.0075622122431735,
-        "tp_mul": 5.721307907059836,
-        "use_rsi_filter": false,
-        "use_vwap_filter": true
-      }
-    },
-    "6330.T": {
-      "ticker": "6330.T",
-      "side": "SHORT",
-      "entry_price": 2838.0,
-      "entry_atr": 18.142857142857142,
-      "fixed_sl": 2856.1428571428573,
-      "tp1": 2810.785714285714,
-      "tp1_hit": true,
-      "highest_price": 2838.0,
-      "lowest_price": 2838.0,
-      "trailing_sl": 2847.0714285714284,
-      "entry_time": "2026-02-24T03:55:54.161318",
-      "logic_type": "Weekly",
-      "params": {
-        "w_rsi": 14,
-        "w_vwap": 21,
-        "w_rvol": 39,
-        "w_adx": 43,
-        "threshold": 78,
-        "sl_mul": 1.0,
-        "tp_mul": 4.174096295755905,
-        "use_rsi_filter": true,
-        "use_vwap_filter": false
-      }
-    }
-  },
-  "pm_active": true,
-  "last_update": "2026-02-24T06:54:51.939896"
+  "positions": {},
+  "pm_active": false,
+  "last_update": "2026-02-24T06:54:54.033302"
 }
