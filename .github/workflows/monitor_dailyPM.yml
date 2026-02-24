@@ -46,26 +46,16 @@ jobs:
       - name: Run Monitor
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # PMセッション: 10:30 JST起動 → 12:30まで待機 → 15:10に自己終了
-          # スケジューラが2時間遅延しても 12:30 JSTから監視開始可能
+          SESSION_TYPE: 'PM'
           MONITOR_START_TIME: '12:30'
-          FORCE_CLOSE_TIME: '14:50'
+          ENTRY_CUTOFF_TIME: '14:30'
+          FORCE_CLOSE_TIME: '14:55'
           MONITOR_END_TIME: '15:10'
-          # 後場終了時に1日分の取引サマリーをDiscordに送信
           SKIP_DAILY_SUMMARY: 'false'
           MAX_RUNTIME_MINUTES: '300'
-          # ③ 後場エントリーカットオフ: 14:00以降は新規エントリーしない（大引け前を回避）
-          ENTRY_CUTOFF_TIME: '14:00'
-        # 10:30〜15:10 = 最大310分のタイムアウト（余裕を持たせる）
+        # 10:30〜15:10 = 最大280分、余裕を持たせる
         timeout-minutes: 310
         run: python monitor.py
-
-      - name: Clear positions.json
-        if: always()
-        run: |
-          # 15:00終了時にポジションデータを消去
-          echo '{}' > positions.json
-          echo "positions.json cleared."
 
       - name: Commit and Push trade records
         if: always()
