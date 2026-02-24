@@ -19,25 +19,37 @@ from utils import safe_get, check_trend_filter, check_divergence
 logger = logging.getLogger(__name__)
 
 def calculate_single_score(row: pd.Series, params: Dict, side: str, div_res: Dict = None) -> Tuple[float, Dict]:
-    """1行分のスコア算出と指標の記録 (ボーナス込み)"""
+    """1行分のスコア算出 (多段階評価で最適化を促進)"""
     score = 0.0
     rsi = safe_get(row, 'rsi_14', 50)
     vwap_dev = safe_get(row, 'vwap_dev', 0)
     rvol = safe_get(row, 'rvol', 1.0)
     adx = safe_get(row, 'adx_14', 0)
     
-    # 1. 基礎スコア
+    # 1. 基礎スコア (段階的加点)
     if side == 'long':
-        if rsi < 40: score += params['w_rsi'] * 1.2
-        if vwap_dev < -0.5: score += params['w_vwap'] * 1.2
-    else:
-        if rsi > 60: score += params['w_rsi'] * 1.2
-        if vwap_dev > 0.5: score += params['w_vwap'] * 1.2
+        if rsi < 30: score += params['w_rsi'] * 1.5
+        elif rsi < 45: score += params['w_rsi'] * 1.0
         
-    if rvol > 1.8: score += params['w_rvol'] * 2.5
-    if adx > 25: score += params['w_adx'] * 2.0
+        if vwap_dev < -1.5: score += params['w_vwap'] * 1.5
+        elif vwap_dev < -0.3: score += params['w_vwap'] * 1.0
+    else:
+        if rsi > 70: score += params['w_rsi'] * 1.5
+        elif rsi > 55: score += params['w_rsi'] * 1.0
+        
+        if vwap_dev > 1.5: score += params['w_vwap'] * 1.5
+        elif vwap_dev > 0.3: score += params['w_vwap'] * 1.0
+        
+    # ボリューム評価
+    if rvol > 2.5: score += params['w_rvol'] * 2.0
+    elif rvol > 1.5: score += params['w_rvol'] * 1.0
+    elif rvol > 1.1: score += params['w_rvol'] * 0.5
     
-    # 2. ボーナススコア (Monitorと同一ロジック)
+    # トレンド強度
+    if adx > 35: score += params['w_adx'] * 1.5
+    elif adx > 20: score += params['w_adx'] * 1.0
+    
+    # 2. ボーナススコア (Monitorと同期)
     vol_accel_bonus = 0.0
     div_bonus = 0.0
     
@@ -137,11 +149,13 @@ def get_random_params() -> Dict:
         'w_vwap': random.randint(r['w_vwap'][0], r['w_vwap'][1]),
         'w_rvol': random.randint(r['w_rvol'][0], r['w_rvol'][1]),
         'w_adx': random.randint(r['w_adx'][0], r['w_adx'][1]),
-        'threshold': random.randint(r['threshold'][0], r['threshold'][1]),
+        # 閾値を低めに開始して取引を発生させる (探索範囲の下限付近から)
+        'threshold': random.randint(r['threshold'][0], r['threshold'][0] + 40),
         'sl_mul': random.uniform(r['sl_mul'][0], r['sl_mul'][1]),
         'tp_mul': random.uniform(r['tp_mul'][0], r['tp_mul'][1]),
-        'use_rsi_filter': random.choice([True, False]),
-        'use_vwap_filter': random.choice([True, False])
+        # フィルタは最初はオフ寄りにする
+        'use_rsi_filter': random.random() > 0.7,
+        'use_vwap_filter': random.random() > 0.7
     }
 
 def mutate_params(p: Dict) -> Dict:
@@ -149,25 +163,33 @@ def mutate_params(p: Dict) -> Dict:
     key = random.choice(['w_rsi', 'w_vwap', 'w_rvol', 'w_adx', 'threshold', 'sl_mul', 'tp_mul'])
     r = PARAM_RANGES
     if key in ['sl_mul', 'tp_mul']:
-        new_p[key] = max(r[key][0], min(r[key][1], new_p[key] + random.uniform(-0.2, 0.2)))
+        new_p[key] = max(r[key][0], min(r[key][1], new_p[key] + random.uniform(-0.3, 0.3)))
     else:
-        new_p[key] = max(r[key][0], min(r[key][1], new_p[key] + random.randint(-3, 3)))
+        new_p[key] = max(r[key][0], min(r[key][1], new_p[key] + random.randint(-10, 10)))
+    
+    # フィルタ設定もたまに反転させる
+    if random.random() < 0.1:
+        f_key = random.choice(['use_rsi_filter', 'use_vwap_filter'])
+        new_p[f_key] = not new_p[f_key]
     return new_p
 
 def optimize_parameters(df: pd.DataFrame, df_15m: pd.DataFrame, side: str, 
                         iterations: int = 500, precise_check: int = 20) -> Dict:
     candidates = []
-    for _ in range(int(iterations * 0.4)):
+    # 1. 初期探索 (30%の試行で多様な種を生成)
+    for _ in range(int(iterations * 0.3)):
         p = get_random_params()
         res = run_precise_backtest(df, df_15m, p, side)
         candidates.append({'params': p, **res})
     
-    top_elite = sorted([c for c in candidates if c['trade_count'] >= 2], key=lambda x: x['fitness'], reverse=True)[:5]
+    # 2. 進化 (取引が1回以上あるものを優先)
+    top_elite = sorted([c for c in candidates if c['trade_count'] >= 1], key=lambda x: x['fitness'], reverse=True)[:10]
     if not top_elite: 
-        top_elite = sorted(candidates, key=lambda x: x['profit'], reverse=True)[:5]
+        top_elite = sorted(candidates, key=lambda x: x['profit'], reverse=True)[:10]
     
     if top_elite:
-        for _ in range(int(iterations * 0.6)):
+        # 70%の試行を進化に割り当てる
+        for _ in range(int(iterations * 0.7)):
             parent = random.choice(top_elite)
             p = mutate_params(parent['params'])
             res = run_precise_backtest(df, df_15m, p, side)

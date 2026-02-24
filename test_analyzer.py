@@ -96,6 +96,7 @@ def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict
 def run_test_session(elite: List[Dict], period: str, count: int, label: str, hurdle: float):
     print(f"\n🔬 {label} 解析中 (ハードル: {hurdle}%)")
     results = []
+    max_p = -999.0
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         futures = {executor.submit(worker_analyze_ticker, s, period, hurdle): s for s in elite}
         for f in as_completed(futures):
@@ -103,8 +104,13 @@ def run_test_session(elite: List[Dict], period: str, count: int, label: str, hur
             if res:
                 res['logic_type'] = label
                 results.append(res)
+                max_p = max(max_p, res['profit'])
                 print(f"   ✅ {res['t']} 完了 (有効利益: {res['profit']:.2f}%)")
-    return sorted(results, key=lambda x: x['profit'], reverse=True)[:count]
+    
+    final_res = sorted(results, key=lambda x: x['profit'], reverse=True)[:count]
+    if not final_res:
+        print(f"   ⚠️ ハードル達成銘柄なし (最高利益: {max_p:.2f}%)")
+    return final_res
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -153,6 +159,7 @@ def main():
     elite = sorted(elite, key=lambda x: x['atr_pct'], reverse=True)
     print(f"   -> フィルタ通過: {len(elite)} / {len(TEST_TICKERS)}")
 
+    # Monthly / Weekly 解析 (固定ハードル遵守)
     long_res = run_test_session(elite, '1mo', 7, "Monthly", TARGET_PROFIT['Monthly'])
     short_res = run_test_session(elite, '1wk', 3, "Weekly", TARGET_PROFIT['Weekly'])
     

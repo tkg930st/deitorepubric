@@ -141,13 +141,16 @@ def main():
     all_tickers = sector_df['ticker'].tolist()
     elite = select_high_volatility_stocks(all_tickers, sector_df, count=CANDIDATE_COUNT)
     
-    # Monthly / Weekly 解析
+    # Monthly / Weekly 解析 (固定ハードル遵守)
     long_res = run_session(elite, '1mo', 7, "Monthly", TARGET_PROFIT['Monthly'])
     short_res = run_session(elite, '1wk', 3, "Weekly", TARGET_PROFIT['Weekly'])
     
     combined = long_res + short_res
     if not combined:
-        print("❌ 条件を満たす銘柄が見つかりませんでした。"); return
+        msg = "❌ 条件を満たす銘柄が見つかりませんでした。"
+        print(msg); logger.error(msg)
+        send_discord_notification(WEBHOOK_URL, f"⚠️ **解析失敗**: {msg}")
+        return
 
     best_config = {'timestamp': datetime.now().isoformat(), 'version': '15.15', 'details': combined}
     with open(OUTPUT_CONFIG, 'w', encoding='utf-8') as f:

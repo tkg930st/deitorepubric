@@ -31,13 +31,13 @@ SLIPPAGE = 0.001  # 往復のスリッページ（0.1%）
 
 # パラメータ探索範囲
 PARAM_RANGES = {
-    'w_rsi': (10, 35),
-    'w_vwap': (10, 35),
-    'w_rvol': (10, 35),
-    'w_adx': (10, 35),
-    'threshold': (30, 75),
-    'sl_mul': (0.8, 2.2),
-    'tp_mul': (2.0, 5.0)
+    'w_rsi': (0, 100),
+    'w_vwap': (0, 100),
+    'w_rvol': (0, 100),
+    'w_adx': (0, 100),
+    'threshold': (10, 200),
+    'sl_mul': (0.3, 4.0),
+    'tp_mul': (1.0, 10.0)
 }
 
 # トレンドフィルター設定
@@ -90,8 +90,13 @@ TARGET_PROFIT = {
     'Weekly': 3.0
 }
 
-# 取引時間設定 (JST) - Monitorセッションで使用
+# 取引時間設定 (JST)
 TRADING_HOURS = {
+    'morning_start': '09:30',
+    'morning_end': '11:30',
+    'afternoon_start': '12:30',
+    'afternoon_end': '15:00',
+    'avoid_close_minutes': 5,
     'start': '09:30',
     'end': '15:10',
     'am_cutoff': '10:30',
