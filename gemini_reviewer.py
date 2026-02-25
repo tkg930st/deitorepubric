@@ -13,6 +13,7 @@ gemini_reviewer.py - Gemini AIによる自動戦略レビュー・改善提案�
 """
 import os
 import sys
+import time
 from datetime import datetime
 import pytz
 from google import genai
@@ -21,6 +22,8 @@ from pathlib import Path
 # ─── 設定 ─────────────────────────────────────────
 MAX_TOTAL_CHARS = 400_000        # プロンプト全体の文字数上限（Gemini 2.0 Flash対応）
 CSV_MAX_ROWS = 50                # CSVファイルは直近N行のみ送信
+MAX_RETRIES = 3                  # APIリトライ回数
+RETRY_DELAY_BASE = 10            # リトライ待機時間のベース（秒）
 
 # 設計ドキュメント（運用監査の基準）
 DOC_FILES = [
@@ -196,17 +199,24 @@ def main():
 
     prompt = build_prompt(content)
 
-    try:
-        print("[INFO] Gemini API にリクエスト送信中...", file=sys.stderr)
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
-        )
-        # 分析結果を stdout に出力（workflow で review_result.txt にリダイレクト）
-        print(response.text)
-    except Exception as e:
-        print(f"Gemini API エラー: {e}", file=sys.stderr)
-        sys.exit(1)
+    for attempt in range(MAX_RETRIES):
+        try:
+            print(f"[INFO] Gemini API にリクエスト送信中... (試行 {attempt + 1}/{MAX_RETRIES})", file=sys.stderr)
+            response = client.models.generate_content(
+                model="gemini-3.1-pro-preview",
+                contents=prompt
+            )
+            # 分析結果を stdout に出力（workflow で review_result.txt にリダイレクト）
+            print(response.text)
+            return  # 成功したら終了
+        except Exception as e:
+            if "429" in str(e) and attempt < MAX_RETRIES - 1:
+                wait_time = RETRY_DELAY_BASE * (2 ** attempt)
+                print(f"[WARN] レート制限(429)を検知。{wait_time}秒後に再試行します: {e}", file=sys.stderr)
+                time.sleep(wait_time)
+            else:
+                print(f"Gemini API エラー: {e}", file=sys.stderr)
+                sys.exit(1)
 
 
 if __name__ == "__main__":
