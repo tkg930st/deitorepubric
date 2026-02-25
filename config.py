@@ -27,7 +27,7 @@ MIN_SCORE_THRESHOLD = 60.0  # スコア閾値の下限ガード
 OPTIMIZATION_ITERATIONS = 500  # パラメータ最適化試行回数
 PRECISE_CHECK_COUNT = 20       # 精密検証を行う上位数
 MIN_DATA_POINTS = 40  # 必要な最小データポイント数
-SLIPPAGE = 0.001  # 往復のスリッページ（0.1%）
+SLIPPAGE = 0.003  # 往復のスリッページ（0.3%）
 
 # パラメータ探索範囲
 PARAM_RANGES = {
@@ -109,7 +109,7 @@ DATA_FETCH = {
     'analyzer_period': '1mo',
     'analyzer_interval': '15m',
     'monitor_period': '5d',
-    'monitor_interval': '5m',
+    'monitor_interval': '1m',
     'chunk_size': 30,
     'request_delay': 2.0,
     'max_retries': 3,
@@ -182,7 +182,7 @@ MONITORING_LOOP = {
     'start_time': '09:30',
     'judgment_time': '09:15',
     'end_time': '15:00',
-    'loop_interval': 60,
+    'loop_interval': 30,
     'use_confirmed_candle': True,
     'am_entry_cutoff': '10:30',
     'pm_entry_cutoff': '14:30',

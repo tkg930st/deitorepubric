@@ -184,19 +184,37 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             
         score = 0.0
         current_div_bonus = 0.0
+        
+        # 1. 基礎スコア (backtest_engine.py と垂直同期)
         if side == 'long':
-            if rsi_val < 40: score += params['w_rsi'] * 1.2
-            if vwap_dev < -0.5: score += params['w_vwap'] * 1.2
+            if rsi_val < 30: score += params['w_rsi'] * 1.5
+            elif rsi_val < 45: score += params['w_rsi'] * 1.0
+            
+            if vwap_dev < -1.5: score += params['w_vwap'] * 1.5
+            elif vwap_dev < -0.3: score += params['w_vwap'] * 1.0
+            
             if div_res['bullish'] or div_res['reverse_bullish']:
                 current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
         else:
-            if rsi_val > 60: score += params['w_rsi'] * 1.2
-            if vwap_dev > 0.5: score += params['w_vwap'] * 1.2
+            if rsi_val > 70: score += params['w_rsi'] * 1.5
+            elif rsi_val > 55: score += params['w_rsi'] * 1.0
+            
+            if vwap_dev > 1.5: score += params['w_vwap'] * 1.5
+            elif vwap_dev > 0.3: score += params['w_vwap'] * 1.0
+            
             if div_res['bearish'] or div_res['reverse_bearish']:
                 current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
 
-        if safe_get(row, 'rvol', 1.0) > 1.8: score += params['w_rvol'] * 2.5
-        if safe_get(row, 'adx_14', 0) > 25: score += params['w_adx'] * 2.0
+        # ボリューム評価 (段階的)
+        rvol_val = safe_get(row, 'rvol', 1.0)
+        if rvol_val > 2.5: score += params['w_rvol'] * 2.0
+        elif rvol_val > 1.5: score += params['w_rvol'] * 1.0
+        elif rvol_val > 1.1: score += params['w_rvol'] * 0.5
+        
+        # トレンド強度 (段階的)
+        adx_val = safe_get(row, 'adx_14', 0)
+        if adx_val > 35: score += params['w_adx'] * 1.5
+        elif adx_val > 20: score += params['w_adx'] * 1.0
         
         # 合計スコア
         total_score = score + vol_accel_bonus + current_div_bonus
@@ -424,30 +442,47 @@ def monitor():
                     send_discord_notification(WEBHOOK_URL, "🔄 **前場監視終了 (後場へ引き継ぎ)**")
                     break
 
-            # 4. 監視メインロジック
+            # 4. 監視メインロジック (ハイブリッド1m/5m方式)
             try:
+                # 1分足データを取得 (トリガー用)
                 raw_data = fetch_yfinance_data(
                     tickers, 
                     period=DATA_FETCH['monitor_period'], 
                     interval=DATA_FETCH['monitor_interval']
                 )
                 for ticker in tickers:
-                    ticker_data = raw_data[ticker] if len(tickers) > 1 else raw_data
-                    df = super_flatten_columns(ticker_data)
-                    if df.empty: continue
+                    ticker_data_1m = raw_data[ticker] if len(tickers) > 1 else raw_data
+                    df_1m = super_flatten_columns(ticker_data_1m)
+                    if df_1m.empty: continue
                     
-                    df = calculate_technical_indicators(df)
-                    df['ma_15m_20'] = calculate_ma_from_higher_timeframe(df, 20)
+                    # 1分足から5分足へリサンプル (テクニカル指標計算用)
+                    df_5m = df_1m.resample('5min').agg({
+                        'open': 'first', 'high': 'max', 'low': 'min', 'close': 'last', 'volume': 'sum'
+                    }).dropna()
                     
-                    check_structure_signal(ticker, df)
+                    if df_5m.empty: continue
+                    
+                    # 指標計算は5分足ベース
+                    df_5m_inds = calculate_technical_indicators(df_5m)
+                    df_5m_inds['ma_15m_20'] = calculate_ma_from_higher_timeframe(df_1m, 20) # 15mは1mから計算可能
+                    
+                    # 最新価格は1分足の終値を使用
+                    latest_price_1m = df_1m['close'].iloc[-1]
+                    
+                    # シグナル判定
+                    check_structure_signal(ticker, df_5m_inds)
                     if position_manager.has_position(ticker):
-                        monitor_positions(ticker, df['close'].iloc[-1])
+                        monitor_positions(ticker, latest_price_1m)
                     else:
-                        check_new_signal(ticker, df, details[ticker])
+                        # 判定関数に最新の1分足価格を考慮させるためにdfを微調整
+                        # (closeだけ最新1分足に差し替えた行を判定に使う)
+                        check_df = df_5m_inds.copy()
+                        check_df.loc[check_df.index[-1], 'close'] = latest_price_1m
+                        check_new_signal(ticker, check_df, details[ticker])
             except Exception as e:
                 logger.error(f"Loop error: {e}")
             
-            time.sleep(60)
+            time.sleep(MONITORING_LOOP['loop_interval'])
     except KeyboardInterrupt:
         pass
     finally:
