@@ -6,6 +6,8 @@
 ### 1.1 コンポーネント構成
 * **Analyzer**: `analyzer.py`, `backtest_engine.py` (Monthly/Weekly 独立解析)
 * **Monitor**: `monitor.py`, `position_manager.py` (実機執行)
+    * **ハイブリッド判定**: 1分足でエントリートリガーを引きつつ、5分足リサンプルデータでテクニカル指標を計算する。
+    * **高頻度監視**: 30秒間隔のメインループで動作し、リアルタイム性を確保する。
 * **Session Handler**: `positions.json` を介した AM/PM 連携。
 
 ### 1.2 AM/PM ハンドオーバー設計
@@ -40,7 +42,7 @@
 2. **ADX (Average Directional Index)**
    - $TR = \max(High - Low, |High - Close_{prev}|, |Low - Close_{prev}|)$
    - $+DM = \text{if } (High - High_{prev} > Low_{prev} - Low) \text{ and } (High - High_{prev} > 0) \text{ then } (High - High_{prev}) \text{ else } 0$
-   - $-DM = \text{if } (Low_{prev} - Low > High - High_{prev}) \text{ and } (Low_{prev} - Low > 0) \text{ then } (Low_{prev} - Low) \text{ else } 0$
+   - $-DM = \text{if } (Low_{prev} - Low > High - High_{prev} ) \text{ and } (Low_{prev} - Low > 0) \text{ then } (Low_{prev} - Low) \text{ else } 0$
    - $DI = 100 \times \frac{EMA(DM, 14)}{EMA(TR, 14)}$
    - $DX = 100 \times \frac{|+DI - -DI|}{+DI + -DI}$
    - $ADX = EMA(DX, 14)$
@@ -54,7 +56,18 @@
    - $ATR = EMA(TR, 14)$
    - ※ $EMA$ は $\alpha = 1/14$ を使用。
 
+5. **多段階スコアリングロジック (Multi-tiered Scoring)**
+   - 指標の強さに応じた段階的な加点により、最適化の精度を向上させる。
+   - **RSI**: 境界値（買い 30/45, 売り 70/55）に基づき 1.0倍〜1.5倍の重みを加算。
+   - **VWAP乖離**: 乖離率（0.3% / 1.5%）に基づき段階的に加算。
+   - **Rvol**: 出来高倍率（1.1 / 1.5 / 2.5）に基づき 0.5倍〜2.0倍の重みを加算。
+   - **ADX**: トレンド強度（20 / 35）に基づき 1.0倍〜1.5倍の重みを加算。
+
 ## 5. リスク管理設計
+* **戦略最適化エンジン (GA)**:
+    - 探索範囲を大幅に拡張（重み 0-100, 閾値上限 200）し、ボーナス加点を考慮した広域探索を行う。
+    - 1世代あたりの多様性を確保するため、フィルタ設定（RSI/VWAP）の有無も進化の対象に含める。
+* **スリッページ適用**: 往復合計 **0.3%** を全シミュレーションおよび実機判定のコストとして算入。
 * **TP2トレーリングストップ**: TP1到達後、直近の高値（買い）/安値（売り）からATRの一定倍率（trailing_atr_multiplier）を引いた価格で逆指値を動的に更新する。
 * **ボラティリティ比例型損切り**: ATRに基づく動的SL。
 * **重複エントリー防止**: 当日既に損切り/利確が完了した銘柄への再エントリーをブロック。
