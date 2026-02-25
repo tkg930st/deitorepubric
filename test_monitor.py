@@ -100,7 +100,7 @@ def run_integration_test():
         monitor.SESSION_TYPE = "AM"
         monitor.MONITOR_START_TIME = "09:30"
         monitor.MONITOR_END_TIME = "11:40"
-        monitor.ENTRY_CUTOFF_TIME = "10:30"
+        monitor.ENTRY_CUTOFF_TIME = "11:30"
         
         logger.info(f"AM Setup: Start={monitor.MONITOR_START_TIME}, End={monitor.MONITOR_END_TIME}, Cutoff={monitor.ENTRY_CUTOFF_TIME}")
         print(f"   ✅ AMセッション設定完了: Cutoff={monitor.ENTRY_CUTOFF_TIME}")

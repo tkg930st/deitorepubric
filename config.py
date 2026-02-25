@@ -99,7 +99,7 @@ TRADING_HOURS = {
     'avoid_close_minutes': 5,
     'start': '09:30',
     'end': '15:10',
-    'am_cutoff': '10:30',
+    'am_cutoff': '11:30',
     'pm_cutoff': '14:30',
     'force_close': '14:55'
 }
@@ -184,7 +184,7 @@ MONITORING_LOOP = {
     'end_time': '15:00',
     'loop_interval': 30,
     'use_confirmed_candle': True,
-    'am_entry_cutoff': '10:30',
+    'am_entry_cutoff': '11:30',
     'pm_entry_cutoff': '14:30',
     'min_rr_ratio': 1.5,
 }

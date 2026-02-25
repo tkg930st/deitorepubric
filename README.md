@@ -60,7 +60,7 @@ Gemini CLI（AIエージェント）を開発パートナーとし、バック�
    ```
 3. **市場監視の自動実行 (GitHub Actions)**:
    - **AMセッション**: 08:00 起動 → 09:30 監視開始 → 後場起動で終了。
-   - **PMセッション**: 10:30 起動 → 12:30 監視開始 → 15:10 終了。
+   - **PMセッション**: 10:00 起動 → 12:30 監視開始 → 15:10 終了。
 
 ---
 *This project is autonomously maintained and improved with the help of Gemini CLI.*
