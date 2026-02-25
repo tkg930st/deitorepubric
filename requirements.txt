@@ -6,10 +6,7 @@ pytz
 python-dotenv
 xlrd
 holidays
-pandas-ta
 google-genai
-numba
-llvmlite
 curl_cffi
 frozendict
 beautifulsoup4

@@ -24,13 +24,7 @@ from utils import (
     calculate_technical_indicators, filter_trading_hours
 )
 from backtest_engine import optimize_parameters
-
-# analyzer.py から共有すべき関数
-def get_rival_tickers(ticker: str, sector: str, sector_df: pd.DataFrame, count: int = 5) -> List[str]:
-    """同一セクターからライバル銘柄を抽出"""
-    rivals = sector_df[sector_df['sector'] == sector]['ticker'].tolist()
-    rivals = [r for r in rivals if r != ticker]
-    return rivals[:count]
+from analyzer import get_rival_tickers
 
 # 検証用銘柄
 TEST_TICKERS = [
