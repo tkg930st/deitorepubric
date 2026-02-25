@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-02-25T00:00:00.000000",
+  "version": "15.15-TEST",
+  "details": [
+    {
+      "t": "3103.T",
+      "profit": 239.38,
+      "long_profit": 239.38,
+      "short_profit": 0.0,
+      "raw_long_profit": 239.38,
+      "raw_short_profit": -13.95,
+      "long_disabled": false,
+      "short_disabled": true,
+      "atr_pct": 18.07,
+      "sector": "繊維製品",
+      "size_category": "TOPIX Small 2",
+      "rivals": ["3001.T", "3002.T", "3104.T", "3106.T", "3109.T"],
+      "params": {
+        "long": {
+          "w_rsi": 100, "w_vwap": 81, "w_rvol": 31, "w_adx": 81,
+          "threshold": 41, "sl_mul": 0.3, "tp_mul": 6.28,
+          "use_rsi_filter": false, "use_vwap_filter": false
+        },
+        "short": {
+          "w_rsi": 18, "w_vwap": 72, "w_rvol": 19, "w_adx": 14,
+          "threshold": 49, "sl_mul": 0.3, "tp_mul": 4.61,
+          "use_rsi_filter": false, "use_vwap_filter": true
+        }
+      },
+      "logic_type": "Monthly"
+    }
+  ]
+}
