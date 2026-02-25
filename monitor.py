@@ -22,7 +22,8 @@ import pandas as pd
 
 from config import (
     WEBHOOK_URL, LOG_FILE, LOG_LEVEL, OUTPUT_CONFIG, DATA_FETCH,
-    MONITORING_LOOP, TREND_FILTER, POSITION_MANAGEMENT, SIGNAL_THRESHOLDS
+    MONITORING_LOOP, TREND_FILTER, POSITION_MANAGEMENT, SIGNAL_THRESHOLDS,
+    RISK_MANAGEMENT, SECTOR_ALIGNMENT, DIVERGENCE
 )
 from utils import (
     super_flatten_columns, fetch_yfinance_data,
@@ -162,7 +163,6 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
     adj = current_macro_adjustments
     
     # ボーナススコアの算出
-    from config import SECTOR_ALIGNMENT, DIVERGENCE
     vol_accel_bonus = 0.0
     if SECTOR_ALIGNMENT['enabled']:
         rvol = safe_get(row, 'rvol', 1.0)
