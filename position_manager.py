@@ -143,6 +143,11 @@ class PositionManager:
             if (side == 'LONG' and current_price >= pos['tp1']) or \
                (side == 'SHORT' and current_price <= pos['tp1']):
                 pos['tp1_hit'] = True
+                # TP1到達時の利益を記録
+                if side == 'LONG':
+                    pos['tp1_profit'] = ((current_price / pos['entry_price']) - 1) * 100
+                else:
+                    pos['tp1_profit'] = (1 - (current_price / pos['entry_price'])) * 100
                 # リスク低減 (建値付近へ)
                 if side == 'LONG':
                     pos['trailing_sl'] = max(pos['trailing_sl'], pos['entry_price'] - (atr * 0.2))

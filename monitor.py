@@ -29,7 +29,7 @@ from utils import (
     super_flatten_columns, fetch_yfinance_data,
     calculate_technical_indicators, calculate_ma_from_higher_timeframe,
     send_discord_notification, detect_market_structure, check_trend_filter,
-    safe_get, fetch_macro_sentiment
+    safe_get, fetch_macro_sentiment, check_divergence
 )
 from position_manager import PositionManager
 
@@ -133,15 +133,15 @@ def check_structure_signal(ticker: str, df: pd.DataFrame):
             last_structure_signals[ticker] = sig_key
 
 def get_today_closed_tickers() -> Set[str]:
-    """本日既に決済された銘柄を取得"""
+    """本日既に決済された銘柄を取得 (JST基準)"""
     results_file = 'trade_results.csv'
     if not os.path.exists(results_file): return set()
     try:
         df = pd.read_csv(results_file)
         if df.empty: return set()
-        df['exit_time'] = pd.to_datetime(df['exit_time'])
-        today = datetime.now().date()
-        return set(df[df['exit_time'].dt.date == today]['ticker'].unique())
+        df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True)
+        today = datetime.now(pytz.timezone('Asia/Tokyo')).date()
+        return set(df[df['exit_time'].dt.tz_convert('Asia/Tokyo').dt.date == today]['ticker'].unique())
     except Exception: return set()
 
 def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
@@ -297,11 +297,11 @@ def send_daily_summary():
     try:
         df = pd.read_csv(results_file)
         # 不正な日付や数値をクレンジング
-        df['exit_time'] = pd.to_datetime(df['exit_time'], errors='coerce')
+        df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True, errors='coerce')
         df = df.dropna(subset=['exit_time'])
-        
-        today = datetime.now().date()
-        df_today = df[df['exit_time'].dt.date == today].copy()
+
+        today = datetime.now(pytz.timezone('Asia/Tokyo')).date()
+        df_today = df[df['exit_time'].dt.tz_convert('Asia/Tokyo').dt.date == today].copy()
         if df_today.empty: return
         
         df_today['total_profit'] = pd.to_numeric(df_today['total_profit'], errors='coerce')
@@ -320,14 +320,14 @@ def send_daily_summary():
     except Exception as e: logger.error(f"Summary error: {e}")
 
 def get_today_total_profit() -> float:
-    """本日の累計損益を計算"""
+    """本日の累計損益を計算 (JST基準)"""
     results_file = POSITION_MANAGEMENT['trade_results_file']
     if not os.path.exists(results_file): return 0.0
     try:
         df = pd.read_csv(results_file)
-        df['exit_time'] = pd.to_datetime(df['exit_time'], errors='coerce')
-        today = datetime.now().date()
-        df_today = df[df['exit_time'].dt.date == today]
+        df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True, errors='coerce')
+        today = datetime.now(pytz.timezone('Asia/Tokyo')).date()
+        df_today = df[df['exit_time'].dt.tz_convert('Asia/Tokyo').dt.date == today]
         if df_today.empty: return 0.0
         return pd.to_numeric(df_today['total_profit'], errors='coerce').sum()
     except Exception as e:
@@ -397,20 +397,18 @@ def monitor():
                 break
 
             # 3. 終了・強制決済判定
-            # 3a. 強制決済 (14:55など)
-            if now_jst >= dt_time.fromisoformat(FORCE_CLOSE_TIME):
+            # 3a. 強制決済 (14:55など) - ポジションがある場合のみ実行
+            if now_jst >= dt_time.fromisoformat(FORCE_CLOSE_TIME) and position_manager.positions:
                 raw_data = fetch_yfinance_data(tickers, period='1d', interval=DATA_FETCH['monitor_interval'])
                 prices = {}
                 for t in tickers:
                     df_raw = raw_data[t] if len(tickers)>1 else raw_data
                     df_flat = super_flatten_columns(df_raw)
                     if not df_flat.empty: prices[t] = df_flat['close'].iloc[-1]
-                
+
                 results = position_manager.force_close_all(prices, '時間切れ強制決済')
                 for r in results:
                     send_discord_notification(WEBHOOK_URL, f"🛑 **[EXIT] {r['ticker']}**\n理由：時間切れ強制決済\n損益：{r['profit_pct']:+.2f}% ({r['logic_type']})")
-                
-                # 強制決済後はループを継続し、MONITOR_END_TIME で終了
             
             # 3b. セッション終了判定
             if now_jst >= dt_time.fromisoformat(MONITOR_END_TIME):

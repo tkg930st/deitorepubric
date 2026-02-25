@@ -131,13 +131,15 @@ def send_discord_notification(webhook_url: str, message: str) -> bool:
             current_chunk = ""
             for line in lines:
                 if len(current_chunk) + len(line) + 1 > MAX_LEN:
-                    requests.post(webhook_url, json={"content": current_chunk}, timeout=10)
+                    res = requests.post(webhook_url, json={"content": current_chunk}, timeout=10)
+                    res.raise_for_status()
                     time.sleep(1.0) # レート制限回避
                     current_chunk = line + '\n'
                 else:
                     current_chunk += line + '\n'
             if current_chunk:
-                requests.post(webhook_url, json={"content": current_chunk}, timeout=10)
+                res = requests.post(webhook_url, json={"content": current_chunk}, timeout=10)
+                res.raise_for_status()
         return True
     except Exception as e:
         logger.error(f"Discord通知送信エラー: {str(e)}")
@@ -161,12 +163,12 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         rs = avg_gain / (avg_loss + 1e-10)
         df['rsi_14'] = 100 - (100 / (1 + rs))
         
-        # ATR
+        # ATR (Wilder's EMA: α=1/14)
         high_low = df['high'] - df['low']
         high_cp = np.abs(df['high'] - df['close'].shift())
         low_cp = np.abs(df['low'] - df['close'].shift())
         tr = pd.concat([high_low, high_cp, low_cp], axis=1).max(axis=1)
-        df['atr_14'] = tr.rolling(window=14).mean()
+        df['atr_14'] = tr.ewm(alpha=1/14, min_periods=14, adjust=False).mean()
         
         # VWAP (日次リセット版)
         v = df['volume']
@@ -178,16 +180,18 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         df['vwap_dev'] = ((df['close'] - df['vwap']) / (df['vwap'] + 1e-10)) * 100
         df.drop(columns=['date_group'], inplace=True)
         
-        # ADX (Wilder方式)
+        # ADX (Wilder方式: ATR_EMAと同じスムージングを使用)
         up_move = df['high'].diff()
         down_move = -df['low'].diff()
-        
+
         plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
         minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
-        
-        # 指数移動平均 (Wilder's RMA) を使用
-        plus_di = 100 * (pd.Series(plus_dm, index=df.index).ewm(alpha=1/14, adjust=False).mean() / (df['atr_14'] + 1e-10))
-        minus_di = 100 * (pd.Series(minus_dm, index=df.index).ewm(alpha=1/14, adjust=False).mean() / (df['atr_14'] + 1e-10))
+
+        # DI = EMA(DM, 14) / ATR(EMA版)  ※ATRは既にEMAで計算済み
+        smoothed_plus_dm = pd.Series(plus_dm, index=df.index).ewm(alpha=1/14, min_periods=14, adjust=False).mean()
+        smoothed_minus_dm = pd.Series(minus_dm, index=df.index).ewm(alpha=1/14, min_periods=14, adjust=False).mean()
+        plus_di = 100 * (smoothed_plus_dm / (df['atr_14'] + 1e-10))
+        minus_di = 100 * (smoothed_minus_dm / (df['atr_14'] + 1e-10))
         
         dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-10)
         df['adx_14'] = dx.ewm(alpha=1/14, adjust=False).mean()
@@ -212,7 +216,7 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
 def safe_get(row: pd.Series, key: str, default: Any = 0) -> Any:
     try: return row.get(key, default)
-    except: return default
+    except Exception: return default
 
 
 def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
@@ -223,20 +227,37 @@ def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
     try:
         recent = df.iloc[-lookback:].copy()
         if 'rsi_14' not in recent.columns or 'close' not in recent.columns: return result
-        p_start, p_end = recent['close'].iloc[0], recent['close'].iloc[-1]
-        r_start, r_end = recent['rsi_14'].iloc[0], recent['rsi_14'].iloc[-1]
-        if pd.isna(p_start) or pd.isna(p_end) or pd.isna(r_start) or pd.isna(r_end): return result
-        p_chg = ((p_end / p_start) - 1) * 100
-        r_chg = r_end - r_start
+        half = len(recent) // 2
+        # 前半・後半の安値/高値を比較して極値ベースの判定を行う
+        first_half = recent.iloc[:half]
+        second_half = recent.iloc[half:]
+        if first_half.empty or second_half.empty: return result
+
+        # 価格とRSIの安値・高値
+        p_low1, p_low2 = first_half['close'].min(), second_half['close'].min()
+        p_high1, p_high2 = first_half['close'].max(), second_half['close'].max()
+        r_at_p_low1 = first_half.loc[first_half['close'].idxmin(), 'rsi_14']
+        r_at_p_low2 = second_half.loc[second_half['close'].idxmin(), 'rsi_14']
+        r_at_p_high1 = first_half.loc[first_half['close'].idxmax(), 'rsi_14']
+        r_at_p_high2 = second_half.loc[second_half['close'].idxmax(), 'rsi_14']
+
+        if any(pd.isna(v) for v in [r_at_p_low1, r_at_p_low2, r_at_p_high1, r_at_p_high2]): return result
+
         rsi_t, prc_t = DIVERGENCE['rsi_threshold'], DIVERGENCE['price_threshold']
+
+        p_low_chg = ((p_low2 / p_low1) - 1) * 100
+        p_high_chg = ((p_high2 / p_high1) - 1) * 100
+        r_low_chg = r_at_p_low2 - r_at_p_low1
+        r_high_chg = r_at_p_high2 - r_at_p_high1
+
         # 通常の強気: 価格安値切り下げ、RSI安値切り上げ
-        if p_chg < -prc_t and r_chg > rsi_t: result['bullish'] = True
+        if p_low_chg < -prc_t and r_low_chg > rsi_t: result['bullish'] = True
         # 通常の弱気: 価格高値切り上げ、RSI高値切り下げ
-        if p_chg > prc_t and r_chg < -rsi_t: result['bearish'] = True
+        if p_high_chg > prc_t and r_high_chg < -rsi_t: result['bearish'] = True
         # 隠れた(リバース)強気: 価格安値切り上げ、RSI安値切り下げ
-        if p_chg > prc_t and r_chg < -rsi_t: result['reverse_bullish'] = True
+        if p_low_chg > prc_t and r_low_chg < -rsi_t: result['reverse_bullish'] = True
         # 隠れた(リバース)弱気: 価格高値切り下げ、RSI高値切り上げ
-        if p_chg < -prc_t and r_chg > rsi_t: result['reverse_bearish'] = True
+        if p_high_chg < -prc_t and r_high_chg > rsi_t: result['reverse_bearish'] = True
     except Exception: pass
     return result
 
