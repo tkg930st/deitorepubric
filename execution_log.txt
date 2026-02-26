@@ -1169,3 +1169,142 @@
 
 2026-02-26 06:10:21,631 - __main__ - ERROR - Summary error: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
 
+2026-02-26 23:18:21,111 - yfinance - ERROR - $^TOPX: possibly delisted; no price data found  (period=5d)
+2026-02-26 23:18:22,302 - __main__ - WARNING - Sector filter error for 3103.T: '3001.T'
+2026-02-26 23:18:22,479 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1592.1, TP1=1638.8
+2026-02-26 23:18:22,503 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:18:22,526 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:18:22,774 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:18:22,820 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:18:22,843 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:18:22,866 - __main__ - WARNING - Sector filter error for 6330.T: '1401.T'
+2026-02-26 23:18:22,866 - __main__ - WARNING - Sector filter error for 6330.T: '1401.T'
+2026-02-26 23:18:23,036 - position_manager - INFO - Position Added: 6330.T (SHORT) SL=3232.4, TP1=3193.4
+2026-02-26 23:18:23,059 - __main__ - INFO - Filter blocked 268A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:18:23,059 - __main__ - WARNING - Sector filter error for 268A.T: '218A.T'
+2026-02-26 23:18:23,279 - position_manager - INFO - Position Added: 268A.T (SHORT) SL=1943.1, TP1=1916.9
+2026-02-26 23:18:53,647 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:18:53,669 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:18:53,692 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:18:53,738 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:18:53,761 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:19:24,089 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:19:24,112 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:19:24,136 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:19:24,182 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:19:24,205 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:19:54,547 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:19:54,569 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:19:54,592 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:19:54,639 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:19:54,662 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:20:25,024 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:20:25,046 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:20:25,069 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:20:25,117 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:20:25,140 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:20:55,476 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:20:55,499 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:20:55,521 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:20:55,568 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:20:55,590 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:21:26,191 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:21:26,214 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:21:26,236 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:21:26,282 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:21:26,305 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:21:56,618 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:21:56,641 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:21:56,664 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:21:56,710 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:21:56,733 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:22:27,105 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:22:27,128 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:22:27,151 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:22:27,198 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:22:27,221 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:22:57,550 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:22:57,573 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:22:57,595 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:22:57,641 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:22:57,664 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:23:28,554 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:23:28,577 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:23:28,600 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:23:28,645 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:23:28,668 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:23:58,988 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:23:59,011 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:23:59,033 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:23:59,080 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:23:59,103 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:24:29,432 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:24:29,455 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:24:29,477 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:24:29,523 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:24:29,546 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:24:59,873 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:24:59,896 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:24:59,919 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:24:59,968 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:24:59,990 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:25:30,360 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:25:30,383 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:25:30,407 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:25:30,452 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:25:30,474 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:26:00,824 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:26:00,847 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:26:00,871 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:26:00,916 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:26:00,939 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:26:31,286 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:26:31,309 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:26:31,333 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:26:31,378 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:26:31,401 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:27:01,742 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:27:01,765 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:27:01,788 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:27:01,833 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:27:01,856 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:27:32,192 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:27:32,215 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:27:32,238 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:27:32,286 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:27:32,308 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:28:02,862 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:28:02,885 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:28:02,908 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:28:02,954 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:28:02,977 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:28:33,589 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:28:33,613 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:28:33,636 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:28:33,681 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:28:33,704 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:29:04,018 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:29:04,041 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:29:04,064 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:29:04,109 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:29:04,132 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:29:34,525 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:29:34,548 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:29:34,570 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:29:34,616 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:29:34,639 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:30:04,955 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:30:04,978 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:30:05,001 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:30:05,047 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:30:05,070 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:30:35,593 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:30:35,616 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:30:35,639 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:30:35,685 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:30:35,708 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
+2026-02-26 23:31:06,589 - __main__ - WARNING - Sector filter error for 7794.T: '1518.T'
+2026-02-26 23:31:06,612 - __main__ - INFO - Filter blocked 6227.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:31:06,635 - __main__ - INFO - Filter blocked 6787.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:31:06,680 - __main__ - INFO - Filter blocked 485A.T (High-Tech): SOX too weak (-3.19%)
+2026-02-26 23:31:06,703 - __main__ - WARNING - Sector filter error for 5706.T: '1491.T'
