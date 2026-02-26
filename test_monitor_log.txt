@@ -1,0 +1,50 @@
+2026-02-26 18:07:46,965 - [TEST] - INFO - Starting Monitor Integration Test (Ver 15.15 Hybrid Logic)
+2026-02-26 18:07:46,969 - [TEST] - INFO - Config Check: SLIPPAGE = 0.003 (OK)
+2026-02-26 18:07:46,970 - [TEST] - INFO - Config Check: PARAM_RANGES = {'w_rsi': (0, 100), 'w_vwap': (0, 100), 'w_rvol': (0, 100), 'w_adx': (0, 100), 'threshold': (10, 200), 'sl_mul': (0.3, 4.0), 'tp_mul': (1.0, 10.0)} (OK)
+2026-02-26 18:07:46,970 - [TEST] - INFO - Config Check: TARGET_PROFIT = {'Monthly': 5.0, 'Weekly': 3.0} (OK)
+2026-02-26 18:07:46,970 - [TEST] - INFO - Config Check: TRADING_HOURS = {'morning_start': '09:30', 'morning_end': '11:30', 'afternoon_start': '12:30', 'afternoon_end': '15:00', 'avoid_close_minutes': 5, 'start': '09:30', 'end': '15:10', 'am_cutoff': '11:30', 'pm_cutoff': '14:30', 'force_close': '14:55'} (OK)
+2026-02-26 18:07:46,970 - [TEST] - INFO - Config Check: RISK_MANAGEMENT = {'daily_stop_loss_pct': -3.0, 'check_interval_loops': 1} (OK)
+2026-02-26 18:07:46,970 - [TEST] - INFO - Config Check: DATA_FETCH = {'analyzer_period': '1mo', 'analyzer_interval': '15m', 'monitor_period': '5d', 'monitor_interval': '1m', 'chunk_size': 30, 'request_delay': 2.0, 'max_retries': 3, 'retry_delay': 2} (OK)
+2026-02-26 18:07:47,267 - [TEST] - INFO - AM Setup: Start=09:30, End=11:40, Cutoff=11:30
+2026-02-26 18:07:47,268 - [TEST] - INFO - PM Setup: Start=12:30, End=15:10, Cutoff=14:30, ForceClose=14:55
+2026-02-26 18:07:47,269 - [TEST] - INFO - Testing with ticker: 3103.T
+2026-02-26 18:07:47,858 - [TEST] - INFO - 1m data fetched: 321 rows. Latest: 2026-02-26 15:25:00+09:00
+2026-02-26 18:07:47,861 - [TEST] - INFO - Resampled to 5m: 66 rows.
+2026-02-26 18:07:47,880 - [TEST] - INFO - Indicator Check (Latest 5m row): RSI=60.43, ADX=21.52
+2026-02-26 18:07:47,880 - [TEST] - INFO - 1m Trigger Check: Latest 1m Price=1607.0
+2026-02-26 18:07:47,881 - [TEST] - INFO - --- DISCORD NOTIFICATION MOCK ---
+🧪 **テスト通知**: 3103.T 解析テスト完了
+---------------------------------
+2026-02-26 18:07:47,881 - [TEST] - INFO - --- TRADE JOURNAL RECORD MOCK ---
+2026-02-26 18:07:47,882 - [TEST] - INFO -   ticker: 3103.T
+2026-02-26 18:07:47,882 - [TEST] - INFO -   side: LONG
+2026-02-26 18:07:47,882 - [TEST] - INFO -   entry_price: 1607.0
+2026-02-26 18:07:47,882 - [TEST] - INFO -   entry_time: 2026-02-26T18:07:47.881820
+2026-02-26 18:07:47,882 - [TEST] - INFO -   score: 85.0
+2026-02-26 18:07:47,882 - [TEST] - INFO -   threshold: 41.0
+2026-02-26 18:07:47,882 - [TEST] - INFO -   rsi: 60.42865484101616
+2026-02-26 18:07:47,882 - [TEST] - INFO -   vwap_dev: 1.7216298081209065
+2026-02-26 18:07:47,882 - [TEST] - INFO - ---------------------------------
+2026-02-26 18:07:47,882 - [TEST] - INFO - --- FILE WRITE MOCK (positions.json) ---
+2026-02-26 18:07:47,882 - [TEST] - INFO -   Description: Update Position State
+2026-02-26 18:07:47,882 - [TEST] - INFO -   Data: {'positions': {'3103.T': {'ticker': '3103.T', 'side': 'LONG', 'entry_price': np.float64(1607.0), 'entry_atr': np.float64(32.14), 'fixed_sl': np.float64(1597.358), 'tp1': np.float64(1655.21), 'tp1_hit': False, 'tp1_profit': 0.0, 'highest_price': np.float64(1607.0), 'lowest_price': np.float64(1607.0), 'trailing_sl': np.float64(1597.358), 'entry_time': '2026-02-26T18:07:47.882659+09:00', 'logic_type': 'Monthly', 'params': {'w_rsi': 100, 'w_vwap': 81, 'w_rvol': 31, 'w_adx': 81, 'threshold': 41, 'sl_mul': 0.3, 'tp_mul': 6.28, 'use_rsi_filter': False, 'use_vwap_filter': False}}}, 'pm_active': None}
+2026-02-26 18:07:47,882 - [TEST] - INFO - ------------------------------------
+2026-02-26 18:07:47,883 - [TEST] - INFO - Position Added: 3103.T (LONG) SL=1597.4, TP1=1655.2
+2026-02-26 18:07:47,883 - [TEST] - INFO - --- FILE WRITE MOCK (trade_results.csv) ---
+2026-02-26 18:07:47,883 - [TEST] - INFO -   Description: Append Trade Result
+2026-02-26 18:07:47,883 - [TEST] - INFO -   Data: {'ticker': '3103.T', 'side': 'LONG', 'entry_price': np.float64(1607.0), 'entry_time': '2026-02-26T18:07:47.882659+09:00', 'exit_price': np.float64(1687.3500000000001), 'exit_time': '2026-02-26T18:07:47.883293+09:00', 'exit_reason': 'テスト決済', 'tp1_hit': False, 'tp1_profit': 0.0, 'final_profit': np.float64(5.000000000000004), 'total_profit': np.float64(5.000000000000004), 'profit_pct': np.float64(5.000000000000004), 'logic_type': 'Monthly'}
+2026-02-26 18:07:47,883 - [TEST] - INFO - ------------------------------------
+2026-02-26 18:07:47,883 - [TEST] - INFO - --- FILE WRITE MOCK (positions.json) ---
+2026-02-26 18:07:47,883 - [TEST] - INFO -   Description: Update Position State
+2026-02-26 18:07:47,883 - [TEST] - INFO -   Data: {'positions': {}, 'pm_active': None}
+2026-02-26 18:07:47,883 - [TEST] - INFO - ------------------------------------
+2026-02-26 18:07:47,884 - [TEST] - INFO - --- FILE WRITE MOCK (positions.json) ---
+2026-02-26 18:07:47,884 - [TEST] - INFO -   Description: Update Position State
+2026-02-26 18:07:47,884 - [TEST] - INFO -   Data: {'positions': {}, 'pm_active': '2026-02-26'}
+2026-02-26 18:07:47,884 - [TEST] - INFO - ------------------------------------
+2026-02-26 18:07:47,885 - [TEST] - INFO - MOCK: Data reloaded from memory (simulating disk load)
+2026-02-26 18:07:47,885 - [TEST] - INFO - Handover Detection: Success (Match found for 2026-02-26)
+2026-02-26 18:07:47,885 - [TEST] - ERROR - Error calculating daily profit: 
+2026-02-26 18:07:47,885 - [TEST] - INFO - Daily Profit (No File): 0.0
+2026-02-26 18:07:47,894 - [TEST] - INFO - Robustness Test (Closed Tickers): {'5801.T', '3103.T'}
+2026-02-26 18:07:47,898 - [TEST] - INFO - Robustness Test (Daily Profit): 4.3

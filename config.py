@@ -153,6 +153,10 @@ RETRY_OPTIMIZATION = {
 RISK_MANAGEMENT = {
     'daily_stop_loss_pct': -3.0,
     'check_interval_loops': 1,
+    'min_sl_multiplier': 0.7,        # SLの下限ガード (ATR倍率)
+    'sentiment_brake_threshold': -0.3, # 地合いブレーキ発動閾値
+    'sentiment_brake_penalty': 15.0,  # ブレーキ時の閾値上乗せ点数
+    'macro_update_interval_sec': 3600 # マクロ指標の更新間隔
 }
 
 # 出力ファイル
