@@ -31,7 +31,7 @@ L: {long_profit}% {L_status} (raw:{raw_long}%) / S: {short_profit}% {S_status} (
    • AM/PM 監視セッション連携 (自動ハンドオーバー)
    • 実行ログの軽量化 (1MB以内) & 通信ノイズ遮断
    • 取引記録 (ジャーナル・結果) の整合性ガード
-   • ダイバージェンス & 出来高加速スコアリング統合
+   • 属性別精密フィルター (SOX/N225/TOPIX)
    • デイリー・ストップロス (-3.0%) 安全装置実装
 
 🔔 **次のステップ**:
@@ -87,7 +87,7 @@ BOS/CHoCH を検知した際のトレンド状況報告。
 TP1: ¥{tp1} (ATR×{tp1_mul}) → 50%決済
 TP2: トレーリング (ATR×{trailing_mul}幅)
 SL: ¥{sl} (ATR×{sl_mul})
-スコア: {total_score} (基礎:{base_score} + Bonus:{bonus_score})
+スコア: {total_score} (判定閾値: {actual_threshold})
 指標: RSI:{rsi}, VWAP:{vwap_dev}
 ```
 
