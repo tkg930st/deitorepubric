@@ -13,7 +13,7 @@ from datetime import datetime, time as dt_time
 import pytz
 from typing import List, Optional, Dict, Any
 from functools import wraps
-from config import DATA_FETCH, TRADING_HOURS
+from config import DATA_FETCH, TRADING_HOURS, SIGNAL_THRESHOLDS
 
 # ロガー設定
 logger = logging.getLogger(__name__)
@@ -196,8 +196,9 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-10)
         df['adx_14'] = dx.ewm(alpha=1/14, min_periods=14, adjust=False).mean()
         
-        # RVOL
-        df['rvol'] = df['volume'] / df['volume'].rolling(window=5).mean()
+        # RVOL (ローリング期間は SIGNAL_THRESHOLDS から参照)
+        rvol_lookback = SIGNAL_THRESHOLDS.get('rvol_lookback', 5)
+        df['rvol'] = df['volume'] / df['volume'].rolling(window=rvol_lookback).mean()
         
         # 一目均衡表
         tenkan_sen = (df['high'].rolling(window=9).max() + df['low'].rolling(window=9).min()) / 2

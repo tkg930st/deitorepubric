@@ -20,35 +20,36 @@ from utils import safe_get, check_trend_filter, check_divergence
 logger = logging.getLogger(__name__)
 
 def calculate_single_score(row: pd.Series, params: Dict, side: str, div_res: Dict = None) -> Tuple[float, Dict]:
-    """1行分のスコア算出 (多段階評価で最適化を促進)"""
+    """1行分のスコア算出 (多段階評価で最適化を促進, SIGNAL_THRESHOLDS参照)"""
+    st = SIGNAL_THRESHOLDS
     score = 0.0
     rsi = safe_get(row, 'rsi_14', 50)
     vwap_dev = safe_get(row, 'vwap_dev', 0)
     rvol = safe_get(row, 'rvol', 1.0)
     adx = safe_get(row, 'adx_14', 0)
-    
+
     # 1. 基礎スコア (段階的加点)
     if side == 'long':
-        if rsi < 30: score += params['w_rsi'] * 1.5
-        elif rsi < 45: score += params['w_rsi'] * 1.0
-        
-        if vwap_dev < -1.5: score += params['w_vwap'] * 1.5
-        elif vwap_dev < -0.3: score += params['w_vwap'] * 1.0
+        if rsi < st['rsi_oversold']: score += params['w_rsi'] * 1.5
+        elif rsi < st['rsi_buy_moderate']: score += params['w_rsi'] * 1.0
+
+        if vwap_dev < -st['vwap_dev_strong']: score += params['w_vwap'] * 1.5
+        elif vwap_dev < -st['vwap_dev_moderate']: score += params['w_vwap'] * 1.0
     else:
-        if rsi > 70: score += params['w_rsi'] * 1.5
-        elif rsi > 55: score += params['w_rsi'] * 1.0
-        
-        if vwap_dev > 1.5: score += params['w_vwap'] * 1.5
-        elif vwap_dev > 0.3: score += params['w_vwap'] * 1.0
-        
+        if rsi > st['rsi_overbought']: score += params['w_rsi'] * 1.5
+        elif rsi > st['rsi_sell_moderate']: score += params['w_rsi'] * 1.0
+
+        if vwap_dev > st['vwap_dev_strong']: score += params['w_vwap'] * 1.5
+        elif vwap_dev > st['vwap_dev_moderate']: score += params['w_vwap'] * 1.0
+
     # ボリューム評価
-    if rvol > 2.5: score += params['w_rvol'] * 2.0
-    elif rvol > 1.5: score += params['w_rvol'] * 1.0
-    elif rvol > 1.1: score += params['w_rvol'] * 0.5
-    
+    if rvol > st['rvol_strong']: score += params['w_rvol'] * 2.0
+    elif rvol > st['rvol_moderate']: score += params['w_rvol'] * 1.0
+    elif rvol > st['rvol_weak']: score += params['w_rvol'] * 0.5
+
     # トレンド強度
-    if adx > 35: score += params['w_adx'] * 1.5
-    elif adx > 20: score += params['w_adx'] * 1.0
+    if adx > st['adx_strong']: score += params['w_adx'] * 1.5
+    elif adx > st['adx_moderate']: score += params['w_adx'] * 1.0
     
     # 2. ボーナススコア (Monitorと同期)
     vol_accel_bonus = 0.0
@@ -120,13 +121,14 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
                 position = None
             continue
 
-        # エントリーフィルター
+        # エントリーフィルター (SIGNAL_THRESHOLDS参照)
+        st = SIGNAL_THRESHOLDS
         rsi_val = safe_get(row, 'rsi_14', 50)
         vwap_dev = safe_get(row, 'vwap_dev', 0)
         if params.get('use_rsi_filter', True):
-            if (side == 'long' and rsi_val >= 75) or (side == 'short' and rsi_val <= 25): continue
+            if (side == 'long' and rsi_val >= st['rsi_filter_long_max']) or (side == 'short' and rsi_val <= st['rsi_filter_short_min']): continue
         if params.get('use_vwap_filter', True):
-            if (side == 'long' and vwap_dev >= 3.0) or (side == 'short' and vwap_dev <= -3.0): continue
+            if (side == 'long' and vwap_dev >= st['vwap_filter_max']) or (side == 'short' and vwap_dev <= -st['vwap_filter_max']): continue
 
         # ダイバージェンス算出 (その時点までの過去データを使用)
         div_res = None
