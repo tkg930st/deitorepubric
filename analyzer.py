@@ -79,7 +79,7 @@ def select_high_volatility_stocks(all_tickers: List[str], sector_df: pd.DataFram
         except Exception: continue
     return sorted(candidates, key=lambda x: x['atr_pct'], reverse=True)[:count]
 
-def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict:
+def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float, market_df: pd.DataFrame = None) -> Dict:
     ticker = ticker_info['t']
     try:
         data = fetch_yfinance_data([ticker], period=period, interval=DATA_FETCH['analyzer_interval'])
@@ -88,8 +88,9 @@ def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict
         if len(df) < MIN_DATA_POINTS: return None
         df = calculate_technical_indicators(df)
         
-        res_l = optimize_parameters(df, pd.DataFrame(), 'long', OPTIMIZATION_ITERATIONS)
-        res_s = optimize_parameters(df, pd.DataFrame(), 'short', OPTIMIZATION_ITERATIONS)
+        # 地合い連動型最適化 (market_dfを渡す)
+        res_l = optimize_parameters(df, pd.DataFrame(), 'long', OPTIMIZATION_ITERATIONS, market_df=market_df)
+        res_s = optimize_parameters(df, pd.DataFrame(), 'short', OPTIMIZATION_ITERATIONS, market_df=market_df)
         
         l_prof = res_l['profit']; s_prof = res_s['profit']
         is_l_valid = l_prof >= hurdle
@@ -116,9 +117,18 @@ def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float) -> Dict
 def run_session(elite: List[Dict], period: str, count: int, label: str, hurdle: float) -> List[Dict]:
     msg = f"\n🔬 {label} 解析開始 (ハードル: {hurdle}%)"
     print(msg); logger.info(msg)
+    
+    # バックテスト期間に対応する市場指数（N225）を一括取得
+    try:
+        market_raw = yf.download("^N225", period=period, interval=DATA_FETCH['analyzer_interval'], progress=False)
+        market_df = super_flatten_columns(market_raw)
+    except Exception as e:
+        logger.warning(f"Market data fetch failed: {e}")
+        market_df = None
+
     results = []
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
-        futures = {executor.submit(worker_analyze_ticker, s, period, hurdle): s for s in elite}
+        futures = {executor.submit(worker_analyze_ticker, s, period, hurdle, market_df): s for s in elite}
         for f in as_completed(futures):
             res = f.result()
             if res:
