@@ -60,7 +60,7 @@ def calculate_single_score(row: pd.Series, params: Dict, side: str, div_res: Dic
     
     return total_score, indicators
 
-def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, side: str) -> Dict:
+def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, side: str, market_df: pd.DataFrame = None) -> Dict:
     if df.empty: return {'profit': 0.0, 'rr_score': 0.0, 'fitness': 0.0, 'trade_count': 0}
     
     trades = []; position = None; total_profit = 0.0
@@ -107,6 +107,20 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
                 total_profit += p; trades.append(p)
                 position = None
             continue
+
+        # --- 地合いシミュレーション (Monitorと同期) ---
+        if market_df is not None:
+            try:
+                # バックテスト期間内の当日寄り付き比騰落を計算
+                m_row = market_df.asof(curr_dt)
+                day_start = curr_dt.replace(hour=9, minute=0, second=0, microsecond=0)
+                m_open = market_df.asof(day_start)['close']
+                m_chg = (m_row['close'] / m_open) - 1
+                
+                # 悪地合い時の逆行エントリーを遮断
+                if side == 'long' and m_chg < -0.008: continue
+                if side == 'short' and m_chg > 0.008: continue
+            except: pass
 
         # エントリーフィルター (SIGNAL_THRESHOLDS参照)
         st = SIGNAL_THRESHOLDS
@@ -178,12 +192,12 @@ def mutate_params(p: Dict) -> Dict:
     return new_p
 
 def optimize_parameters(df: pd.DataFrame, df_15m: pd.DataFrame, side: str, 
-                        iterations: int = 500, precise_check: int = 20) -> Dict:
+                        iterations: int = 500, precise_check: int = 20, market_df: pd.DataFrame = None) -> Dict:
     candidates = []
     # 1. 初期探索 (30%の試行で多様な種を生成)
     for _ in range(int(iterations * 0.3)):
         p = get_random_params()
-        res = run_precise_backtest(df, df_15m, p, side)
+        res = run_precise_backtest(df, df_15m, p, side, market_df=market_df)
         candidates.append({'params': p, **res})
     
     # 2. 進化 (取引が1回以上あるものを優先)
@@ -196,7 +210,7 @@ def optimize_parameters(df: pd.DataFrame, df_15m: pd.DataFrame, side: str,
         for _ in range(int(iterations * 0.7)):
             parent = random.choice(top_elite)
             p = mutate_params(parent['params'])
-            res = run_precise_backtest(df, df_15m, p, side)
+            res = run_precise_backtest(df, df_15m, p, side, market_df=market_df)
             candidates.append({'params': p, **res})
         
     best = sorted(candidates, key=lambda x: x['fitness'], reverse=True)[0]
