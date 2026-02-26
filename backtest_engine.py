@@ -51,24 +51,11 @@ def calculate_single_score(row: pd.Series, params: Dict, side: str, div_res: Dic
     if adx > st['adx_strong']: score += params['w_adx'] * 1.5
     elif adx > st['adx_moderate']: score += params['w_adx'] * 1.0
     
-    # 2. ボーナススコア (Monitorと同期)
-    vol_accel_bonus = 0.0
-    div_bonus = 0.0
-    
-    if SECTOR_ALIGNMENT['enabled'] and rvol > SECTOR_ALIGNMENT.get('volume_accel_rvol_threshold', 1.2):
-        vol_accel_bonus = SECTOR_ALIGNMENT.get('volume_accel_score', 10)
-        
-    if div_res:
-        if side == 'long' and (div_res['bullish'] or div_res['reverse_bullish']):
-            div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
-        elif side == 'short' and (div_res['bearish'] or div_res['reverse_bearish']):
-            div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
-            
-    total_score = score + vol_accel_bonus + div_bonus
+    # 2. ボーナススコアの廃止 (加点方式は最適化を破壊するため)
+    total_score = score
     
     indicators = {
-        'rsi': rsi, 'vwap_dev': vwap_dev, 'rvol': rvol, 'adx': adx,
-        'vol_accel_bonus': vol_accel_bonus, 'div_bonus': div_bonus
+        'rsi': rsi, 'vwap_dev': vwap_dev, 'rvol': rvol, 'adx': adx
     }
     
     return total_score, indicators

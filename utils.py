@@ -299,8 +299,8 @@ def calculate_ma_from_higher_timeframe(df_5m: pd.DataFrame, ma_period: int = 20)
 
 
 def fetch_macro_sentiment() -> Dict[str, float]:
-    result = {'sox_chg': 0.0, 'tnx_chg': 0.0, 'vix_value': 18.0, 'vix_chg': 0.0, 'jpy_chg': 0.0, 'market_sentiment': 0.0}
-    ticker_alternatives = {'SOX': ['^SOX', 'SOXX'], 'TNX': ['^TNX', 'IEF'], 'VIX': ['^VIX'], 'JPY': ['JPY=X'], 'N225': ['^N225']}
+    result = {'sox_chg': 0.0, 'tnx_chg': 0.0, 'vix_value': 18.0, 'vix_chg': 0.0, 'jpy_chg': 0.0, 'topix_chg': 0.0, 'market_sentiment': 0.0}
+    ticker_alternatives = {'SOX': ['^SOX', 'SOXX'], 'TNX': ['^TNX', 'IEF'], 'VIX': ['^VIX'], 'JPY': ['JPY=X'], 'N225': ['^N225'], 'TOPX': ['^TOPX', '1306.T']}
     
     score = 0.0
     for key, tickers in ticker_alternatives.items():
@@ -317,16 +317,21 @@ def fetch_macro_sentiment() -> Dict[str, float]:
                         elif latest > 20: score -= 0.2
                         elif latest < 15: score += 0.2
                     elif key == 'SOX':
-                        if change > 1.5: score += 0.3
-                        elif change < -1.5: score -= 0.3
+                        if change > 1.5: score += 0.2
+                        elif change < -1.5: score -= 0.2
                     elif key == 'N225':
-                        if change > 1.0: score += 0.3
-                        elif change < -1.0: score -= 0.3
+                        if change > 1.0: score += 0.2
+                        elif change < -1.0: score -= 0.2
+                    elif key == 'TOPX':
+                        if change > 0.8: score += 0.2
+                        elif change < -0.8: score -= 0.2
                     
-                    if key != 'VIX' and key != 'N225':
+                    if key != 'VIX' and key != 'N225' and key != 'TOPX':
                         result[key.lower() + '_chg'] = round(change, 2)
                     elif key == 'VIX':
                         result['vix_chg'] = round(change, 2)
+                    elif key == 'TOPX':
+                        result['topix_chg'] = round(change, 2)
                     break
             except Exception: continue
             
