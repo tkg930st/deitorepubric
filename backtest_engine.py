@@ -11,43 +11,45 @@ import random
 from typing import Dict, Tuple, List
 from datetime import datetime, time as dt_time
 from config import (
-    SIGNAL_THRESHOLDS, POSITION_MANAGEMENT, TREND_FILTER, 
-    PARAM_RANGES, SLIPPAGE, MIN_SCORE_THRESHOLD, SECTOR_ALIGNMENT, DIVERGENCE
+    SIGNAL_THRESHOLDS, POSITION_MANAGEMENT, TREND_FILTER,
+    PARAM_RANGES, SLIPPAGE, MIN_SCORE_THRESHOLD, SECTOR_ALIGNMENT, DIVERGENCE,
+    RISK_MANAGEMENT
 )
 from utils import safe_get, check_trend_filter, check_divergence
 
 logger = logging.getLogger(__name__)
 
 def calculate_single_score(row: pd.Series, params: Dict, side: str, div_res: Dict = None) -> Tuple[float, Dict]:
-    """1行分のスコア算出 (多段階評価で最適化を促進)"""
+    """1行分のスコア算出 (多段階評価で最適化を促進, SIGNAL_THRESHOLDS参照)"""
+    st = SIGNAL_THRESHOLDS
     score = 0.0
     rsi = safe_get(row, 'rsi_14', 50)
     vwap_dev = safe_get(row, 'vwap_dev', 0)
     rvol = safe_get(row, 'rvol', 1.0)
     adx = safe_get(row, 'adx_14', 0)
-    
+
     # 1. 基礎スコア (段階的加点)
     if side == 'long':
-        if rsi < 30: score += params['w_rsi'] * 1.5
-        elif rsi < 45: score += params['w_rsi'] * 1.0
-        
-        if vwap_dev < -1.5: score += params['w_vwap'] * 1.5
-        elif vwap_dev < -0.3: score += params['w_vwap'] * 1.0
+        if rsi < st['rsi_oversold']: score += params['w_rsi'] * 1.5
+        elif rsi < st['rsi_buy_moderate']: score += params['w_rsi'] * 1.0
+
+        if vwap_dev < -st['vwap_dev_strong']: score += params['w_vwap'] * 1.5
+        elif vwap_dev < -st['vwap_dev_moderate']: score += params['w_vwap'] * 1.0
     else:
-        if rsi > 70: score += params['w_rsi'] * 1.5
-        elif rsi > 55: score += params['w_rsi'] * 1.0
-        
-        if vwap_dev > 1.5: score += params['w_vwap'] * 1.5
-        elif vwap_dev > 0.3: score += params['w_vwap'] * 1.0
-        
+        if rsi > st['rsi_overbought']: score += params['w_rsi'] * 1.5
+        elif rsi > st['rsi_sell_moderate']: score += params['w_rsi'] * 1.0
+
+        if vwap_dev > st['vwap_dev_strong']: score += params['w_vwap'] * 1.5
+        elif vwap_dev > st['vwap_dev_moderate']: score += params['w_vwap'] * 1.0
+
     # ボリューム評価
-    if rvol > 2.5: score += params['w_rvol'] * 2.0
-    elif rvol > 1.5: score += params['w_rvol'] * 1.0
-    elif rvol > 1.1: score += params['w_rvol'] * 0.5
-    
+    if rvol > st['rvol_strong']: score += params['w_rvol'] * 2.0
+    elif rvol > st['rvol_moderate']: score += params['w_rvol'] * 1.0
+    elif rvol > st['rvol_weak']: score += params['w_rvol'] * 0.5
+
     # トレンド強度
-    if adx > 35: score += params['w_adx'] * 1.5
-    elif adx > 20: score += params['w_adx'] * 1.0
+    if adx > st['adx_strong']: score += params['w_adx'] * 1.5
+    elif adx > st['adx_moderate']: score += params['w_adx'] * 1.0
     
     # 2. ボーナススコア (Monitorと同期)
     vol_accel_bonus = 0.0
@@ -76,24 +78,29 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
     
     trades = []; position = None; total_profit = 0.0
     tp1_mul = POSITION_MANAGEMENT.get('tp1_multiplier', 1.5)
-    
+    tp1_exit_ratio = POSITION_MANAGEMENT.get('tp1_exit_ratio', 0.5)
+
     lookback = DIVERGENCE.get('lookback', 25)
     for idx in range(len(df)):
         row = df.iloc[idx]
         curr_dt = row.name
 
         if position:
-            # ... (決済判定ロジックは変更なし)
             h, l = row['high'], row['low']
             exit_reason = None
-            
+
             if not position['tp1_hit']:
                 if (side == 'long' and h >= position['tp1']) or (side == 'short' and l <= position['tp1']):
                     position['tp1_hit'] = True
+                    # TP1損益を記録
+                    if side == 'long':
+                        position['tp1_profit'] = ((position['tp1'] / position['entry_price']) - 1 - SLIPPAGE) * 100
+                    else:
+                        position['tp1_profit'] = (1 - (position['tp1'] / position['entry_price']) - SLIPPAGE) * 100
                     # TP1後はリスクを半分に縮小した位置にSLを移動
                     if side == 'long': position['sl'] = max(position['sl'], position['entry_price'] - (position['atr'] * 0.5))
                     else: position['sl'] = min(position['sl'], position['entry_price'] + (position['atr'] * 0.5))
-            
+
             # 決済判定
             if (side == 'long' and l <= position['sl']) or (side == 'short' and h >= position['sl']):
                 exit_reason = "STOP_LOSS"
@@ -101,21 +108,27 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
                 exit_reason = "SESSION_CLOSE"
 
             if exit_reason:
-                p = ((position['sl']/position['entry_price'])-1-SLIPPAGE)*100 if side == 'long' else (1-(position['sl']/position['entry_price'])-SLIPPAGE)*100
-                if exit_reason == "SESSION_CLOSE":
-                    p = ((row['close']/position['entry_price'])-1-SLIPPAGE)*100 if side == 'long' else (1-(row['close']/position['entry_price'])-SLIPPAGE)*100
-                
+                exit_price = position['sl'] if exit_reason == "STOP_LOSS" else row['close']
+                remaining_p = ((exit_price / position['entry_price']) - 1 - SLIPPAGE) * 100 if side == 'long' else (1 - (exit_price / position['entry_price']) - SLIPPAGE) * 100
+
+                # TP1到達済み: 50%×TP1損益 + 50%×残ポジション損益
+                if position['tp1_hit']:
+                    p = (tp1_exit_ratio * position['tp1_profit']) + ((1 - tp1_exit_ratio) * remaining_p)
+                else:
+                    p = remaining_p
+
                 total_profit += p; trades.append(p)
                 position = None
             continue
 
-        # エントリーフィルター
+        # エントリーフィルター (SIGNAL_THRESHOLDS参照)
+        st = SIGNAL_THRESHOLDS
         rsi_val = safe_get(row, 'rsi_14', 50)
         vwap_dev = safe_get(row, 'vwap_dev', 0)
         if params.get('use_rsi_filter', True):
-            if (side == 'long' and rsi_val >= 75) or (side == 'short' and rsi_val <= 25): continue
+            if (side == 'long' and rsi_val >= st['rsi_filter_long_max']) or (side == 'short' and rsi_val <= st['rsi_filter_short_min']): continue
         if params.get('use_vwap_filter', True):
-            if (side == 'long' and vwap_dev >= 3.0) or (side == 'short' and vwap_dev <= -3.0): continue
+            if (side == 'long' and vwap_dev >= st['vwap_filter_max']) or (side == 'short' and vwap_dev <= -st['vwap_filter_max']): continue
 
         # ダイバージェンス算出 (その時点までの過去データを使用)
         div_res = None
@@ -131,7 +144,7 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
             actual_sl_mul = max(params['sl_mul'], RISK_MANAGEMENT.get('min_sl_multiplier', 0.7))
             
             position = {
-                'entry_price': row['close'], 'atr': atr, 'tp1_hit': False,
+                'entry_price': row['close'], 'atr': atr, 'tp1_hit': False, 'tp1_profit': 0.0,
                 'tp1': row['close'] + (atr * tp1_mul) if side == 'long' else row['close'] - (atr * tp1_mul),
                 'sl': row['close'] - (atr * actual_sl_mul) if side == 'long' else row['close'] + (atr * actual_sl_mul)
             }

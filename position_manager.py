@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Dict, Optional, List, Any
 import os
 import pytz
-from config import POSITION_MANAGEMENT
+from config import POSITION_MANAGEMENT, SLIPPAGE
 
 logger = logging.getLogger(__name__)
 tz = pytz.timezone('Asia/Tokyo')
@@ -143,11 +143,11 @@ class PositionManager:
             if (side == 'LONG' and current_price >= pos['tp1']) or \
                (side == 'SHORT' and current_price <= pos['tp1']):
                 pos['tp1_hit'] = True
-                # TP1到達時の利益を記録
+                # TP1到達時の利益を記録 (スリッページ適用)
                 if side == 'LONG':
-                    pos['tp1_profit'] = ((current_price / pos['entry_price']) - 1) * 100
+                    pos['tp1_profit'] = ((current_price / pos['entry_price']) - 1 - SLIPPAGE) * 100
                 else:
-                    pos['tp1_profit'] = (1 - (current_price / pos['entry_price'])) * 100
+                    pos['tp1_profit'] = (1 - (current_price / pos['entry_price']) - SLIPPAGE) * 100
                 # リスク低減 (建値付近へ)
                 if side == 'LONG':
                     pos['trailing_sl'] = max(pos['trailing_sl'], pos['entry_price'] - (atr * 0.2))
@@ -169,8 +169,18 @@ class PositionManager:
         pos = self.positions[ticker]
         entry_price = pos['entry_price']
         side = pos['side']
-        profit_pct = ((exit_price / entry_price - 1) * 100) if side == 'LONG' else ((1 - exit_price / entry_price) * 100)
-        
+        # スリッページ適用 (往復0.3% = SLIPPAGE) - バックテストと同期
+        remaining_profit_pct = ((exit_price / entry_price - 1 - SLIPPAGE) * 100) if side == 'LONG' else ((1 - exit_price / entry_price - SLIPPAGE) * 100)
+
+        # TP1到達済みの場合: 50%×TP1損益 + 50%×残ポジション損益 でブレンド計算
+        tp1_exit_ratio = POSITION_MANAGEMENT.get('tp1_exit_ratio', 0.5)
+        tp1_hit = pos.get('tp1_hit', False)
+        tp1_profit = pos.get('tp1_profit', 0.0)
+        if tp1_hit:
+            total_profit = (tp1_exit_ratio * tp1_profit) + ((1 - tp1_exit_ratio) * remaining_profit_pct)
+        else:
+            total_profit = remaining_profit_pct
+
         # 通知および解析に必要なデータをすべて保持
         result = {
             'ticker': ticker,
@@ -180,11 +190,11 @@ class PositionManager:
             'exit_price': exit_price,
             'exit_time': datetime.now(tz).isoformat(),
             'exit_reason': reason,
-            'tp1_hit': pos.get('tp1_hit', False),
-            'tp1_profit': pos.get('tp1_profit', 0.0),
-            'final_profit': profit_pct,
-            'total_profit': profit_pct,
-            'profit_pct': profit_pct, # monitor.py の通知用 (互換性)
+            'tp1_hit': tp1_hit,
+            'tp1_profit': tp1_profit,
+            'final_profit': remaining_profit_pct,
+            'total_profit': total_profit,
+            'profit_pct': total_profit, # monitor.py の通知用 (互換性)
             'logic_type': pos.get('logic_type', 'Unknown') # monitor.py の通知用
         }
         

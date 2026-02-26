@@ -209,46 +209,47 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
         params = side_params[side]
         if detail.get(f'{side}_disabled', False): continue
         
+        st = SIGNAL_THRESHOLDS
         rsi_val = safe_get(row, 'rsi_14', 50)
         vwap_dev = safe_get(row, 'vwap_dev', 0)
         if params.get('use_rsi_filter', True):
-            if (side == 'long' and rsi_val >= 75) or (side == 'short' and rsi_val <= 25): continue
+            if (side == 'long' and rsi_val >= st['rsi_filter_long_max']) or (side == 'short' and rsi_val <= st['rsi_filter_short_min']): continue
         if params.get('use_vwap_filter', True):
-            if (side == 'long' and vwap_dev >= 3.0) or (side == 'short' and vwap_dev <= -3.0): continue
-            
+            if (side == 'long' and vwap_dev >= st['vwap_filter_max']) or (side == 'short' and vwap_dev <= -st['vwap_filter_max']): continue
+
         score = 0.0
         current_div_bonus = 0.0
-        
-        # 1. 基礎スコア (backtest_engine.py と垂直同期)
+
+        # 1. 基礎スコア (backtest_engine.py と垂直同期, SIGNAL_THRESHOLDS参照)
         if side == 'long':
-            if rsi_val < 30: score += params['w_rsi'] * 1.5
-            elif rsi_val < 45: score += params['w_rsi'] * 1.0
-            
-            if vwap_dev < -1.5: score += params['w_vwap'] * 1.5
-            elif vwap_dev < -0.3: score += params['w_vwap'] * 1.0
-            
+            if rsi_val < st['rsi_oversold']: score += params['w_rsi'] * 1.5
+            elif rsi_val < st['rsi_buy_moderate']: score += params['w_rsi'] * 1.0
+
+            if vwap_dev < -st['vwap_dev_strong']: score += params['w_vwap'] * 1.5
+            elif vwap_dev < -st['vwap_dev_moderate']: score += params['w_vwap'] * 1.0
+
             if div_res['bullish'] or div_res['reverse_bullish']:
                 current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20) * bonus_multiplier
         else:
-            if rsi_val > 70: score += params['w_rsi'] * 1.5
-            elif rsi_val > 55: score += params['w_rsi'] * 1.0
-            
-            if vwap_dev > 1.5: score += params['w_vwap'] * 1.5
-            elif vwap_dev > 0.3: score += params['w_vwap'] * 1.0
-            
+            if rsi_val > st['rsi_overbought']: score += params['w_rsi'] * 1.5
+            elif rsi_val > st['rsi_sell_moderate']: score += params['w_rsi'] * 1.0
+
+            if vwap_dev > st['vwap_dev_strong']: score += params['w_vwap'] * 1.5
+            elif vwap_dev > st['vwap_dev_moderate']: score += params['w_vwap'] * 1.0
+
             if div_res['bearish'] or div_res['reverse_bearish']:
                 current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20) * bonus_multiplier
 
         # ボリューム評価 (段階的)
         rvol_val = safe_get(row, 'rvol', 1.0)
-        if rvol_val > 2.5: score += params['w_rvol'] * 2.0
-        elif rvol_val > 1.5: score += params['w_rvol'] * 1.0
-        elif rvol_val > 1.1: score += params['w_rvol'] * 0.5
-        
+        if rvol_val > st['rvol_strong']: score += params['w_rvol'] * 2.0
+        elif rvol_val > st['rvol_moderate']: score += params['w_rvol'] * 1.0
+        elif rvol_val > st['rvol_weak']: score += params['w_rvol'] * 0.5
+
         # トレンド強度 (段階的)
         adx_val = safe_get(row, 'adx_14', 0)
-        if adx_val > 35: score += params['w_adx'] * 1.5
-        elif adx_val > 20: score += params['w_adx'] * 1.0
+        if adx_val > st['adx_strong']: score += params['w_adx'] * 1.5
+        elif adx_val > st['adx_moderate']: score += params['w_adx'] * 1.0
         
         # 合計スコア (地合いによる閾値調整を適用)
         total_score = score + vol_accel_bonus + current_div_bonus
@@ -453,7 +454,6 @@ def monitor():
             # マクロ指標の更新 (Roadmap 6.1)
             if time.time() - last_macro_update > macro_update_interval:
                 sentiment = fetch_macro_sentiment()
-                global current_macro_sentiment
                 current_macro_sentiment = sentiment
                 apply_macro_adjustments(sentiment)
                 last_macro_update = time.time()

@@ -246,7 +246,8 @@ def run_integration_test():
             from config import POSITION_MANAGEMENT
             with patch.dict(POSITION_MANAGEMENT, {'trade_results_file': test_csv}):
                 # 1. 決済済み銘柄の取得 (11列/13列が混ざっていても3103.Tを取得できるか)
-                closed = monitor.get_today_closed_tickers()
+                closed_trades = monitor.get_today_closed_trades()
+                closed = {t['ticker'] for t in closed_trades}
                 logger.info(f"Robustness Test (Closed Tickers): {closed}")
                 if '3103.T' in closed:
                     print("   ✅ 形式混在CSVからの銘柄抽出成功")

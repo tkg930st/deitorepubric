@@ -18,14 +18,10 @@ LOG_LEVEL = 'INFO'
 # 銘柄選定基準
 LIQUIDITY_THRESHOLD = 5_000_000_000  # 売買代金50億円以上に戻す
 MIN_PRICE = 500  # 最低株価
-ATR_CHECK_COUNT = 50   # ATRスクリーニング対象銘柄数
-TOP_CANDIDATES = 30    # 解析対象の主力銘柄数
-FINAL_MONITORING = 10  # 最終監視銘柄数
 MIN_SCORE_THRESHOLD = 60.0  # スコア閾値の下限ガード
 
 # バックテスト設定
 OPTIMIZATION_ITERATIONS = 500  # パラメータ最適化試行回数
-PRECISE_CHECK_COUNT = 20       # 精密検証を行う上位数
 MIN_DATA_POINTS = 40  # 必要な最小データポイント数
 SLIPPAGE = 0.003  # 往復のスリッページ（0.3%）
 
@@ -55,33 +51,34 @@ DIVERGENCE = {
     'price_threshold': 0.5  # 価格変化率閾値（%）
 }
 
-# 当日制限設定
-DAILY_COOLDOWN = {
-    'enabled': True,
-    'cooldown_file': 'daily_cooldown.json',
-    'reset_time': '09:00'  # リセット時刻
-}
-
 # トレードジャーナル設定
 TRADE_JOURNAL = {
     'enabled': True,
     'journal_file': 'trade_journal.csv'
 }
 
-# シグナル検出閾値
+# シグナル検出閾値 (SYSTEM_DESIGN §4 多段階スコアリング定義に準拠)
 SIGNAL_THRESHOLDS = {
-    'rsi_low': 35,
-    'rsi_high': 65,
-    'vwap_dev_low': -1.0,
-    'vwap_dev_high': 1.0,
-    'rvol_threshold': 1.5,
-    'adx_threshold': 25,
-    'adx_trend_strength': 30,
-    'rsi_overbought': 70,
-    'rsi_oversold': 30,
-    'vwap_dev_max': 2.5,
-    'vol_surge_lookback': 10,
-    'vol_surge_threshold': 2.0,
+    # RSI 段階的閾値 (買い: oversold/moderate, 売り: overbought/moderate)
+    'rsi_oversold': 30,         # 買い強シグナル (×1.5倍)
+    'rsi_buy_moderate': 45,     # 買い中シグナル (×1.0倍)
+    'rsi_overbought': 70,       # 売り強シグナル (×1.5倍)
+    'rsi_sell_moderate': 55,    # 売り中シグナル (×1.0倍)
+    # RSI/VWAPフィルタ (エントリー除外閾値)
+    'rsi_filter_long_max': 75,  # LONG時 RSI上限
+    'rsi_filter_short_min': 25, # SHORT時 RSI下限
+    'vwap_filter_max': 3.0,     # VWAP乖離フィルタ上限
+    # VWAP乖離 段階的閾値
+    'vwap_dev_strong': 1.5,     # 強シグナル (×1.5倍)
+    'vwap_dev_moderate': 0.3,   # 中シグナル (×1.0倍)
+    # RVOL (出来高倍率) 段階的閾値
+    'rvol_strong': 2.5,         # 強シグナル (×2.0倍)
+    'rvol_moderate': 1.5,       # 中シグナル (×1.0倍)
+    'rvol_weak': 1.1,           # 弱シグナル (×0.5倍)
+    'rvol_lookback': 5,         # RVOL計算のローリング期間
+    # ADX (トレンド強度) 段階的閾値
+    'adx_strong': 35,           # 強トレンド (×1.5倍)
+    'adx_moderate': 20,         # 中トレンド (×1.0倍)
 }
 
 # 解析・バックテスト目標利益 (%)
@@ -190,12 +187,4 @@ MONITORING_LOOP = {
     'use_confirmed_candle': True,
     'am_entry_cutoff': '11:30',
     'pm_entry_cutoff': '14:30',
-    'min_rr_ratio': 1.5,
-}
-
-# ファンダメンタルズ設定
-FUNDAMENTAL_FILTER = {
-    'enabled': True,
-    'min_roe': 0.10,
-    'max_peg': 1.0
 }
