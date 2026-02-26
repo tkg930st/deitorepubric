@@ -84,8 +84,12 @@ def git_sync(action: str = 'pull'):
         logger.error(f"Git sync error: {e}")
 
 SESSION_TYPE = os.getenv('SESSION_TYPE', 'AM')
-MONITOR_START_TIME = os.getenv('MONITOR_START_TIME', MONITORING_LOOP['start_time'])
-MONITOR_END_TIME = os.getenv('MONITOR_END_TIME', MONITORING_LOOP['end_time'])
+# セッションタイプに応じたデフォルト時刻の設定 (AM: 09:30-11:40, PM: 12:30-15:10)
+default_start = MONITORING_LOOP['start_time'] if SESSION_TYPE == 'AM' else '12:30'
+default_end = '11:40' if SESSION_TYPE == 'AM' else MONITORING_LOOP['end_time']
+
+MONITOR_START_TIME = os.getenv('MONITOR_START_TIME', default_start)
+MONITOR_END_TIME = os.getenv('MONITOR_END_TIME', default_end)
 ENTRY_CUTOFF_TIME = os.getenv('ENTRY_CUTOFF_TIME', 
                               MONITORING_LOOP['pm_entry_cutoff'] if SESSION_TYPE == 'PM' else MONITORING_LOOP['am_entry_cutoff'])
 FORCE_CLOSE_TIME = os.getenv('FORCE_CLOSE_TIME', '14:55' if SESSION_TYPE == 'PM' else '23:59')
@@ -329,6 +333,24 @@ def monitor():
     macro_update_interval = RISK_MANAGEMENT.get('macro_update_interval_sec', 3600)
 
     try:
+        # 1. 開始時刻までの待機
+        if SESSION_TYPE == 'PM':
+            position_manager.set_pm_active(datetime.now(tz).strftime('%Y-%m-%d'))
+            logger.info(f"PM session active flag set for {datetime.now(tz).strftime('%Y-%m-%d')} (Waiting/Running)")
+
+        while True:
+            now_jst = datetime.now(tz).time()
+            if now_jst >= dt_time.fromisoformat(MONITOR_START_TIME):
+                break
+            
+            # 待機ログ (5分おき)
+            if now_jst.minute % 5 == 0 and now_jst.second < 30:
+                logger.info(f"Waiting for start time: {MONITOR_START_TIME} (Session: {SESSION_TYPE})")
+            
+            time.sleep(30)
+
+        logger.info(f"Market monitor started. Session: {SESSION_TYPE} (End: {MONITOR_END_TIME})")
+
         while True:
             now_jst = datetime.now(tz).time()
             if now_jst >= dt_time.fromisoformat(MONITOR_END_TIME):
