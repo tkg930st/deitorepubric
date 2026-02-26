@@ -69,7 +69,6 @@ jobs:
           SESSION_TYPE: 'AM'
           MONITOR_START_TIME: '09:30'
           MONITOR_END_TIME: '11:40'
-          ENTRY_CUTOFF_TIME: '10:30'
           SKIP_DAILY_SUMMARY: 'true'
           MAX_RUNTIME_MINUTES: '300'
         # 08:00〜11:40 = 最大220分、余裕を持たせる
