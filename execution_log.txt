@@ -536,3 +536,636 @@
 
 2026-02-26 02:40:27,783 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
 
+2026-02-26 03:36:33,337 - __main__ - INFO - Waiting for start time: 12:30 (Session: PM)
+2026-02-26 03:36:33,337 - __main__ - INFO - PM session starting. Setting active flag for 2026-02-26.
+2026-02-26 03:36:34,471 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:36:35,239 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1605.7, TP1=1661.7
+2026-02-26 03:36:35,483 - position_manager - INFO - Position Added: 485A.T (LONG) SL=3487.0, TP1=3536.3
+2026-02-26 03:36:35,727 - position_manager - INFO - Position Added: 5706.T (LONG) SL=37205.7, TP1=37951.6
+2026-02-26 03:37:05,746 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:37:36,245 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:38:06,742 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:38:37,206 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:39:07,711 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:39:38,168 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:40:08,674 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:40:39,128 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:41:09,838 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:41:40,311 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:42:10,858 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:42:41,316 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:43:11,861 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:43:42,308 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:44:12,777 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:44:43,241 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:45:13,706 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:45:44,632 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:45:45,224 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1599.2, TP1=1652.1
+2026-02-26 03:45:45,462 - position_manager - INFO - Position Added: 5706.T (LONG) SL=36814.2, TP1=37508.8
+2026-02-26 03:46:15,480 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:46:46,117 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:46:46,977 - position_manager - INFO - Position Added: 5706.T (LONG) SL=36599.7, TP1=37321.3
+2026-02-26 03:47:16,996 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:47:47,516 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:48:17,999 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:48:18,403 - __main__ - INFO - Signal missed: 3103.T (LONG) Score: 7.5 (Req: 12.0) [RSI:55.4, VWAP:1.17, RVOL:1.16, ADX:19.5]
+2026-02-26 03:48:48,520 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:48:48,910 - __main__ - INFO - Signal missed: 3103.T (LONG) Score: 7.5 (Req: 12.0) [RSI:54.5, VWAP:0.99, RVOL:1.16, ADX:19.5]
+2026-02-26 03:49:19,025 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:49:19,569 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1579.6, TP1=1636.2
+2026-02-26 03:49:49,686 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:50:20,408 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:50:50,912 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:51:21,381 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:51:52,137 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:52:22,628 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:52:53,126 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:53:23,653 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:53:54,125 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:54:24,602 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:54:25,196 - position_manager - INFO - Position Added: 5801.T (LONG) SL=27916.2, TP1=28328.8
+2026-02-26 03:54:55,263 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:55:25,733 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:55:56,213 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:56:26,899 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:56:57,425 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:57:27,940 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:57:58,422 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:58:28,943 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:58:59,423 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 03:59:29,905 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:00:00,368 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:00:30,864 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:01:01,356 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:01:31,839 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:02:02,324 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:02:32,820 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:03:03,451 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:03:04,056 - position_manager - INFO - Position Added: 485A.T (LONG) SL=3549.8, TP1=3607.5
+2026-02-26 04:03:34,090 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:04:04,794 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:04:05,278 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1562.9, TP1=1617.6
+2026-02-26 04:04:35,394 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:05:06,033 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:05:37,323 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:05:37,952 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1562.2, TP1=1614.8
+2026-02-26 04:06:08,068 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:06:39,138 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:07:09,657 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:07:40,175 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:08:10,670 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:08:41,179 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:09:11,920 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:09:42,401 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:10:12,909 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:10:13,480 - position_manager - INFO - Position Added: 6787.T (LONG) SL=21660.5, TP1=21957.6
+2026-02-26 04:10:43,564 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:11:14,057 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:11:14,573 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1563.2, TP1=1615.9
+2026-02-26 04:11:44,690 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:12:15,200 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:12:45,744 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:13:16,280 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:13:46,916 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:14:17,441 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:14:47,958 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:14:48,656 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1560.0, TP1=1614.0
+2026-02-26 04:15:18,773 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:15:49,250 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:16:19,734 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:16:50,240 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:17:20,717 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:17:51,238 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:18:21,748 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:18:52,352 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:19:23,117 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:19:53,599 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:20:24,080 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:20:54,564 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:21:25,087 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:21:55,577 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:22:26,075 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:22:56,793 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:23:27,295 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:23:57,808 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:24:28,309 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:24:59,078 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:25:29,578 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:26:00,060 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:26:30,587 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:27:01,088 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:27:31,853 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:27:32,566 - position_manager - INFO - Position Added: 6787.T (LONG) SL=21643.5, TP1=21922.6
+2026-02-26 04:28:02,651 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:28:33,177 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:29:03,664 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:29:34,142 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:30:04,645 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:30:35,127 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:31:05,634 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:31:36,112 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:31:36,694 - position_manager - INFO - Position Added: 485A.T (LONG) SL=3489.6, TP1=3548.0
+2026-02-26 04:32:06,729 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:32:37,503 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:33:08,338 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:33:09,027 - position_manager - INFO - Position Added: 5706.T (LONG) SL=36859.3, TP1=37463.3
+2026-02-26 04:33:39,046 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:34:09,555 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:34:40,077 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:35:10,592 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:35:11,153 - position_manager - INFO - Position Added: 6787.T (LONG) SL=21634.2, TP1=21908.8
+2026-02-26 04:35:41,238 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:36:11,994 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:36:12,660 - position_manager - INFO - Position Added: 5706.T (LONG) SL=36772.3, TP1=37358.4
+2026-02-26 04:36:42,679 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:37:13,175 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:37:43,667 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:38:14,151 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:38:44,654 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:39:15,139 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:39:45,624 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:40:16,641 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:40:47,122 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:41:17,888 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:41:48,374 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:41:49,051 - position_manager - INFO - Position Added: 6787.T (LONG) SL=21618.7, TP1=21866.7
+2026-02-26 04:42:19,136 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:42:50,101 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:43:20,591 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:43:51,086 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:44:21,615 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:44:52,073 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:45:22,593 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:45:53,092 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:46:23,613 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:46:54,085 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:47:24,587 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:47:55,100 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:48:25,590 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:48:56,070 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:49:26,567 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:49:57,055 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:50:27,573 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:50:58,073 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:51:28,560 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:51:59,053 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:52:29,544 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:53:00,058 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:53:30,593 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:54:01,083 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:54:31,600 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:55:02,091 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:55:32,630 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:56:03,133 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:56:33,628 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:57:04,120 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:57:34,677 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:58:05,155 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:58:35,666 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:59:06,192 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 04:59:36,656 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:00:07,146 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:00:37,642 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:01:08,147 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:01:38,684 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:02:09,136 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:02:39,889 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:03:10,392 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:03:40,917 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:04:11,395 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:04:41,891 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:05:12,382 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:05:42,864 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:06:13,358 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:06:43,845 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:07:14,331 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:07:44,857 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:08:15,338 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:08:45,821 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:09:16,314 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:09:46,823 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:10:17,322 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:10:47,819 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:11:18,294 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:11:18,973 - position_manager - INFO - Position Added: 3103.T (LONG) SL=1559.5, TP1=1604.7
+2026-02-26 05:11:49,091 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:12:19,604 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:12:50,106 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:13:20,574 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:13:51,528 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:14:22,065 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:14:52,596 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:15:23,100 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:15:53,601 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:16:24,088 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:16:54,580 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:17:25,087 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:17:55,578 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:18:26,090 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:18:56,793 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:19:27,294 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:19:57,754 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:20:28,248 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:20:58,702 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:21:29,198 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:21:59,647 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:22:30,150 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:23:00,740 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:23:31,295 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:24:01,795 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:24:32,299 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:25:02,802 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:25:33,294 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:26:03,792 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:26:34,287 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:27:04,798 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:27:35,278 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:28:05,793 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:28:36,289 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:29:06,793 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:29:37,312 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:30:07,821 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:30:38,325 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:31:08,797 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:31:39,648 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:32:10,115 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:32:40,595 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:33:11,057 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:33:41,604 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:34:12,075 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:34:42,572 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:35:13,051 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:35:43,510 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:36:14,052 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:36:44,607 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:37:15,089 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:37:45,652 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:38:16,159 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:38:46,642 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:39:17,137 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:39:47,651 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:40:18,133 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:40:48,871 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:41:19,370 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:41:50,016 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:42:20,522 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:42:52,658 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:43:23,144 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:43:53,671 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:44:24,161 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:44:54,664 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:45:25,145 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:45:55,679 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:46:26,182 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:46:56,693 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:47:27,180 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:47:57,708 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:48:28,255 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:48:58,757 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:49:29,243 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:49:59,726 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:50:30,206 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:51:00,677 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:51:31,192 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:52:01,701 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:52:32,187 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:53:02,699 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:53:33,171 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:54:03,676 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:54:34,179 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:55:04,689 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:55:35,741 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:56:06,283 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:56:36,766 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:57:08,602 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:57:39,086 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:58:09,604 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:58:40,089 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:59:10,569 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 05:59:41,069 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:00:11,594 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:00:42,044 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:01:12,559 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:01:43,038 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:02:13,560 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:02:44,113 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:03:14,592 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:03:45,083 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:04:15,596 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:04:46,100 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:05:16,606 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:05:47,131 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:06:17,668 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:06:48,190 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:07:18,686 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:07:49,175 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:08:19,653 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:08:50,165 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:09:20,663 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:09:51,146 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:10:21,631 - __main__ - ERROR - Error calculating daily profit: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
+2026-02-26 06:10:21,631 - __main__ - ERROR - Summary error: Error tokenizing data. C error: Expected 11 fields in line 14, saw 12
+
