@@ -194,7 +194,7 @@ def calculate_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         minus_di = 100 * (smoothed_minus_dm / (df['atr_14'] + 1e-10))
         
         dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-10)
-        df['adx_14'] = dx.ewm(alpha=1/14, adjust=False).mean()
+        df['adx_14'] = dx.ewm(alpha=1/14, min_periods=14, adjust=False).mean()
         
         # RVOL
         df['rvol'] = df['volume'] / df['volume'].rolling(window=5).mean()

@@ -453,7 +453,6 @@ def monitor():
             # マクロ指標の更新 (Roadmap 6.1)
             if time.time() - last_macro_update > macro_update_interval:
                 sentiment = fetch_macro_sentiment()
-                global current_macro_sentiment
                 current_macro_sentiment = sentiment
                 apply_macro_adjustments(sentiment)
                 last_macro_update = time.time()

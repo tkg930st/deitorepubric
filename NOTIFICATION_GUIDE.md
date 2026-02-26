@@ -1,4 +1,4 @@
-# Discord 通知フォーマット定義書 (Ver 15.13基準)
+# Discord 通知フォーマット定義書 (Ver 15.15基準)
 
 本ドキュメントは、deitorepubric システムが送信するすべての通知の「正解」を定義する。
 ロジックの修正やリファクタリング時、本フォーマットの情報量や絵文字、構成を独断で変更することは禁止される。
@@ -8,7 +8,7 @@
 
 **テンプレート:**
 ```
-✅ **Version 15.12 統合戦略構築完了！**
+✅ **Version 15.15 統合戦略構築完了！**
 
 ⏱️ **実行時間**: {elapsed}秒 ({elapsed_min}分)
 📅 **完了時刻**: {finish_time} JST
@@ -27,12 +27,12 @@ L: {long_profit}% {L_status} (raw:{raw_long}%) / S: {short_profit}% {S_status} (
    期待利益: {best_profit}%
    ボラティリティ: {best_atr_pct}%
 
-🆕 **Version 15.12 改良点**:
-   • 2段階進化型最適化 (Phase 1: 広域 / Phase 2: 局所進化)
-   • Fitness Ver 2 (リスク対効果・RR効率評価)
-   • ボラティリティ比例型動的損切り (ATR基準)
-   • フィルターON/OFF個別最適化 (RSI/VWAP)
-   • 月次(Monthly) / 週次(Weekly) 独立戦略構築
+🆕 **Version 15.15 改良点**:
+   • AM/PM 監視セッション連携 (自動ハンドオーバー)
+   • 実行ログの軽量化 (1MB以内) & 通信ノイズ遮断
+   • 取引記録 (ジャーナル・結果) の整合性ガード
+   • ダイバージェンス & 出来高加速スコアリング統合
+   • デイリー・ストップロス (-3.0%) 安全装置実装
 
 🔔 **次のステップ**:
    python monitor.py で監視を開始してください！
@@ -43,7 +43,7 @@ L: {long_profit}% {L_status} (raw:{raw_long}%) / S: {short_profit}% {S_status} (
 
 **テンプレート:**
 ```
-📡 **Version 15.12 統合戦略監視 起動**
+📡 **Version 15.15 統合戦略監視 ({SESSION_TYPE}) 起動**
 ━━━━━━━━━━━━━━
 🌍 **マクロ地合い情報**:
 • VIX: {vix_value} ({vix_chg}%)
@@ -81,13 +81,14 @@ BOS/CHoCH を検知した際のトレンド状況報告。
 
 **テンプレート:**
 ```
-🛡️ **新規シグナル (Ver 15.12): {SIDE}**
+🛡️ **新規シグナル (Ver 15.15): {SIDE}**
 銘柄: {ticker} ({logic_type})
 価格: ¥{entry_price}
 TP1: ¥{tp1} (ATR×{tp1_mul}) → 50%決済
 TP2: トレーリング (ATR×{trailing_mul}幅)
 SL: ¥{sl} (ATR×{sl_mul})
-スコア: {score} (RSI:{rsi}, VWAP:{vwap_dev})
+スコア: {total_score} (基礎:{base_score} + Bonus:{bonus_score})
+指標: RSI:{rsi}, VWAP:{vwap_dev}
 ```
 
 ## 6. TP1達成通知 (monitor.py / position_manager.py) ✅

@@ -169,8 +169,17 @@ class PositionManager:
         pos = self.positions[ticker]
         entry_price = pos['entry_price']
         side = pos['side']
-        profit_pct = ((exit_price / entry_price - 1) * 100) if side == 'LONG' else ((1 - exit_price / entry_price) * 100)
-        
+        remaining_profit_pct = ((exit_price / entry_price - 1) * 100) if side == 'LONG' else ((1 - exit_price / entry_price) * 100)
+
+        # TP1到達済みの場合: 50%×TP1損益 + 50%×残ポジション損益 でブレンド計算
+        tp1_exit_ratio = POSITION_MANAGEMENT.get('tp1_exit_ratio', 0.5)
+        tp1_hit = pos.get('tp1_hit', False)
+        tp1_profit = pos.get('tp1_profit', 0.0)
+        if tp1_hit:
+            total_profit = (tp1_exit_ratio * tp1_profit) + ((1 - tp1_exit_ratio) * remaining_profit_pct)
+        else:
+            total_profit = remaining_profit_pct
+
         # 通知および解析に必要なデータをすべて保持
         result = {
             'ticker': ticker,
@@ -180,11 +189,11 @@ class PositionManager:
             'exit_price': exit_price,
             'exit_time': datetime.now(tz).isoformat(),
             'exit_reason': reason,
-            'tp1_hit': pos.get('tp1_hit', False),
-            'tp1_profit': pos.get('tp1_profit', 0.0),
-            'final_profit': profit_pct,
-            'total_profit': profit_pct,
-            'profit_pct': profit_pct, # monitor.py の通知用 (互換性)
+            'tp1_hit': tp1_hit,
+            'tp1_profit': tp1_profit,
+            'final_profit': remaining_profit_pct,
+            'total_profit': total_profit,
+            'profit_pct': total_profit, # monitor.py の通知用 (互換性)
             'logic_type': pos.get('logic_type', 'Unknown') # monitor.py の通知用
         }
         
