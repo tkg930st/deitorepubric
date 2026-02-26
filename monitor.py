@@ -106,16 +106,39 @@ def load_config() -> Optional[Dict]:
 def apply_macro_adjustments(sentiment: Dict[str, float]):
     global current_macro_adjustments
     vix = sentiment.get('vix_value', 18.0)
+    ms = sentiment.get('market_sentiment', 0.0)
+    
+    # 基本調整
+    threshold_add = 0.0
+    tp_mul = 1.0
+    sl_mul = 1.0
+    
+    # 地合いによるブレーキ (Roadmap 6.1)
+    if ms < RISK_MANAGEMENT.get('sentiment_brake_threshold', -0.3):
+        threshold_add += RISK_MANAGEMENT.get('sentiment_brake_penalty', 15.0) # LONGを大幅に抑制
+        sl_mul *= 1.2 # 損切り幅を広げてノイズを回避
+    elif ms > 0.3:
+        threshold_add -= 5.0 # エントリーしやすくする
+        
     if vix > 20:
-        adjustment_msg = "ℹ️ **市場ボラティリティ上昇検知 (VIX > 20)**\n"
-        adjustment_msg += "リスク管理のため以下の調整を自動適用しました：\n"
-        adjustment_msg += "• エントリー閾値: +5.0 (厳格化)\n"
-        adjustment_msg += "• 利確幅(TP): ×1.25 (拡大)\n"
-        adjustment_msg += "• 損切幅(SL): ×1.15 (拡大)"
-        current_macro_adjustments = {'threshold_add': 5.0, 'tp_mul': 1.25, 'sl_mul': 1.15}
+        adjustment_msg = f"ℹ️ **市場ボラティリティ上昇検知 (VIX:{vix:.1f}, Sentiment:{ms:+.1f})**\n"
+        adjustment_msg += "リスク管理調整を自動適用しました：\n"
+        adjustment_msg += f"• エントリー閾値修正: {threshold_add:+.1f} (基礎スコア)\n"
+        adjustment_msg += f"• 利確幅(TP)倍率: ×{1.25 if vix > 20 else 1.0:.2f}\n"
+        adjustment_msg += f"• 損切幅(SL)倍率: ×{sl_mul * (1.15 if vix > 20 else 1.0):.2f}"
+        
+        current_macro_adjustments = {
+            'threshold_add': threshold_add, 
+            'tp_mul': 1.25, 
+            'sl_mul': sl_mul * 1.15
+        }
         send_discord_notification(WEBHOOK_URL, adjustment_msg)
     else:
-        current_macro_adjustments = {'threshold_add': 0.0, 'tp_mul': 1.0, 'sl_mul': 1.0}
+        current_macro_adjustments = {
+            'threshold_add': threshold_add, 
+            'tp_mul': 1.0, 
+            'sl_mul': sl_mul
+        }
 
 def check_structure_signal(ticker: str, df: pd.DataFrame):
     global last_structure_signals
@@ -132,24 +155,32 @@ def check_structure_signal(ticker: str, df: pd.DataFrame):
             send_discord_notification(WEBHOOK_URL, msg)
             last_structure_signals[ticker] = sig_key
 
-def get_today_closed_tickers() -> Set[str]:
-    """本日既に決済された銘柄を取得 (JST基準)"""
-    results_file = 'trade_results.csv'
-    if not os.path.exists(results_file): return set()
+def get_today_closed_trades() -> List[Dict]:
+    """本日既に決済された取引の詳細を取得 (JST基準)"""
+    results_file = POSITION_MANAGEMENT.get('trade_results_file', 'trade_results.csv')
+    if not os.path.exists(results_file): return []
     try:
-        df = pd.read_csv(results_file)
-        if df.empty: return set()
-        df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True)
+        df = pd.read_csv(results_file, on_bad_lines='warn', engine='python')
+        if df.empty: return []
+        df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True, errors='coerce')
+        df = df.dropna(subset=['exit_time'])
         today = datetime.now(pytz.timezone('Asia/Tokyo')).date()
-        return set(df[df['exit_time'].dt.tz_convert('Asia/Tokyo').dt.date == today]['ticker'].unique())
-    except Exception: return set()
+        today_trades = df[df['exit_time'].dt.tz_convert('Asia/Tokyo').dt.date == today]
+        return today_trades[['ticker', 'side', 'exit_reason']].to_dict('records')
+    except Exception as e:
+        logger.error(f"Error reading today closed trades: {e}")
+        return []
 
 def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
     if position_manager.has_position(ticker): return
     
-    # 本日既に損切り/利確済みの銘柄は再エントリーしない
-    if ticker in get_today_closed_tickers():
-        return
+    # 本日既に決済済みの銘柄チェック (Design 5)
+    closed_trades = get_today_closed_trades()
+    for trade in closed_trades:
+        if trade['ticker'] == ticker:
+            # 1. 同一銘柄は理由を問わず1日1回に制限（より厳格な運用）
+            # もし「利確後はOK」とする場合は、ここで exit_reason == 'STOP_LOSS' の時のみ return する
+            return
 
     # 時刻によるエントリー制限
     now_jst = datetime.now(pytz.timezone('Asia/Tokyo')).time()
@@ -162,12 +193,15 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
     trailing_atr_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
     adj = current_macro_adjustments
     
-    # ボーナススコアの算出
+    # ボーナススコアの算出 (Roadmap 6.3: 地合いが悪い時はボーナスを無効化)
+    ms_val = current_macro_sentiment.get('market_sentiment', 0.0)
+    bonus_multiplier = 1.0 if ms_val > 0.1 else (0.5 if ms_val >= -0.2 else 0.0)
+
     vol_accel_bonus = 0.0
-    if SECTOR_ALIGNMENT['enabled']:
+    if SECTOR_ALIGNMENT['enabled'] and bonus_multiplier > 0:
         rvol = safe_get(row, 'rvol', 1.0)
         if rvol > SECTOR_ALIGNMENT.get('volume_accel_rvol_threshold', 1.2):
-            vol_accel_bonus = SECTOR_ALIGNMENT.get('volume_accel_score', 10)
+            vol_accel_bonus = SECTOR_ALIGNMENT.get('volume_accel_score', 10) * bonus_multiplier
 
     div_res = check_divergence(df) if DIVERGENCE['enabled'] else {'bullish': False, 'bearish': False, 'reverse_bullish': False, 'reverse_bearish': False}
 
@@ -194,7 +228,7 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             elif vwap_dev < -0.3: score += params['w_vwap'] * 1.0
             
             if div_res['bullish'] or div_res['reverse_bullish']:
-                current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
+                current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20) * bonus_multiplier
         else:
             if rsi_val > 70: score += params['w_rsi'] * 1.5
             elif rsi_val > 55: score += params['w_rsi'] * 1.0
@@ -203,7 +237,7 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             elif vwap_dev > 0.3: score += params['w_vwap'] * 1.0
             
             if div_res['bearish'] or div_res['reverse_bearish']:
-                current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20)
+                current_div_bonus = SECTOR_ALIGNMENT.get('divergence_bonus_score', 20) * bonus_multiplier
 
         # ボリューム評価 (段階的)
         rvol_val = safe_get(row, 'rvol', 1.0)
@@ -216,7 +250,7 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
         if adx_val > 35: score += params['w_adx'] * 1.5
         elif adx_val > 20: score += params['w_adx'] * 1.0
         
-        # 合計スコア
+        # 合計スコア (地合いによる閾値調整を適用)
         total_score = score + vol_accel_bonus + current_div_bonus
         actual_threshold = params['threshold'] + adj.get('threshold_add', 0)
         
@@ -229,8 +263,12 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             detail['atr'] = atr
             entry_price = row['close']
             
-            sl_dist = atr * params['sl_mul'] * adj.get('sl_mul', 1.0)
+            # SL下限ガード (Roadmap 5.1 / Config同期)
+            min_sl = RISK_MANAGEMENT.get('min_sl_multiplier', 0.7)
+            actual_sl_mul = max(params['sl_mul'], min_sl) * adj.get('sl_mul', 1.0)
+            sl_dist = atr * actual_sl_mul
             sl = entry_price - sl_dist if side == 'long' else entry_price + sl_dist
+            
             tp1_dist = atr * tp1_mul_base * adj.get('tp_mul', 1.0)
             tp1 = entry_price + tp1_dist if side == 'long' else entry_price - tp1_dist
             
@@ -313,8 +351,11 @@ def send_daily_summary():
     results_file = POSITION_MANAGEMENT['trade_results_file']
     if not os.path.exists(results_file): return
     try:
-        df = pd.read_csv(results_file)
+        df = pd.read_csv(results_file, on_bad_lines='warn', engine='python')
         # 不正な日付や数値をクレンジング
+        if 'exit_time' not in df.columns or 'total_profit' not in df.columns:
+            logger.warning("Summary: trade_results.csv format is invalid.")
+            return
         df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True, errors='coerce')
         df = df.dropna(subset=['exit_time'])
 
@@ -342,7 +383,9 @@ def get_today_total_profit() -> float:
     results_file = POSITION_MANAGEMENT['trade_results_file']
     if not os.path.exists(results_file): return 0.0
     try:
-        df = pd.read_csv(results_file)
+        df = pd.read_csv(results_file, on_bad_lines='warn', engine='python')
+        if 'exit_time' not in df.columns or 'total_profit' not in df.columns:
+            return 0.0
         df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True, errors='coerce')
         today = datetime.now(pytz.timezone('Asia/Tokyo')).date()
         df_today = df[df['exit_time'].dt.tz_convert('Asia/Tokyo').dt.date == today]
@@ -398,11 +441,24 @@ def monitor():
     send_discord_notification(WEBHOOK_URL, start_msg)
     apply_macro_adjustments(sentiment)
 
+    # マクロ指標の周期的更新用
+    last_macro_update = 0
+    macro_update_interval = RISK_MANAGEMENT.get('macro_update_interval_sec', 3600) # 1時間ごとに更新
+
     try:
         while True:
             now_jst = datetime.now(tz).time()
             today_str = datetime.now(tz).strftime('%Y-%m-%d')
             
+            # マクロ指標の更新 (Roadmap 6.1)
+            if time.time() - last_macro_update > macro_update_interval:
+                sentiment = fetch_macro_sentiment()
+                global current_macro_sentiment
+                current_macro_sentiment = sentiment
+                apply_macro_adjustments(sentiment)
+                last_macro_update = time.time()
+                logger.info(f"Macro sentiment updated: {sentiment['market_sentiment']}")
+
             # デイリー・ストップロスチェック
             today_profit = get_today_total_profit()
             limit = RISK_MANAGEMENT.get('daily_stop_loss_pct', -3.0)

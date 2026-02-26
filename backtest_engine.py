@@ -126,10 +126,14 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
         if score >= params['threshold']:
             atr = row['atr_14']
             if atr <= 0: continue
+            
+            # SL下限ガードを適用 (Monitorと同期)
+            actual_sl_mul = max(params['sl_mul'], RISK_MANAGEMENT.get('min_sl_multiplier', 0.7))
+            
             position = {
                 'entry_price': row['close'], 'atr': atr, 'tp1_hit': False,
                 'tp1': row['close'] + (atr * tp1_mul) if side == 'long' else row['close'] - (atr * tp1_mul),
-                'sl': row['close'] - (atr * params['sl_mul']) if side == 'long' else row['close'] + (atr * params['sl_mul'])
+                'sl': row['close'] - (atr * actual_sl_mul) if side == 'long' else row['close'] + (atr * actual_sl_mul)
             }
 
     trade_count = len(trades)

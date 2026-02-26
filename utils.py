@@ -298,17 +298,36 @@ def calculate_ma_from_higher_timeframe(df_5m: pd.DataFrame, ma_period: int = 20)
 
 
 def fetch_macro_sentiment() -> Dict[str, float]:
-    result = {'sox_chg': 0.0, 'tnx_chg': 0.0, 'vix_value': 18.0, 'vix_chg': 0.0, 'jpy_chg': 0.0}
-    ticker_alternatives = {'SOX': ['^SOX', 'SOXX'], 'TNX': ['^TNX', 'IEF'], 'VIX': ['^VIX'], 'JPY': ['JPY=X']}
+    result = {'sox_chg': 0.0, 'tnx_chg': 0.0, 'vix_value': 18.0, 'vix_chg': 0.0, 'jpy_chg': 0.0, 'market_sentiment': 0.0}
+    ticker_alternatives = {'SOX': ['^SOX', 'SOXX'], 'TNX': ['^TNX', 'IEF'], 'VIX': ['^VIX'], 'JPY': ['JPY=X'], 'N225': ['^N225']}
+    
+    score = 0.0
     for key, tickers in ticker_alternatives.items():
         for ticker in tickers:
             try:
-                hist = yf.Ticker(ticker).history(period='1mo', interval='1d')
+                hist = yf.Ticker(ticker).history(period='5d', interval='1d')
                 if len(hist) >= 2:
                     latest, previous = float(hist['Close'].iloc[-1]), float(hist['Close'].iloc[-2])
                     change = ((latest / previous) - 1) * 100
-                    if key == 'VIX': result['vix_value'] = round(latest, 2)
-                    result[key.lower() + '_chg' if key != 'VIX' else 'vix_chg'] = round(change, 2)
+                    if key == 'VIX': 
+                        result['vix_value'] = round(latest, 2)
+                        # VIXによるスコアリング
+                        if latest > 25: score -= 0.4
+                        elif latest > 20: score -= 0.2
+                        elif latest < 15: score += 0.2
+                    elif key == 'SOX':
+                        if change > 1.5: score += 0.3
+                        elif change < -1.5: score -= 0.3
+                    elif key == 'N225':
+                        if change > 1.0: score += 0.3
+                        elif change < -1.0: score -= 0.3
+                    
+                    if key != 'VIX' and key != 'N225':
+                        result[key.lower() + '_chg'] = round(change, 2)
+                    elif key == 'VIX':
+                        result['vix_chg'] = round(change, 2)
                     break
             except Exception: continue
+            
+    result['market_sentiment'] = round(np.clip(score, -1.0, 1.0), 2)
     return result

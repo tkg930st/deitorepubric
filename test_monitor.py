@@ -224,11 +224,45 @@ def run_integration_test():
                 raise ValueError(f"引き継ぎフラグが不一致です: {active_date} != {today_str}")
 
             # 5c. 損益計算の安全性 (空データ)
-            print("   💰 損益計算の安全性テスト...")
+            print("   💰 損益計算の安全性テスト (空データ)...")
             with patch('pandas.read_csv', side_effect=FileNotFoundError):
                 profit = monitor.get_today_total_profit()
                 logger.info(f"Daily Profit (No File): {profit}")
                 print(f"   ✅ 空データ時の損益計算成功: {profit}")
+
+            # 5d. CSV破損/形式混在の堅牢性検証 (Ver 15.15 修正確認)
+            print("   🛡️ CSV破損/形式混在の堅牢性テスト...")
+            test_csv = 'test_corrupted_results.csv'
+            # ヘッダー + 正解データ(12列) + 古いデータ(11列) + 破損データ(多すぎる列)
+            csv_content = [
+                "ticker,side,entry_price,entry_time,exit_price,exit_time,exit_reason,tp1_hit,tp1_profit,final_profit,total_profit,logic_type",
+                f"3103.T,LONG,1500.0,{today_str}T10:00:00+09:00,1550.0,{today_str}T11:00:00+09:00,TP1,True,2.5,5.0,5.0,Monthly",
+                f"5801.T,LONG,28000.0,{today_str}T09:30:00+09:00,27800.0,{today_str}T09:45:00+09:00,SL,False,0.0,-0.7,-0.7", # 11列
+                f"9999.T,LONG,100.0,time,110.0,time,reason,False,0.0,10.0,10.0,Monthly,EXTRA_COLUMN" # 13列(破損)
+            ]
+            with open(test_csv, 'w', encoding='utf-8') as f:
+                f.write("\n".join(csv_content))
+            
+            from config import POSITION_MANAGEMENT
+            with patch.dict(POSITION_MANAGEMENT, {'trade_results_file': test_csv}):
+                # 1. 決済済み銘柄の取得 (11列/13列が混ざっていても3103.Tを取得できるか)
+                closed = monitor.get_today_closed_tickers()
+                logger.info(f"Robustness Test (Closed Tickers): {closed}")
+                if '3103.T' in closed:
+                    print("   ✅ 形式混在CSVからの銘柄抽出成功")
+                else:
+                    raise ValueError(f"銘柄抽出に失敗しました: {closed}")
+
+                # 2. 損益計算 (エラーで止まらずに計算できるか)
+                profit = monitor.get_today_total_profit()
+                logger.info(f"Robustness Test (Daily Profit): {profit}")
+                print(f"   ✅ 形式混在CSVからの損益計算成功: {profit}")
+
+                # 3. サマリー送信 (エラーで止まらないか)
+                monitor.send_daily_summary()
+                print(f"   ✅ 形式混在CSVからのサマリー作成(通知試行)成功")
+
+            if os.path.exists(test_csv): os.remove(test_csv)
 
     except Exception as e:
         logger.error(f"Test failed: {e}")
