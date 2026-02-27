@@ -82,15 +82,20 @@ def select_high_volatility_stocks(all_tickers: List[str], sector_df: pd.DataFram
 def worker_analyze_ticker(ticker_info: Dict, period: str, hurdle: float, market_df: pd.DataFrame = None) -> Dict:
     ticker = ticker_info['t']
     try:
-        data = fetch_yfinance_data([ticker], period=period, interval=DATA_FETCH['analyzer_interval'])
-        df = super_flatten_columns(data)
-        df = filter_trading_hours(df)
-        if len(df) < MIN_DATA_POINTS: return None
-        df = calculate_technical_indicators(df)
+        data = fetch_yfinance_data([ticker], period=period, interval='1m')
+        df_1m = super_flatten_columns(data)
+        df_1m = filter_trading_hours(df_1m)
+        if df_1m.empty: return None
         
-        # 地合い連動型最適化 (market_dfを渡す)
-        res_l = optimize_parameters(df, pd.DataFrame(), 'long', OPTIMIZATION_ITERATIONS, market_df=market_df)
-        res_s = optimize_parameters(df, pd.DataFrame(), 'short', OPTIMIZATION_ITERATIONS, market_df=market_df)
+        df_5m = df_1m.resample('5min').agg({'open':'first','high':'max','low':'min','close':'last','volume':'sum'}).dropna()
+        if len(df_5m) < MIN_DATA_POINTS: return None
+        
+        df_inds = calculate_technical_indicators(df_5m)
+        df_inds['ma_15m_20'] = calculate_ma_from_higher_timeframe(df_1m, 20)
+        
+        # 地合い連動型最適化 (1分足と5分足を両方渡す)
+        res_l = optimize_parameters(df_1m, df_inds, 'long', OPTIMIZATION_ITERATIONS, market_df=market_df)
+        res_s = optimize_parameters(df_1m, df_inds, 'short', OPTIMIZATION_ITERATIONS, market_df=market_df)
         
         l_prof = res_l['profit']; s_prof = res_s['profit']
         is_l_valid = l_prof >= hurdle
@@ -194,7 +199,7 @@ def main():
     msg += f"   • AM/PM 監視セッション連携 (自動ハンドオーバー)\n"
     msg += f"   • 実行ログの軽量化 (1MB以内) & 通信ノイズ遮断\n"
     msg += f"   • 取引記録 (ジャーナル・結果) の整合性ガード\n"
-    msg += f"   • ダイバージェンス & 出来高加速スコアリング統合\n"
+    msg += f"   • 属性別精密フィルター (SOX/N225/TOPIX)\n"
     msg += f"   • デイリー・ストップロス (-3.0%) 安全装置実装\n\n"
     
     msg += f"🔔 **次のステップ**:\n"

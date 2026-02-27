@@ -1,6 +1,84 @@
 {
-
-      ,
-  "pm_active": null,
-  "last_update": "2026-02-27T08:31:06.737385+09:00"
+  "positions": {
+    "5801.T": {
+      "ticker": "5801.T",
+      "side": "LONG",
+      "entry_price": 25995.0,
+      "entry_atr": 519.9,
+      "fixed_sl": 25817.98149515169,
+      "tp1": 26374.3253675321,
+      "tp1_hit": true,
+      "tp1_profit": 1.1618195806885838,
+      "highest_price": 27970.0,
+      "lowest_price": 25995.0,
+      "trailing_sl": 27450.1,
+      "entry_time": "2026-02-27T10:55:16.394755+09:00",
+      "logic_type": "Monthly",
+      "params": {
+        "w_rsi": 57,
+        "w_vwap": 18,
+        "w_rvol": 12,
+        "w_adx": 23,
+        "threshold": 44,
+        "sl_mul": 0.3,
+        "tp_mul": 1.155752136730253,
+        "use_rsi_filter": true,
+        "use_vwap_filter": true
+      }
+    },
+    "5706.T": {
+      "ticker": "5706.T",
+      "side": "LONG",
+      "entry_price": 36590.0,
+      "entry_atr": 731.8000000000001,
+      "fixed_sl": 36442.18140867968,
+      "tp1": 36906.75412425783,
+      "tp1_hit": false,
+      "tp1_profit": 0.0,
+      "highest_price": 36850.0,
+      "lowest_price": 36590.0,
+      "trailing_sl": 36442.18140867968,
+      "entry_time": "2026-02-27T13:43:06.016860+09:00",
+      "logic_type": "Monthly",
+      "params": {
+        "w_rsi": 39,
+        "w_vwap": 26,
+        "w_rvol": 89,
+        "w_adx": 16,
+        "threshold": 36,
+        "sl_mul": 0.3,
+        "tp_mul": 6.918443486361314,
+        "use_rsi_filter": false,
+        "use_vwap_filter": true
+      }
+    },
+    "268A.T": {
+      "ticker": "268A.T",
+      "side": "SHORT",
+      "entry_price": 1939.0,
+      "entry_atr": 38.78,
+      "fixed_sl": 1951.476189908274,
+      "tp1": 1915.6949732920805,
+      "tp1_hit": true,
+      "tp1_profit": 0.9893243940175326,
+      "highest_price": 1939.0,
+      "lowest_price": 1908.0,
+      "trailing_sl": 1946.756,
+      "entry_time": "2026-02-27T13:54:49.780024+09:00",
+      "logic_type": "Weekly",
+      "params": {
+        "w_rsi": 83,
+        "w_vwap": 64,
+        "w_rvol": 97,
+        "w_adx": 9,
+        "threshold": 49,
+        "sl_mul": 0.8030149502489634,
+        "tp_mul": 2.2313398173309116,
+        "use_rsi_filter": false,
+        "use_vwap_filter": false
+      }
+    }
+  },
+  "pm_active": false,
+  "last_update": "2026-02-27T15:10:04.682641+09:00"
 }

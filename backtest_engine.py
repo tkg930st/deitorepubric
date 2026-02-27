@@ -210,23 +210,57 @@ def run_precise_backtest(df_1m: pd.DataFrame, df_inds: pd.DataFrame, params: Dic
 
     trade_count = len(trades)
     if trade_count == 0: return {'profit': 0.0, 'rr_score': 0.0, 'fitness': 0.0, 'trade_count': 0}
-    
-    avg_profit = np.mean(trades)
-    rr_efficiency = avg_profit / params['sl_mul']
-    fitness = total_profit * (rr_efficiency if rr_efficiency > 0 else 0.1) * np.log1p(trade_count)
-    if trade_count < 2: fitness *= 0.05
-    
-    return {'profit': total_profit, 'rr_score': rr_efficiency, 'fitness': fitness, 'trade_count': trade_count}
+
+    # --- 改善されたフィットネス関数 ---
+    # 問題: 旧式 fitness = total_profit * rr_efficiency * log(trade_count) は
+    #       「取引を増やせば有利」な構造で、低閾値・多エントリー設定が優位になっていた。
+    # 改善: 勝率 × プロフィットファクター × 適切取引数ペナルティ で評価する。
+
+    win_count = sum(1 for t in trades if t > 0)
+    win_rate  = win_count / trade_count
+
+    gross_profit = sum(t for t in trades if t > 0)
+    gross_loss   = -sum(t for t in trades if t < 0)
+    profit_factor = gross_profit / (gross_loss + 1e-6)  # ゼロ除算防止
+    profit_factor = min(profit_factor, 4.0)              # 上限キャップ（外れ値対策）
+
+    # 理想取引数ウィンドウ: 月次3〜12件, 週次2〜6件
+    # 範囲外は取引数に比例してペナルティ（過剰取引を抑制）
+    ideal_min, ideal_max = 3, 12
+    if trade_count < ideal_min:
+        trade_factor = max(0.3, trade_count / ideal_min)   # 少なすぎは軽微ペナルティ
+    elif trade_count > ideal_max:
+        over = trade_count - ideal_max
+        trade_factor = max(0.2, 1.0 - 0.05 * over)        # 多すぎは急速にペナルティ
+    else:
+        trade_factor = 1.0
+
+    # sl_mulが実効値(min_sl_multiplier=0.7)に切り上げられるため、
+    # rr_efficiencyの計算も実効SL倍率で行う
+    effective_sl = max(params['sl_mul'], RISK_MANAGEMENT.get('min_sl_multiplier', 0.7))
+    rr_efficiency = np.mean(trades) / effective_sl
+
+    fitness = total_profit * win_rate * profit_factor * trade_factor
+    if trade_count < 2: fitness *= 0.05  # 1件のみは信頼性ゼロ扱い
+
+    return {'profit': total_profit, 'rr_score': rr_efficiency, 'fitness': fitness,
+            'trade_count': trade_count, 'win_rate': win_rate, 'profit_factor': profit_factor}
 
 def get_random_params() -> Dict:
     r = PARAM_RANGES
+    # 閾値を3ゾーンに均等分散して探索（旧: 下限付近のみ探索し低閾値設定が優位になっていた）
+    # 低(30-70): 高頻度シグナル候補 / 中(70-130): バランス候補 / 高(130-180): 厳選候補
+    zone = random.choice(['low', 'mid', 'high'])
+    threshold_by_zone = {'low': (30, 70), 'mid': (70, 130), 'high': (130, 180)}
+    t_min, t_max = threshold_by_zone[zone]
+    # PARAM_RANGESの上限を超えないようクリップ
+    t_max = min(t_max, r['threshold'][1])
     return {
         'w_rsi': random.randint(r['w_rsi'][0], r['w_rsi'][1]),
         'w_vwap': random.randint(r['w_vwap'][0], r['w_vwap'][1]),
         'w_rvol': random.randint(r['w_rvol'][0], r['w_rvol'][1]),
         'w_adx': random.randint(r['w_adx'][0], r['w_adx'][1]),
-        # 閾値を低めに開始して取引を発生させる (探索範囲の下限付近から)
-        'threshold': random.randint(r['threshold'][0], r['threshold'][0] + 40),
+        'threshold': random.randint(t_min, t_max),
         'sl_mul': random.uniform(r['sl_mul'][0], r['sl_mul'][1]),
         'tp_mul': random.uniform(r['tp_mul'][0], r['tp_mul'][1]),
         # フィルタは最初はオフ寄りにする
@@ -252,7 +286,7 @@ def mutate_params(p: Dict) -> Dict:
 def optimize_parameters(df: pd.DataFrame, df_15m: pd.DataFrame, side: str, 
                         iterations: int = 500, precise_check: int = 20, market_df: pd.DataFrame = None) -> Dict:
     candidates = []
-    # 1. 初期探索 (30%の試行で多様な種を生成)
+    # 1. 初期探索 (30%の試行で多様な種を生成。3ゾーン均等分散で閾値の偏りを排除)
     for _ in range(int(iterations * 0.3)):
         p = get_random_params()
         res = run_precise_backtest(df, df_15m, p, side, market_df=market_df)
@@ -272,4 +306,17 @@ def optimize_parameters(df: pd.DataFrame, df_15m: pd.DataFrame, side: str,
             candidates.append({'params': p, **res})
         
     best = sorted(candidates, key=lambda x: x['fitness'], reverse=True)[0]
+
+    # 3. 閾値下限ガード: MIN_SCORE_THRESHOLDを適用
+    #    最適化結果が極端に低い閾値を出力しても、best_config.jsonへの書き込みを防ぐ
+    MIN_THRESHOLD = PARAM_RANGES.get('threshold', (10, 200))[0]  # config定義の下限
+    PRACTICAL_MIN = 30  # 実運用上の最低閾値 (過剰エントリーを防ぐ安全ネット)
+    effective_min = max(MIN_THRESHOLD, PRACTICAL_MIN)
+    if best['params']['threshold'] < effective_min:
+        logger.warning(
+            f"Optimizer returned threshold={best['params']['threshold']}, "
+            f"applying floor={effective_min} to prevent over-trading."
+        )
+        best['params']['threshold'] = effective_min
+
     return best

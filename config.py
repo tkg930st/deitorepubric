@@ -32,7 +32,7 @@ PARAM_RANGES = {
     'w_rvol': (0, 100),
     'w_adx': (0, 100),
     'threshold': (10, 200),
-    'sl_mul': (0.3, 4.0),
+    'sl_mul': (0.7, 4.0),   # 0.3→0.7: min_sl_multiplierと同期（バックテストと本番のSL下限を一致させる）
     'tp_mul': (1.0, 10.0)
 }
 
