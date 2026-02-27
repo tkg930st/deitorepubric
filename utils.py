@@ -308,7 +308,7 @@ def calculate_ma_from_higher_timeframe(df_1m: pd.DataFrame, ma_period: int = 20)
 
 def fetch_macro_sentiment() -> Dict[str, float]:
     result = {'sox_chg': 0.0, 'tnx_chg': 0.0, 'vix_value': 18.0, 'vix_chg': 0.0, 'jpy_chg': 0.0, 'topix_chg': 0.0, 'market_sentiment': 0.0}
-    ticker_alternatives = {'SOX': ['^SOX', 'SOXX'], 'TNX': ['^TNX', 'IEF'], 'VIX': ['^VIX'], 'JPY': ['JPY=X'], 'N225': ['^N225'], 'TOPX': ['^TOPX', '1306.T']}
+    ticker_alternatives = {'SOX': ['^SOX', 'SOXX'], 'TNX': ['^TNX', 'IEF'], 'VIX': ['^VIX'], 'JPY': ['JPY=X'], 'N225': ['^N225', '^NKX'], 'TOPX': ['1306.T', '^TOPIX', '0P0001CYO3.T']}
     
     score = 0.0
     for key, tickers in ticker_alternatives.items():

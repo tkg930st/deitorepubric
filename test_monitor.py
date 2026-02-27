@@ -208,15 +208,17 @@ def run_integration_test():
             
             # 新規シグナル通知のテスト
             monitor.current_macro_adjustments = {'threshold_add': 5.0, 'tp_mul': 1.25, 'sl_mul': 1.15}
-            monitor.send_discord_notification("http://dummy",
-                f"[SIGNAL] 新規シグナル (Ver 15.15): LONG\n"
+            signal_msg_mock = (
+                f"🛡️ **新規シグナル (Ver 15.15): LONG**\n"
                 f"銘柄: {ticker} (Monthly)\n"
-                f"価格: {latest_price_1m:,.1f}\n"
-                f"TP1: {latest_price_1m * 1.02:,.1f} (ATR x 1.25)\n"
-                f"SL: {latest_price_1m * 0.98:,.1f} (ATR x 1.15)\n"
+                f"価格: ¥{latest_price_1m:,.1f}\n"
+                f"TP1: ¥{latest_price_1m * 1.02:,.1f} (ATR×1.25) → 50%決済\n"
+                f"TP2: トレーリング (ATR×1.00幅)\n"
+                f"SL: ¥{latest_price_1m * 0.98:,.1f} (ATR×1.15)\n"
                 f"スコア: 85.0 (判定閾値: 41.0)\n"
                 f"指標: RSI:70.1, VWAP:+1.50%"
             )
+            monitor.send_discord_notification("http://dummy", signal_msg_mock)
             # --- 模擬呼び出しここまで ---
 
             # 2. ポジション追加テスト (positions.json書き込み相当)
@@ -226,14 +228,25 @@ def run_integration_test():
             # 3. TP1達成と決済記録テスト (trade_results.csv書き込み相当)
             print("   [*] ポジション決済テスト...")
             # TP1 notification test
-            monitor.send_discord_notification("http://dummy", 
-                f"[TP1] {ticker}: 50%利確完了 損益:+2.00% リスク縮小済み"
+            tp1_msg_mock = (
+                f"✅ **TP1達成: {ticker}**\n"
+                f"🎯 50%利確完了\n"
+                f"・価格: ¥{latest_price_1m:,.1f}\n"
+                f"・損益: +2.00%\n"
+                f"・リスクを半分（建値近辺）に縮小しました\n"
+                f"・残り50%はトレーリングTP (ATR×1.0) で追従中"
             )
+            monitor.send_discord_notification("http://dummy", tp1_msg_mock)
+            
             # EXIT notification test
             pm.close_position(ticker, latest_price_1m * 1.05, 'STOP_LOSS')
-            monitor.send_discord_notification("http://dummy", 
-                f"[EXIT] {ticker}: STOP_LOSS 損益:+5.00%"
+            exit_msg_mock = (
+                f"🛑 **[EXIT] {ticker}**\n"
+                f"理由：損切り / トレーリング\n"
+                f"損益：+5.00% (Monthly)\n"
+                f"決済単価：¥{latest_price_1m * 1.05:,.1f}"
             )
+            monitor.send_discord_notification("http://dummy", exit_msg_mock)
 
             print(f"   [OK] 通知・ジャーナル・ポジション・決済記録の全ロジック検証完了")
 
@@ -324,7 +337,8 @@ def run_integration_test():
                 print(f"   [OK] 形式混在CSVからの損益計算成功: {profit}")
 
                 # 3. サマリー送信 (エラーで止まらないか)
-                monitor.send_daily_summary()
+                with patch('monitor.send_discord_notification', side_effect=log_notification):
+                    monitor.send_daily_summary()
                 print(f"   [OK] 形式混在CSVからのサマリー作成(通知試行)成功")
 
             if os.path.exists(test_csv): os.remove(test_csv)

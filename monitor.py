@@ -144,7 +144,7 @@ def get_today_closed_trades() -> List[Dict]:
     results_file = POSITION_MANAGEMENT.get('trade_results_file', 'trade_results.csv')
     if not os.path.exists(results_file): return []
     try:
-        df = pd.read_csv(results_file, on_bad_lines='warn', engine='python')
+        df = pd.read_csv(results_file, on_bad_lines='skip', engine='python')
         if df.empty: return []
         df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True, errors='coerce')
         df = df.dropna(subset=['exit_time'])
@@ -265,11 +265,32 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
             'market_sentiment': ms_val, 'rsi': rsi_val, 'vwap_dev': vwap_dev, 'rvol': rvol_val,
             'adx': adx_val, 'ma15_value': ma15_val, 'ma15_diff_pct': ((row['close']/ma15_val-1)*100) if ma15_val else 0,
             'vix_value': current_macro_sentiment.get('vix_value', 0),
-            'divergence_bullish': div_res.get('bullish', False), 'score': score, 'threshold': actual_threshold,
+            'sox_chg': current_macro_sentiment.get('sox_chg', 0),
+            'tnx_chg': current_macro_sentiment.get('tnx_chg', 0),
+            'divergence_bullish': div_res.get('bullish', False),
+            'divergence_bearish': div_res.get('bearish', False),
+            'cooldown_overridden': False,
+            'score': score, 'threshold': actual_threshold,
             'sector_alignment': 1.0, 'volume_accel': 0.0, 'divergence_bonus': 0.0
         }
         record_trade_journal(journal_entry)
-        send_discord_notification(WEBHOOK_URL, f"🛡️ **シグナル発生: {side.upper()}**\n銘柄: {ticker}\n価格: ¥{row['close']:,.1f}\nSL: ¥{sl:,.1f}\n地合い: {ms_val:+.2f}")
+        
+        # 通知: 新規シグナル (Ver 15.15)
+        logic_type = detail.get('logic_type', 'Unknown')
+        tp1_mul = tp1_mul_base * adj.get('tp_mul', 1.0)
+        trailing_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
+        signal_msg = (
+            f"🛡️ **新規シグナル (Ver 15.15): {side.upper()}**\n"
+            f"銘柄: {ticker} ({logic_type})\n"
+            f"価格: ¥{row['close']:,.1f}\n"
+            f"TP1: ¥{tp1:,.1f} (ATR×{tp1_mul:.2f}) → 50%決済\n"
+            f"TP2: トレーリング (ATR×{trailing_mul:.2f}幅)\n"
+            f"SL: ¥{sl:,.1f} (ATR×{actual_sl_mul:.2f})\n"
+            f"スコア: {score:.1f} (判定閾値: {actual_threshold:.1f})\n"
+            f"指標: RSI:{rsi_val:.1f}, VWAP:{vwap_dev:+.2f}%"
+        )
+        send_discord_notification(WEBHOOK_URL, signal_msg)
+        
         position_manager.add_position(ticker, side.upper(), row['close'], detail, sl=sl, tp1=tp1)
         break
 
@@ -303,11 +324,28 @@ def monitor_positions(ticker: str, current_price: float, df_inds: pd.DataFrame, 
     )
     
     if event == 'TP1_HIT':
-        send_discord_notification(WEBHOOK_URL, f"✅ **TP1達成: {ticker}**\n価格: ¥{current_price:,.1f}\nリスクを縮小しました")
+        pos_info = position_manager.get_position(ticker)
+        tp1_profit = pos_info.get('tp1_profit', 0.0) if pos_info else 0.0
+        trailing_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
+        tp1_msg = (
+            f"✅ **TP1達成: {ticker}**\n"
+            f"🎯 50%利確完了\n"
+            f"・価格: ¥{current_price:,.1f}\n"
+            f"・損益: {tp1_profit:+.2f}%\n"
+            f"・リスクを半分（建値近辺）に縮小しました\n"
+            f"・残り50%はトレーリングTP (ATR×{trailing_mul:.1f}) で追従中"
+        )
+        send_discord_notification(WEBHOOK_URL, tp1_msg)
     elif event in ['STOP_LOSS', 'TIME_MAX_LIMIT', 'TIME_DECAY_COUNTER']:
         res = position_manager.close_position(ticker, current_price, event)
         reason_msg = "損切り / トレーリング" if event == 'STOP_LOSS' else ("120分強制決済" if event == 'TIME_MAX_LIMIT' else "60分経過＆逆シグナル検知決済")
-        send_discord_notification(WEBHOOK_URL, f"🛑 **[EXIT] {res['ticker']}**\n理由：{reason_msg}\n損益：{res['profit_pct']:+.2f}%")
+        exit_msg = (
+            f"🛑 **[EXIT] {res['ticker']}**\n"
+            f"理由：{reason_msg}\n"
+            f"損益：{res['profit_pct']:+.2f}% ({res.get('logic_type', 'Unknown')})\n"
+            f"決済単価：¥{res['exit_price']:,.1f}"
+        )
+        send_discord_notification(WEBHOOK_URL, exit_msg)
 
 def send_daily_summary():
     results_file = POSITION_MANAGEMENT['trade_results_file']
@@ -318,13 +356,29 @@ def send_daily_summary():
         df_today = df[df['exit_time'].dt.tz_convert('Asia/Tokyo').dt.date == today]
         if df_today.empty: return
         total_profit = pd.to_numeric(df_today['total_profit'], errors='coerce').sum()
-        send_discord_notification(WEBHOOK_URL, f"📊 **本日の最終結果サマリー**\n💰 **総合損益: {total_profit:+.2f}%**")
+        
+        msg = f"📊 **本日の最終結果サマリー**\n\n💰 **総合損益: {total_profit:+.2f}%**\n━━━━━━━━━━━━━━\n"
+        
+        monthly_trades = df_today[df_today['logic_type'] == 'Monthly']
+        if not monthly_trades.empty:
+            msg += "📅 **Monthly 戦略結果**\n"
+            for _, row in monthly_trades.iterrows():
+                msg += f"• {row['ticker']} ({row['side']}): {row['total_profit']:+.2f}% [{row['exit_reason']}]\n"
+            msg += "\n"
+            
+        weekly_trades = df_today[df_today['logic_type'] == 'Weekly']
+        if not weekly_trades.empty:
+            msg += "📅 **Weekly 戦略結果**\n"
+            for _, row in weekly_trades.iterrows():
+                msg += f"• {row['ticker']} ({row['side']}): {row['total_profit']:+.2f}% [{row['exit_reason']}]\n"
+                
+        send_discord_notification(WEBHOOK_URL, msg.strip())
     except Exception as e: logger.error(f"Summary error: {e}")
 
 def get_today_total_profit() -> float:
     results_file = POSITION_MANAGEMENT['trade_results_file']
     try:
-        df = pd.read_csv(results_file, on_bad_lines='warn', engine='python')
+        df = pd.read_csv(results_file, on_bad_lines='skip', engine='python')
         today = datetime.now(pytz.timezone('Asia/Tokyo')).date()
         df['exit_time'] = pd.to_datetime(df['exit_time'], utc=True, errors='coerce')
         df_today = df[df['exit_time'].dt.tz_convert('Asia/Tokyo').dt.date == today]
@@ -372,9 +426,12 @@ def monitor():
                 break
             
             if time.time() - last_macro_update > macro_update_interval:
-                sentiment = fetch_macro_sentiment()
-                current_macro_sentiment = sentiment
-                apply_macro_adjustments(sentiment)
+                try:
+                    sentiment = fetch_macro_sentiment()
+                    current_macro_sentiment = sentiment
+                    apply_macro_adjustments(sentiment)
+                except Exception as e:
+                    logger.warning(f"Macro sentiment update failed (使用中の値を継続): {e}")
                 last_macro_update = time.time()
 
             today_profit = get_today_total_profit()
@@ -404,7 +461,14 @@ def monitor():
             except Exception as e: logger.error(f"Loop error: {e}")
             time.sleep(MONITORING_LOOP['loop_interval'])
     finally:
-        if SESSION_TYPE == 'PM': position_manager.set_pm_active(False)
+        # PMセッション終了時は必ずフラグをリセットし、サマリー通知を試みる
+        if SESSION_TYPE == 'PM':
+            position_manager.set_pm_active(False)
+            if not SKIP_DAILY_SUMMARY:
+                try:
+                    send_daily_summary()
+                except Exception as e:
+                    logger.error(f"Final summary failed: {e}")
 
 if __name__ == "__main__":
     tz = pytz.timezone('Asia/Tokyo')
