@@ -4,3 +4,21 @@ __pycache__/
 .env
 venv/
 .venv/
+
+# 実行時生成ファイル (コミット対象外)
+execution_log.txt
+retest_log.txt
+retest_output.txt
+retest.log
+debug_out.log
+error.log
+test_run.log
+test_monitor_log.txt
+
+# 一時スクリプト
+debug_retest.py
+analysis_scratch.py
+
+# 実行時JSON (ポジション・クールダウン)
+positions.json
+daily_cooldown.json

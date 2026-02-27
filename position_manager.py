@@ -109,10 +109,10 @@ class PositionManager:
         self.save_positions()
         logger.info(f"Position Added: {ticker} ({side}) SL={sl:.1f}, TP1={tp1:.1f}")
 
-    def update_price(self, ticker: str, current_price: float) -> Optional[str]:
+    def update_price(self, ticker: str, current_price: float, current_time: datetime, counter_signal_score: float = 0.0, limit_score: float = 50.0) -> Optional[str]:
         """
         価格更新とイベント判定
-        戻り値: 'TP1_HIT', 'STOP_LOSS', または None
+        戻り値: 'TP1_HIT', 'STOP_LOSS', 'TIME_DECAY_COUNTER', 'TIME_MAX_LIMIT', または None
         """
         if ticker not in self.positions: return None
         pos = self.positions[ticker]
@@ -122,44 +122,58 @@ class PositionManager:
         
         event = None
         
-        # 1. 最高値/最安値の更新
-        if side == 'LONG':
-            if current_price > pos['highest_price']:
-                pos['highest_price'] = current_price
-                # TP1ヒット後は高値に合わせてSLを引き上げる (トレーリング)
-                if pos['tp1_hit']:
-                    new_sl = current_price - (atr * trailing_mul)
-                    pos['trailing_sl'] = max(pos['trailing_sl'], new_sl)
-        else: # SHORT
-            if current_price < pos['lowest_price']:
-                pos['lowest_price'] = current_price
-                # TP1ヒット後は安値に合わせてSLを引き下げる (トレーリング)
-                if pos['tp1_hit']:
-                    new_sl = current_price + (atr * trailing_mul)
-                    pos['trailing_sl'] = min(pos['trailing_sl'], new_sl)
+        # 0. タイムディケイ（時間経過）判定
+        try:
+            entry_t = datetime.fromisoformat(pos['entry_time']).astimezone(tz)
+            duration_min = (current_time - entry_t).total_seconds() / 60.0
+            
+            if duration_min >= 120:
+                event = 'TIME_MAX_LIMIT'
+            elif duration_min >= 60 and counter_signal_score >= limit_score:
+                event = 'TIME_DECAY_COUNTER'
+        except Exception as e:
+            logger.error(f"Time decay check error for {ticker}: {e}")
+        
+        # 1. 最高値/最安値の更新 (タイムディケイで決済済みの場合はスキップ)
+        if not event:
+            if side == 'LONG':
+                if current_price > pos['highest_price']:
+                    pos['highest_price'] = current_price
+                    # TP1ヒット後は高値に合わせてSLを引き上げる (トレーリング)
+                    if pos['tp1_hit']:
+                        new_sl = current_price - (atr * trailing_mul)
+                        pos['trailing_sl'] = max(pos['trailing_sl'], new_sl)
+            else: # SHORT
+                if current_price < pos['lowest_price']:
+                    pos['lowest_price'] = current_price
+                    # TP1ヒット後は安値に合わせてSLを引き下げる (トレーリング)
+                    if pos['tp1_hit']:
+                        new_sl = current_price + (atr * trailing_mul)
+                        pos['trailing_sl'] = min(pos['trailing_sl'], new_sl)
 
-        # 2. TP1達成チェック
-        if not pos['tp1_hit']:
-            if (side == 'LONG' and current_price >= pos['tp1']) or \
-               (side == 'SHORT' and current_price <= pos['tp1']):
-                pos['tp1_hit'] = True
-                # TP1到達時の利益を記録 (スリッページ適用)
-                if side == 'LONG':
-                    pos['tp1_profit'] = ((current_price / pos['entry_price']) - 1 - SLIPPAGE) * 100
-                else:
-                    pos['tp1_profit'] = (1 - (current_price / pos['entry_price']) - SLIPPAGE) * 100
-                # リスク低減 (建値付近へ)
-                if side == 'LONG':
-                    pos['trailing_sl'] = max(pos['trailing_sl'], pos['entry_price'] - (atr * 0.2))
-                else:
-                    pos['trailing_sl'] = min(pos['trailing_sl'], pos['entry_price'] + (atr * 0.2))
-                event = 'TP1_HIT'
+            # 2. TP1達成チェック
+            if not pos['tp1_hit']:
+                if (side == 'LONG' and current_price >= pos['tp1']) or \
+                   (side == 'SHORT' and current_price <= pos['tp1']):
+                    pos['tp1_hit'] = True
+                    # TP1到達時の利益を記録 (スリッページ適用)
+                    if side == 'LONG':
+                        pos['tp1_profit'] = ((current_price / pos['entry_price']) - 1 - SLIPPAGE) * 100
+                    else:
+                        pos['tp1_profit'] = (1 - (current_price / pos['entry_price']) - SLIPPAGE) * 100
+                    # リスク低減 (建値付近へ)
+                    if side == 'LONG':
+                        pos['trailing_sl'] = max(pos['trailing_sl'], pos['entry_price'] - (atr * 0.2))
+                    else:
+                        pos['trailing_sl'] = min(pos['trailing_sl'], pos['entry_price'] + (atr * 0.2))
+                    event = 'TP1_HIT'
 
-        # 3. 決済判定 (STOP_LOSS または トレーリング決済)
-        if side == 'LONG':
-            if current_price <= pos['trailing_sl']: event = 'STOP_LOSS'
-        else: # SHORT
-            if current_price >= pos['trailing_sl']: event = 'STOP_LOSS'
+            # 3. 決済判定 (STOP_LOSS または トレーリング決済)
+            if not event:
+                if side == 'LONG':
+                    if current_price <= pos['trailing_sl']: event = 'STOP_LOSS'
+                else: # SHORT
+                    if current_price >= pos['trailing_sl']: event = 'STOP_LOSS'
             
         self.save_positions()
         return event

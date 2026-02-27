@@ -33,6 +33,7 @@ from utils import (
     safe_get, fetch_macro_sentiment, check_divergence
 )
 from position_manager import PositionManager
+from backtest_engine import calculate_single_score
 
 # ロギング設定
 logging.basicConfig(
@@ -175,34 +176,21 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
         params = side_params[side]
         if detail.get(f'{side}_disabled', False): continue
         
-        st = SIGNAL_THRESHOLDS
-        rsi_val = safe_get(row, 'rsi_14', 50)
-        vwap_dev = safe_get(row, 'vwap_dev', 0)
-        
+        # 1. 厳格なデータバリデーション (backtest_engine.pyと完全同期)
+        rsi_val = safe_get(row, 'rsi_14', np.nan)
+        vwap_dev = safe_get(row, 'vwap_dev', np.nan)
+        adx_val = safe_get(row, 'adx_14', np.nan)
+        if pd.isna(rsi_val) or pd.isna(vwap_dev) or pd.isna(adx_val) or adx_val == 0.0:
+            continue  # 指標データ不完全な場合はスキップ
+
         if params.get('use_rsi_filter', True):
-            if (side == 'long' and rsi_val >= st['rsi_filter_long_max']) or (side == 'short' and rsi_val <= st['rsi_filter_short_min']): continue
+            if (side == 'long' and rsi_val >= SIGNAL_THRESHOLDS['rsi_filter_long_max']) or (side == 'short' and rsi_val <= SIGNAL_THRESHOLDS['rsi_filter_short_min']): continue
         if params.get('use_vwap_filter', True):
-            if (side == 'long' and vwap_dev >= st['vwap_filter_max']) or (side == 'short' and vwap_dev <= -st['vwap_filter_max']): continue
+            if (side == 'long' and vwap_dev >= SIGNAL_THRESHOLDS['vwap_filter_max']) or (side == 'short' and vwap_dev <= -SIGNAL_THRESHOLDS['vwap_filter_max']): continue
 
-        # 1. 基礎テクニカルスコアリング
-        score = 0.0
-        if side == 'long':
-            if rsi_val < st['rsi_oversold']: score += params['w_rsi'] * 1.5
-            elif rsi_val < st['rsi_buy_moderate']: score += params['w_rsi'] * 1.0
-            if vwap_dev < -st['vwap_dev_strong']: score += params['w_vwap'] * 1.5
-            elif vwap_dev < -st['vwap_dev_moderate']: score += params['w_vwap'] * 1.0
-        else:
-            if rsi_val > st['rsi_overbought']: score += params['w_rsi'] * 1.5
-            elif rsi_val > st['rsi_sell_moderate']: score += params['w_rsi'] * 1.0
-            if vwap_dev > st['vwap_dev_strong']: score += params['w_vwap'] * 1.5
-            elif vwap_dev > st['vwap_dev_moderate']: score += params['w_vwap'] * 1.0
-
-        rvol_val = safe_get(row, 'rvol', 1.0)
-        if rvol_val > st['rvol_strong']: score += params['w_rvol'] * 2.0
-        elif rvol_val > st['rvol_moderate']: score += params['w_rvol'] * 1.0
-        adx_val = safe_get(row, 'adx_14', 0)
-        if adx_val > st['adx_strong']: score += params['w_adx'] * 1.5
-        elif adx_val > st['adx_moderate']: score += params['w_adx'] * 1.0
+        # 2. テクニカルスコアリング (backtest_engine.calculate_single_scoreと完全同期)
+        score, indicators = calculate_single_score(row, params, side, div_res if DIVERGENCE['enabled'] else None)
+        rvol_val = indicators.get('rvol', 1.0)
         
         actual_threshold = params['threshold'] + adj.get('threshold_add', 0)
         if score < actual_threshold: continue
@@ -285,15 +273,41 @@ def check_new_signal(ticker: str, df: pd.DataFrame, detail: Dict):
         position_manager.add_position(ticker, side.upper(), row['close'], detail, sl=sl, tp1=tp1)
         break
 
-def monitor_positions(ticker: str, current_price: float):
-    event = position_manager.update_price(ticker, current_price)
+def monitor_positions(ticker: str, current_price: float, df_inds: pd.DataFrame, detail: Dict):
     pos = position_manager.get_position(ticker)
     if not pos: return
+    
+    # タイムディケイ監視用：逆方向のスコアを計算
+    side = pos['side'].lower()
+    opposite_side = 'short' if side == 'long' else 'long'
+    params = detail['params'].get(opposite_side, {})
+    counter_score = 0.0
+    limit_score = 50.0  # デフォルト
+    
+    if params and not df_inds.empty:
+        limit_score = params.get('threshold', 50.0)
+        try:
+            # 最新の指標行を使って逆方向スコアを評価
+            row = df_inds.iloc[-1]
+            counter_score, _ = calculate_single_score(row, params, opposite_side)
+        except Exception as e:
+            logger.warning(f"Counter score calc error for {ticker}: {e}")
+
+    tz = pytz.timezone('Asia/Tokyo')
+    event = position_manager.update_price(
+        ticker, 
+        current_price, 
+        current_time=datetime.now(tz),
+        counter_signal_score=counter_score,
+        limit_score=limit_score
+    )
+    
     if event == 'TP1_HIT':
         send_discord_notification(WEBHOOK_URL, f"✅ **TP1達成: {ticker}**\n価格: ¥{current_price:,.1f}\nリスクを縮小しました")
-    elif event == 'STOP_LOSS':
-        res = position_manager.close_position(ticker, current_price, 'STOP_LOSS')
-        send_discord_notification(WEBHOOK_URL, f"🛑 **[EXIT] {res['ticker']}**\n理由：STOP_LOSS\n損益：{res['profit_pct']:+.2f}%")
+    elif event in ['STOP_LOSS', 'TIME_MAX_LIMIT', 'TIME_DECAY_COUNTER']:
+        res = position_manager.close_position(ticker, current_price, event)
+        reason_msg = "損切り / トレーリング" if event == 'STOP_LOSS' else ("120分強制決済" if event == 'TIME_MAX_LIMIT' else "60分経過＆逆シグナル検知決済")
+        send_discord_notification(WEBHOOK_URL, f"🛑 **[EXIT] {res['ticker']}**\n理由：{reason_msg}\n損益：{res['profit_pct']:+.2f}%")
 
 def send_daily_summary():
     results_file = POSITION_MANAGEMENT['trade_results_file']
@@ -382,7 +396,7 @@ def monitor():
                     
                     check_structure_signal(ticker, df_inds)
                     if position_manager.has_position(ticker):
-                        monitor_positions(ticker, latest_price)
+                        monitor_positions(ticker, latest_price, df_inds, details[ticker])
                     else:
                         check_df = df_inds.copy()
                         check_df.loc[check_df.index[-1], 'close'] = latest_price
@@ -393,4 +407,15 @@ def monitor():
         if SESSION_TYPE == 'PM': position_manager.set_pm_active(False)
 
 if __name__ == "__main__":
+    tz = pytz.timezone('Asia/Tokyo')
+    now = datetime.now(tz)
+    
+    # --- AMセッション(12時前)の起動時のみ、前日の不要なログを削除 ---
+    if now.hour < 12:
+        if os.path.exists(LOG_FILE):
+            try:
+                os.remove(LOG_FILE)
+            except Exception:
+                pass
+                
     monitor()

@@ -264,7 +264,7 @@ def check_divergence(df: pd.DataFrame, lookback: int = 25) -> Dict[str, bool]:
 
 
 def check_trend_filter(current_price: float, ma15_value: float, side: str) -> bool:
-    if pd.isna(ma15_value) or ma15_value == 0: return True
+    if pd.isna(ma15_value) or ma15_value == 0: return False  # Block entries if missing data
     return current_price > ma15_value if side == 'LONG' else current_price < ma15_value
 
 
@@ -290,12 +290,20 @@ def detect_market_structure(df: pd.DataFrame, lookback: int = 5) -> Dict:
     except Exception: return {'type': None, 'direction': None, 'price': 0.0}
 
 
-def calculate_ma_from_higher_timeframe(df_5m: pd.DataFrame, ma_period: int = 20) -> pd.Series:
+def calculate_ma_from_higher_timeframe(df_1m: pd.DataFrame, ma_period: int = 20) -> pd.Series:
+    """
+    1分足データから15分足の移動平均(M15)を計算し、1分足のインデックスに合わせる
+    """
     try:
-        df_15m = df_5m.resample('15min').agg({'open': 'first', 'high': 'max', 'low': 'min', 'close': 'last', 'volume': 'sum'}).dropna()
+        # 1. 1m足を15m足にリサンプリング
+        df_15m = df_1m.resample('15min').agg({'open': 'first', 'high': 'max', 'low': 'min', 'close': 'last', 'volume': 'sum'}).dropna()
+        # 2. 15m足上でMAを計算
         ma_15m = df_15m['close'].rolling(window=ma_period).mean()
-        return ma_15m.reindex(df_5m.index, method='ffill')
-    except Exception: return pd.Series(index=df_5m.index, dtype=float)
+        # 3. 1m足のインデックスに合わせて前値補完 (ffill)
+        return ma_15m.reindex(df_1m.index, method='ffill')
+    except Exception as e:
+        logger.error(f"MA calculation error: {e}")
+        return pd.Series(index=df_1m.index, dtype=float)
 
 
 def fetch_macro_sentiment() -> Dict[str, float]:
