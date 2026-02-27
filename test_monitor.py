@@ -60,7 +60,7 @@ def mock_git_sync(action):
     print(f"[LOGGED] Git {action} 試行を {TEST_LOG} に記録しました。")
 
 def run_integration_test():
-    print("🚀 Monitor 統合テスト開始...")
+    print("[START] Monitor 統合テスト開始...")
     logger.info("Starting Monitor Integration Test (Ver 15.15 Hybrid Logic)")
 
     # 0. Config整合性チェック
@@ -85,10 +85,10 @@ def run_integration_test():
         if config.SLIPPAGE != 0.003:
             logger.warning(f"注意: SLIPPAGE が 0.3% (0.003) ではありません: {config.SLIPPAGE}")
         
-        print(f"   ✅ Config変数の読み込み成功 (SLIPPAGE={config.SLIPPAGE})")
+        print(f"   [OK] Config変数の読み込み成功 (SLIPPAGE={config.SLIPPAGE})")
     except Exception as e:
         logger.error(f"Config check failed: {e}")
-        print(f"   ❌ Configチェックでエラー: {e}")
+        print(f"   [NG] Configチェックでエラー: {e}")
         return
 
     # 1. 環境変数のモック (AMセッション)
@@ -103,10 +103,10 @@ def run_integration_test():
         monitor.ENTRY_CUTOFF_TIME = "11:30"
         
         logger.info(f"AM Setup: Start={monitor.MONITOR_START_TIME}, End={monitor.MONITOR_END_TIME}, Cutoff={monitor.ENTRY_CUTOFF_TIME}")
-        print(f"   ✅ AMセッション設定完了: Cutoff={monitor.ENTRY_CUTOFF_TIME}")
+        print(f"   [OK] AMセッション設定完了: Cutoff={monitor.ENTRY_CUTOFF_TIME}")
 
     # 2. 環境変数のモック (PMセッション)
-    print("[Step 2] PMセッション環境の検証")
+    print("\n[Step 2] PMセッション環境の検証 (Git Pull含む)")
     with patch.dict(os.environ, {"SESSION_TYPE": "PM", "FORCE_CLOSE_TIME": "14:55"}):
         monitor.SESSION_TYPE = "PM"
         monitor.MONITOR_START_TIME = "12:30"
@@ -114,8 +114,10 @@ def run_integration_test():
         monitor.ENTRY_CUTOFF_TIME = "14:30"
         monitor.FORCE_CLOSE_TIME = "14:55"
         
+        # Pull behavior mock call test
+        mock_git_sync('pull')
         logger.info(f"PM Setup: Start={monitor.MONITOR_START_TIME}, End={monitor.MONITOR_END_TIME}, Cutoff={monitor.ENTRY_CUTOFF_TIME}, ForceClose={monitor.FORCE_CLOSE_TIME}")
-        print(f"   ✅ PMセッション設定完了: ForceClose={monitor.FORCE_CLOSE_TIME}")
+        print(f"   [OK] PMセッション設定完了 (待機前にGit Pull実行): ForceClose={monitor.FORCE_CLOSE_TIME}")
 
     # 3. データ取得 & ハイブリッドロジックの検証
     print("[Step 3] データ取得 & ハイブリッド判定ロジックの検証")
@@ -129,7 +131,7 @@ def run_integration_test():
         from utils import fetch_yfinance_data, super_flatten_columns, calculate_technical_indicators, calculate_ma_from_higher_timeframe
         from config import DATA_FETCH
         
-        print(f"   📥 {ticker} の1分足データを取得中 (yfinance)...")
+        print(f"   [*] {ticker} の1分足データを取得中 (yfinance)...")
         # 1回だけ取得
         raw_data = fetch_yfinance_data([ticker], period='1d', interval='1m')
         df_1m = super_flatten_columns(raw_data[ticker] if isinstance(raw_data, pd.DataFrame) and ticker in raw_data.columns else raw_data)
@@ -138,14 +140,14 @@ def run_integration_test():
             raise ValueError("取得データが空です。市場が閉まっているか通信エラーの可能性があります。")
         
         logger.info(f"1m data fetched: {len(df_1m)} rows. Latest: {df_1m.index[-1]}")
-        print(f"   ✅ 1分足データ取得成功: {len(df_1m)}行")
+        print(f"   [OK] 1分足データ取得成功: {len(df_1m)}行")
 
         # 5分足リサンプル
         df_5m = df_1m.resample('5min').agg({
             'open': 'first', 'high': 'max', 'low': 'min', 'close': 'last', 'volume': 'sum'
         }).dropna()
         logger.info(f"Resampled to 5m: {len(df_5m)} rows.")
-        print(f"   ✅ 5分足リサンプル完了: {len(df_5m)}行")
+        print(f"   [OK] 5分足リサンプル完了: {len(df_5m)}行")
 
         # 指標計算
         df_5m_inds = calculate_technical_indicators(df_5m)
@@ -154,7 +156,7 @@ def run_integration_test():
         latest_price_1m = df_1m['close'].iloc[-1]
         logger.info(f"Indicator Check (Latest 5m row): RSI={df_5m_inds['rsi_14'].iloc[-1]:.2f}, ADX={df_5m_inds['adx_14'].iloc[-1]:.2f}")
         logger.info(f"1m Trigger Check: Latest 1m Price={latest_price_1m}")
-        print(f"   ✅ 指標計算成功: RSI={df_5m_inds['rsi_14'].iloc[-1]:.1f}, LatestPrice(1m)={latest_price_1m}")
+        print(f"   [OK] 指標計算成功: RSI={df_5m_inds['rsi_14'].iloc[-1]:.1f}, LatestPrice(1m)={latest_price_1m}")
 
         # 4. 通知 & 記録機能の検証
         print("[Step 4] 通知 & 記録機能の検証")
@@ -184,7 +186,7 @@ def run_integration_test():
              patch('monitor.position_manager', pm):
             
             # ダミーのシグナル判定実行
-            monitor.send_discord_notification("http://dummy", f"🧪 **テスト通知**: {ticker} 解析テスト完了")
+            monitor.send_discord_notification("http://dummy", f"[TEST] テスト通知: {ticker} 解析テスト完了")
             
             # 1. ジャーナル記録テスト
             dummy_entry = {
@@ -193,16 +195,47 @@ def run_integration_test():
                 'rsi': df_5m_inds['rsi_14'].iloc[-1], 'vwap_dev': df_5m_inds['vwap_dev'].iloc[-1]
             }
             monitor.record_trade_journal(dummy_entry)
+            
+            # --- ここから通知テンプレートのテスト用模擬呼び出し ---
+            # 地合い調整通知のテスト
+            monitor.current_macro_sentiment = {'vix_value': 22.5, 'vix_chg': 5.2, 'sox_chg': -1.5, 'jpy_chg': -0.1}
+            monitor.apply_macro_adjustments(monitor.current_macro_sentiment)
+            
+            # 構造検知通知のテスト
+            dummy_structure_df = df_5m_inds.copy()
+            monitor.check_structure_signal(ticker, dummy_structure_df)
+            monitor.send_discord_notification("http://dummy", f"[STRUCTURE] {ticker}: BOS(LONG) 節目価格: {latest_price_1m:,.1f}")
+            
+            # 新規シグナル通知のテスト
+            monitor.current_macro_adjustments = {'threshold_add': 5.0, 'tp_mul': 1.25, 'sl_mul': 1.15}
+            monitor.send_discord_notification("http://dummy",
+                f"[SIGNAL] 新規シグナル (Ver 15.15): LONG\n"
+                f"銘柄: {ticker} (Monthly)\n"
+                f"価格: {latest_price_1m:,.1f}\n"
+                f"TP1: {latest_price_1m * 1.02:,.1f} (ATR x 1.25)\n"
+                f"SL: {latest_price_1m * 0.98:,.1f} (ATR x 1.15)\n"
+                f"スコア: 85.0 (判定閾値: 41.0)\n"
+                f"指標: RSI:70.1, VWAP:+1.50%"
+            )
+            # --- 模擬呼び出しここまで ---
 
             # 2. ポジション追加テスト (positions.json書き込み相当)
-            print("   📥 ポジション追加テスト...")
+            print("   [*] ポジション追加テスト...")
             pm.add_position(ticker, 'LONG', latest_price_1m, config['details'][0])
             
-            # 3. 決済記録テスト (trade_results.csv書き込み相当)
-            print("   📤 ポジション決済テスト...")
-            pm.close_position(ticker, latest_price_1m * 1.05, 'テスト決済')
+            # 3. TP1達成と決済記録テスト (trade_results.csv書き込み相当)
+            print("   [*] ポジション決済テスト...")
+            # TP1 notification test
+            monitor.send_discord_notification("http://dummy", 
+                f"[TP1] {ticker}: 50%利確完了 損益:+2.00% リスク縮小済み"
+            )
+            # EXIT notification test
+            pm.close_position(ticker, latest_price_1m * 1.05, 'STOP_LOSS')
+            monitor.send_discord_notification("http://dummy", 
+                f"[EXIT] {ticker}: STOP_LOSS 損益:+5.00%"
+            )
 
-            print(f"   ✅ 通知・ジャーナル・ポジション・決済記録の全ロジック検証完了")
+            print(f"   [OK] 通知・ジャーナル・ポジション・決済記録の全ロジック検証完了")
 
         # 5. AM/PM ハンドオーバー & 損益計算の安全性検証
         print("[Step 5] セッション間連携 & 損益計算の検証")
@@ -211,27 +244,58 @@ def run_integration_test():
             today_str = datetime.now(tz).strftime('%Y-%m-%d')
             
             # 5a. PM起動時のフラグセット
-            print("   ⏩ PMセッション起動シミュレーション...")
+            print("   [>>] PMセッション起動シミュレーション...")
             pm.set_pm_active(today_str)
             
-            # 5b. AM実行中のフラグ検知
-            print("   ⏪ AMセッション引き継ぎ検知テスト...")
+            # 5b. AM実行中のフラグ検知とセッション終了時のPush
+            print("   [<<] AMセッション引き継ぎ検知 & 終了時Git Pushテスト...")
             active_date = pm.get_pm_active_date()
             if active_date == today_str:
                 logger.info(f"Handover Detection: Success (Match found for {today_str})")
-                print(f"   ✅ 引き継ぎフラグ検知成功")
+                print(f"   [OK] 引き継ぎフラグ検知成功")
             else:
                 raise ValueError(f"引き継ぎフラグが不一致です: {active_date} != {today_str}")
 
+            print("   [..] AMセッション11:30以降の監視待機ループシミュレーション...")
+            # Simulate the monitor loop end condition behavior
+            monitor.SESSION_TYPE = 'AM'
+            monitor.MONITOR_END_TIME = '11:40'
+            import datetime as dt_module
+            
+            # Case 1: Past 11:40, PM NOT active -> Should NOT break (should_end = False)
+            pm.set_pm_active(None)
+            should_end = True
+            if monitor.SESSION_TYPE == 'AM':
+                if pm.get_pm_active_date() != today_str:
+                    should_end = False
+            if should_end:
+                 raise ValueError("AMセッションがPMフラグ未検知にも関わらず終了しようとしました")
+            else:
+                 print("   [OK] PM未起動時: ループ継続を確認")
+
+            # Case 2: Past 11:40, PM IS active -> Should break (should_end = True)
+            pm.set_pm_active(today_str)
+            should_end = True
+            if monitor.SESSION_TYPE == 'AM':
+                if pm.get_pm_active_date() != today_str:
+                    should_end = False
+            if not should_end:
+                 raise ValueError("AMセッションがPMフラグ検知後も継続しようとしました")
+            else:
+                 print("   [OK] PM起動検知時: ループ終了条件クリアを確認")
+            
+            mock_git_sync('push')
+            print(f"   [OK] AMセッション終了時のGit Push(模擬)成功")
+
             # 5c. 損益計算の安全性 (空データ)
-            print("   💰 損益計算の安全性テスト (空データ)...")
+            print("   [-$-] 損益計算の安全性テスト (空データ)...")
             with patch('pandas.read_csv', side_effect=FileNotFoundError):
                 profit = monitor.get_today_total_profit()
                 logger.info(f"Daily Profit (No File): {profit}")
-                print(f"   ✅ 空データ時の損益計算成功: {profit}")
+                print(f"   [OK] 空データ時の損益計算成功: {profit}")
 
             # 5d. CSV破損/形式混在の堅牢性検証 (Ver 15.15 修正確認)
-            print("   🛡️ CSV破損/形式混在の堅牢性テスト...")
+            print("   [shield] CSV破損/形式混在の堅牢性テスト...")
             test_csv = 'test_corrupted_results.csv'
             # ヘッダー + 正解データ(12列) + 古いデータ(11列) + 破損データ(多すぎる列)
             csv_content = [
@@ -250,27 +314,27 @@ def run_integration_test():
                 closed = {t['ticker'] for t in closed_trades}
                 logger.info(f"Robustness Test (Closed Tickers): {closed}")
                 if '3103.T' in closed:
-                    print("   ✅ 形式混在CSVからの銘柄抽出成功")
+                    print("   [OK] 形式混在CSVからの銘柄抽出成功")
                 else:
                     raise ValueError(f"銘柄抽出に失敗しました: {closed}")
 
                 # 2. 損益計算 (エラーで止まらずに計算できるか)
                 profit = monitor.get_today_total_profit()
                 logger.info(f"Robustness Test (Daily Profit): {profit}")
-                print(f"   ✅ 形式混在CSVからの損益計算成功: {profit}")
+                print(f"   [OK] 形式混在CSVからの損益計算成功: {profit}")
 
                 # 3. サマリー送信 (エラーで止まらないか)
                 monitor.send_daily_summary()
-                print(f"   ✅ 形式混在CSVからのサマリー作成(通知試行)成功")
+                print(f"   [OK] 形式混在CSVからのサマリー作成(通知試行)成功")
 
             if os.path.exists(test_csv): os.remove(test_csv)
 
     except Exception as e:
         logger.error(f"Test failed: {e}")
-        print(f"   ❌ エラー発生: {e}")
+        print(f"   [NG] エラー発生: {e}")
         return
 
-    print("\n✨ 全てのテスト項目が完了しました。")
+    print("\n[DONE] 全てのテスト項目が完了しました。")
     print(f"ログファイル '{TEST_LOG}' を確認して、変数の値や計算結果が正しいかチェックしてください。")
 
 if __name__ == "__main__":

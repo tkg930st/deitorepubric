@@ -60,42 +60,80 @@ def calculate_single_score(row: pd.Series, params: Dict, side: str, div_res: Dic
     
     return total_score, indicators
 
-def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, side: str, market_df: pd.DataFrame = None) -> Dict:
-    if df.empty: return {'profit': 0.0, 'rr_score': 0.0, 'fitness': 0.0, 'trade_count': 0}
+def run_precise_backtest(df_1m: pd.DataFrame, df_inds: pd.DataFrame, params: Dict, side: str, market_df: pd.DataFrame = None) -> Dict:
+    if df_1m.empty or df_inds.empty: return {'profit': 0.0, 'rr_score': 0.0, 'fitness': 0.0, 'trade_count': 0}
     
     trades = []; position = None; total_profit = 0.0
     tp1_mul = POSITION_MANAGEMENT.get('tp1_multiplier', 1.5)
     tp1_exit_ratio = POSITION_MANAGEMENT.get('tp1_exit_ratio', 0.5)
-
+    trailing_mul = POSITION_MANAGEMENT.get('trailing_atr_multiplier', 1.0)
     lookback = DIVERGENCE.get('lookback', 25)
-    for idx in range(len(df)):
-        row = df.iloc[idx]
+
+    # df_inds のインデックスをリスト化し、高速に直近の5分足指標を検索できるようにする
+    ind_times = df_inds.index
+
+    for idx in range(len(df_1m)):
+        row = df_1m.iloc[idx]
         curr_dt = row.name
 
+        # 現在時刻以前の最新の5分足指標を取得 (ポジション保有中もカウンターシグナル判定に使用)
+        valid_inds = ind_times[ind_times <= curr_dt]
+        if len(valid_inds) == 0: continue
+        latest_ind_time = valid_inds[-1]
+        ind_row = df_inds.loc[latest_ind_time]
+
         if position:
-            h, l = row['high'], row['low']
+            h, l, c = row['high'], row['low'], row['close']
             exit_reason = None
 
-            if not position['tp1_hit']:
-                if (side == 'long' and h >= position['tp1']) or (side == 'short' and l <= position['tp1']):
-                    position['tp1_hit'] = True
-                    # TP1損益を記録
-                    if side == 'long':
-                        position['tp1_profit'] = ((position['tp1'] / position['entry_price']) - 1 - SLIPPAGE) * 100
-                    else:
-                        position['tp1_profit'] = (1 - (position['tp1'] / position['entry_price']) - SLIPPAGE) * 100
-                    # TP1後はリスクを半分に縮小した位置にSLを移動
-                    if side == 'long': position['sl'] = max(position['sl'], position['entry_price'] - (position['atr'] * 0.5))
-                    else: position['sl'] = min(position['sl'], position['entry_price'] + (position['atr'] * 0.5))
+            # 0. タイムディケイ（時間経過）判定
+            duration_min = (curr_dt - position['entry_time']).total_seconds() / 60.0
+            if duration_min >= 120:
+                exit_reason = "TIME_MAX_LIMIT"
+            elif duration_min >= 60:
+                # カウンターシグナル判定
+                opp_side = 'short' if side == 'long' else 'long'
+                opp_thresh = params.get('threshold', 50.0)
+                try:
+                    c_score, _ = calculate_single_score(ind_row, params, opp_side) # パラメータは共通とする
+                    if c_score >= opp_thresh:
+                        exit_reason = "TIME_DECAY_COUNTER"
+                except: pass
 
-            # 決済判定
-            if (side == 'long' and l <= position['sl']) or (side == 'short' and h >= position['sl']):
-                exit_reason = "STOP_LOSS"
-            elif idx == len(df) - 1:
-                exit_reason = "SESSION_CLOSE"
+            # 1. 最高値/最安値の更新 (トレーリング用)
+            if not exit_reason:
+                if side == 'long':
+                    if c > position['highest_price']:
+                        position['highest_price'] = c
+                        if position['tp1_hit']:
+                            position['sl'] = max(position['sl'], c - (position['atr'] * trailing_mul))
+                else:
+                    if c < position['lowest_price']:
+                        position['lowest_price'] = c
+                        if position['tp1_hit']:
+                            position['sl'] = min(position['sl'], c + (position['atr'] * trailing_mul))
+
+                # 2. TP1ヒット判定
+                if not position['tp1_hit']:
+                    if (side == 'long' and h >= position['tp1']) or (side == 'short' and l <= position['tp1']):
+                        position['tp1_hit'] = True
+                        # TP1損益を記録
+                        if side == 'long':
+                            position['tp1_profit'] = ((position['tp1'] / position['entry_price']) - 1 - SLIPPAGE) * 100
+                        else:
+                            position['tp1_profit'] = (1 - (position['tp1'] / position['entry_price']) - SLIPPAGE) * 100
+                        # TP1後はリスクを半分以下(建値付近)に縮小
+                        if side == 'long': position['sl'] = max(position['sl'], position['entry_price'] - (position['atr'] * 0.2))
+                        else: position['sl'] = min(position['sl'], position['entry_price'] + (position['atr'] * 0.2))
+
+                # 3. 決済判定 (STOP_LOSS 優先)
+                if (side == 'long' and l <= position['sl']) or (side == 'short' and h >= position['sl']):
+                    exit_reason = "STOP_LOSS"
+                elif idx == len(df_1m) - 1:
+                    exit_reason = "SESSION_CLOSE"
 
             if exit_reason:
-                exit_price = position['sl'] if exit_reason == "STOP_LOSS" else row['close']
+                exit_price = position['sl'] if exit_reason == "STOP_LOSS" else c
                 remaining_p = ((exit_price / position['entry_price']) - 1 - SLIPPAGE) * 100 if side == 'long' else (1 - (exit_price / position['entry_price']) - SLIPPAGE) * 100
 
                 # TP1到達済み: 50%×TP1損益 + 50%×残ポジション損益
@@ -108,6 +146,22 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
                 position = None
             continue
 
+        # エントリー判定ロジック (ポジションなし時)
+        # 【厳格なデータバリデーション】(NaN/0.0ブロック) Monitorと完全同期
+        rsi_val = safe_get(ind_row, 'rsi_14', np.nan)
+        vwap_dev = safe_get(ind_row, 'vwap_dev', np.nan)
+        ma15 = safe_get(ind_row, 'ma_15m_20', np.nan)
+        adx_val = safe_get(ind_row, 'adx_14', np.nan)
+        
+        if pd.isna(rsi_val) or pd.isna(vwap_dev) or pd.isna(ma15) or pd.isna(adx_val) or adx_val == 0.0:
+            continue # 指標データが不完全な場合はスコアリングを完全ブロック
+
+        # トレンドフィルター (MA15による乖離判定)
+        if params.get('use_trend_filter', True):
+            price_for_ma = row['close']
+            if not check_trend_filter(price_for_ma, ma15, params, side):
+                continue
+                
         # --- 地合いシミュレーション (Monitorと同期) ---
         if market_df is not None:
             try:
@@ -124,28 +178,32 @@ def run_precise_backtest(df: pd.DataFrame, df_15m: pd.DataFrame, params: Dict, s
 
         # エントリーフィルター (SIGNAL_THRESHOLDS参照)
         st = SIGNAL_THRESHOLDS
-        rsi_val = safe_get(row, 'rsi_14', 50)
-        vwap_dev = safe_get(row, 'vwap_dev', 0)
         if params.get('use_rsi_filter', True):
             if (side == 'long' and rsi_val >= st['rsi_filter_long_max']) or (side == 'short' and rsi_val <= st['rsi_filter_short_min']): continue
         if params.get('use_vwap_filter', True):
             if (side == 'long' and vwap_dev >= st['vwap_filter_max']) or (side == 'short' and vwap_dev <= -st['vwap_filter_max']): continue
 
-        # ダイバージェンス算出 (その時点までの過去データを使用)
+        # ダイバージェンス算出 (その時点までの過去5分足データを使用)
         div_res = None
-        if idx >= lookback:
-            div_res = check_divergence(df.iloc[idx-lookback:idx+1])
+        ind_idx = df_inds.index.get_loc(latest_ind_time)
+        if isinstance(ind_idx, slice): ind_idx = ind_idx.stop - 1 # 重複対処
+        elif isinstance(ind_idx, np.ndarray): ind_idx = np.where(ind_idx)[0][-1]
+        
+        if ind_idx >= lookback:
+            div_res = check_divergence(df_inds.iloc[ind_idx-lookback:ind_idx+1])
 
-        score, inds = calculate_single_score(row, params, side, div_res=div_res)
+        score, _ = calculate_single_score(ind_row, params, side, div_res=div_res)
         if score >= params['threshold']:
-            atr = row['atr_14']
-            if atr <= 0: continue
+            atr = ind_row['atr_14']
+            if atr <= 0 or pd.isna(atr): continue
             
             # SL下限ガードを適用 (Monitorと同期)
             actual_sl_mul = max(params['sl_mul'], RISK_MANAGEMENT.get('min_sl_multiplier', 0.7))
             
             position = {
-                'entry_price': row['close'], 'atr': atr, 'tp1_hit': False, 'tp1_profit': 0.0,
+                'entry_price': row['close'], 'entry_time': curr_dt, 'atr': atr, 
+                'tp1_hit': False, 'tp1_profit': 0.0,
+                'highest_price': row['close'], 'lowest_price': row['close'],
                 'tp1': row['close'] + (atr * tp1_mul) if side == 'long' else row['close'] - (atr * tp1_mul),
                 'sl': row['close'] - (atr * actual_sl_mul) if side == 'long' else row['close'] + (atr * actual_sl_mul)
             }
